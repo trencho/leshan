@@ -1,5 +1,17 @@
 package org.eclipse.leshan.client.demo;
 
+import org.eclipse.leshan.client.request.ServerIdentity;
+import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
+import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.response.ExecuteResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
+import org.eclipse.leshan.util.NamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -9,19 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.TimeZone;
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.eclipse.leshan.client.request.ServerIdentity;
-import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.core.node.LwM2mResource;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.response.WriteResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class MyDevice extends BaseInstanceEnabler {
 
@@ -33,55 +35,56 @@ public class MyDevice extends BaseInstanceEnabler {
 
     public MyDevice() {
         // notify new date each 5 second
-        Timer timer = new Timer("Device-Current Time");
-        timer.schedule(new TimerTask() {
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Device-Current Time"));
+        scheduler.scheduleAtFixedRate(new Runnable() {
+
             @Override
             public void run() {
                 fireResourcesChange(13);
             }
-        }, 5000, 5000);
+        }, 5, 5, TimeUnit.SECONDS);
     }
 
     @Override
     public ReadResponse read(ServerIdentity identity, int resourceid) {
         LOG.info("Read on Device Resource " + resourceid);
         switch (resourceid) {
-        case 0:
-            return ReadResponse.success(resourceid, getManufacturer());
-        case 1:
-            return ReadResponse.success(resourceid, getModelNumber());
-        case 2:
-            return ReadResponse.success(resourceid, getSerialNumber());
-        case 3:
-            return ReadResponse.success(resourceid, getFirmwareVersion());
-        case 9:
-            return ReadResponse.success(resourceid, getBatteryLevel());
-        case 10:
-            return ReadResponse.success(resourceid, getMemoryFree());
-        case 11:
-            Map<Integer, Long> errorCodes = new HashMap<>();
-            errorCodes.put(0, getErrorCode());
-            return ReadResponse.success(resourceid, errorCodes, Type.INTEGER);
-        case 13:
-            return ReadResponse.success(resourceid, getCurrentTime());
-        case 14:
-            return ReadResponse.success(resourceid, getUtcOffset());
-        case 15:
-            return ReadResponse.success(resourceid, getTimezone());
-        case 16:
-            return ReadResponse.success(resourceid, getSupportedBinding());
-        case 17:
-            return ReadResponse.success(resourceid, getDeviceType());
-        case 18:
-            return ReadResponse.success(resourceid, getHardwareVersion());
-        case 19:
-            return ReadResponse.success(resourceid, getSoftwareVersion());
-        case 20:
-            return ReadResponse.success(resourceid, getBatteryStatus());
-        case 21:
-            return ReadResponse.success(resourceid, getMemoryTotal());
-        default:
-            return super.read(identity, resourceid);
+            case 0:
+                return ReadResponse.success(resourceid, getManufacturer());
+            case 1:
+                return ReadResponse.success(resourceid, getModelNumber());
+            case 2:
+                return ReadResponse.success(resourceid, getSerialNumber());
+            case 3:
+                return ReadResponse.success(resourceid, getFirmwareVersion());
+            case 9:
+                return ReadResponse.success(resourceid, getBatteryLevel());
+            case 10:
+                return ReadResponse.success(resourceid, getMemoryFree());
+            case 11:
+                Map<Integer, Long> errorCodes = new HashMap<>();
+                errorCodes.put(0, getErrorCode());
+                return ReadResponse.success(resourceid, errorCodes, Type.INTEGER);
+            case 13:
+                return ReadResponse.success(resourceid, getCurrentTime());
+            case 14:
+                return ReadResponse.success(resourceid, getUtcOffset());
+            case 15:
+                return ReadResponse.success(resourceid, getTimezone());
+            case 16:
+                return ReadResponse.success(resourceid, getSupportedBinding());
+            case 17:
+                return ReadResponse.success(resourceid, getDeviceType());
+            case 18:
+                return ReadResponse.success(resourceid, getHardwareVersion());
+            case 19:
+                return ReadResponse.success(resourceid, getSoftwareVersion());
+            case 20:
+                return ReadResponse.success(resourceid, getBatteryStatus());
+            case 21:
+                return ReadResponse.success(resourceid, getMemoryTotal());
+            default:
+                return super.read(identity, resourceid);
         }
     }
 
@@ -97,18 +100,18 @@ public class MyDevice extends BaseInstanceEnabler {
     public WriteResponse write(ServerIdentity identity, int resourceid, LwM2mResource value) {
         LOG.info("Write on Device Resource " + resourceid + " value " + value);
         switch (resourceid) {
-        case 13:
-            return WriteResponse.notFound();
-        case 14:
-            setUtcOffset((String) value.getValue());
-            fireResourcesChange(resourceid);
-            return WriteResponse.success();
-        case 15:
-            setTimezone((String) value.getValue());
-            fireResourcesChange(resourceid);
-            return WriteResponse.success();
-        default:
-            return super.write(identity, resourceid, value);
+            case 13:
+                return WriteResponse.notFound();
+            case 14:
+                setUtcOffset((String) value.getValue());
+                fireResourcesChange(resourceid);
+                return WriteResponse.success();
+            case 15:
+                setTimezone((String) value.getValue());
+                fireResourcesChange(resourceid);
+                return WriteResponse.success();
+            default:
+                return super.write(identity, resourceid, value);
         }
     }
 

@@ -1,15 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2013-2015 Sierra Wireless and others.
- * 
+ *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
- * 
+ *
  * The Eclipse Public License is available at
  *    http://www.eclipse.org/legal/epl-v10.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
- * 
+ *
  * Contributors:
  *     Zebra Technologies - initial API and implementation
  *     Sierra Wireless, - initial API and implementation
@@ -17,21 +17,6 @@
  *******************************************************************************/
 
 package org.eclipse.leshan.client.demo;
-
-import static org.eclipse.leshan.LwM2mId.*;
-import static org.eclipse.leshan.client.object.Security.*;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
@@ -54,50 +39,46 @@ import org.eclipse.leshan.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
+import static org.eclipse.leshan.LwM2mId.DEVICE;
+import static org.eclipse.leshan.LwM2mId.LOCATION;
+import static org.eclipse.leshan.LwM2mId.SECURITY;
+import static org.eclipse.leshan.LwM2mId.SERVER;
+import static org.eclipse.leshan.client.object.Security.noSec;
+import static org.eclipse.leshan.client.object.Security.noSecBootstap;
+import static org.eclipse.leshan.client.object.Security.psk;
+import static org.eclipse.leshan.client.object.Security.pskBootstrap;
+import static org.eclipse.leshan.client.object.Security.rpk;
+import static org.eclipse.leshan.client.object.Security.rpkBootstrap;
+import static org.eclipse.leshan.client.object.Security.x509;
+import static org.eclipse.leshan.client.object.Security.x509Bootstrap;
+
 public class LeshanClientDemo {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeshanClientDemo.class);
 
-    private final static String[] modelPaths = new String[] { "3303.xml" };
+    private final static String[] modelPaths = new String[] { "3303.xml", "3304.xml" };
 
     private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
+    private static final int OBJECT_ID_HUMIDITY_SENSOR = 3304;
     private final static String DEFAULT_ENDPOINT = "LeshanClientDemo";
     private final static String USAGE = "java -jar leshan-client-demo.jar [OPTION]\n\n";
-
-    private static MyLocation locationInstance;
 
     public static void main(final String[] args) {
 
         // Define options for command line tools
         Options options = new Options();
-
-        final StringBuilder PSKChapter = new StringBuilder();
-        PSKChapter.append("\n .");
-        PSKChapter.append("\n .");
-        PSKChapter.append("\n ================================[ PSK ]=================================");
-        PSKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        PSKChapter.append("\n | To use PSK, -i and -p options should be used together.               |");
-        PSKChapter.append("\n ------------------------------------------------------------------------");
-
-        final StringBuilder RPKChapter = new StringBuilder();
-        RPKChapter.append("\n .");
-        RPKChapter.append("\n .");
-        RPKChapter.append("\n ================================[ RPK ]=================================");
-        RPKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        RPKChapter.append("\n | To use RPK, -cpubk -cprik -spubk options should be used together.    |");
-        RPKChapter.append("\n | To get helps about files format and how to generate it, see :        |");
-        RPKChapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
-        RPKChapter.append("\n ------------------------------------------------------------------------");
-
-        final StringBuilder X509Chapter = new StringBuilder();
-        X509Chapter.append("\n .");
-        X509Chapter.append("\n .");
-        X509Chapter.append("\n ================================[X509]==================================");
-        X509Chapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        X509Chapter.append("\n | To use X509, -ccert -cprik -scert options should be used together.   |");
-        X509Chapter.append("\n | To get helps about files format and how to generate it, see :        |");
-        X509Chapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
-        X509Chapter.append("\n ------------------------------------------------------------------------");
 
         options.addOption("h", "help", false, "Display help information.");
         options.addOption("n", true, String.format(
@@ -110,13 +91,35 @@ public class LeshanClientDemo {
                 LwM2m.DEFAULT_COAP_PORT));
         options.addOption("pos", true,
                 "Set the initial location (latitude, longitude) of the device to be reported by the Location object.\n Format: lat_float:long_float");
+        String PSKChapter = "\n ." +
+                "\n ." +
+                "\n ================================[ PSK ]=================================" +
+                "\n | By default Leshan demo use non secure connection.                    |" +
+                "\n | To use PSK, -i and -p options should be used together.               |" +
+                "\n ------------------------------------------------------------------------";
         options.addOption("sf", true, "Scale factor to apply when shifting position.\n Default is 1.0." + PSKChapter);
         options.addOption("i", true, "Set the LWM2M or Bootstrap server PSK identity in ascii.");
+        String RPKChapter = "\n ." +
+                "\n ." +
+                "\n ================================[ RPK ]=================================" +
+                "\n | By default Leshan demo use non secure connection.                    |" +
+                "\n | To use RPK, -cpubk -cprik -spubk options should be used together.    |" +
+                "\n | To get helps about files format and how to generate it, see :        |" +
+                "\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |" +
+                "\n ------------------------------------------------------------------------";
         options.addOption("p", true, "Set the LWM2M or Bootstrap server Pre-Shared-Key in hexa." + RPKChapter);
         options.addOption("cpubk", true,
                 "The path to your client public key file.\n The public Key should be in SubjectPublicKeyInfo format (DER encoding).");
         options.addOption("cprik", true,
                 "The path to your client private key file.\nThe private key should be in PKCS#8 format (DER encoding).");
+        String X509Chapter = "\n ." +
+                "\n ." +
+                "\n ================================[X509]==================================" +
+                "\n | By default Leshan demo use non secure connection.                    |" +
+                "\n | To use X509, -ccert -cprik -scert options should be used together.   |" +
+                "\n | To get helps about files format and how to generate it, see :        |" +
+                "\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |" +
+                "\n ------------------------------------------------------------------------";
         options.addOption("spubk", true,
                 "The path to your server public key file.\n The public Key should be in SubjectPublicKeyInfo format (DER encoding)."
                         + X509Chapter);
@@ -273,7 +276,7 @@ public class LeshanClientDemo {
 
         Float latitude = null;
         Float longitude = null;
-        Float scaleFactor = 1.0f;
+        float scaleFactor = 1.0f;
         // get initial Location
         if (cl.hasOption("pos")) {
             try {
@@ -294,7 +297,7 @@ public class LeshanClientDemo {
         }
         if (cl.hasOption("sf")) {
             try {
-                scaleFactor = Float.valueOf(cl.getOptionValue("sf"));
+                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
             } catch (NumberFormatException e) {
                 System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
                 formatter.printHelp(USAGE, options);
@@ -308,16 +311,15 @@ public class LeshanClientDemo {
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
-            return;
         }
     }
 
     public static void createAndStartClient(String endpoint, String localAddress, int localPort, boolean needBootstrap,
-            String serverURI, byte[] pskIdentity, byte[] pskKey, PrivateKey clientPrivateKey, PublicKey clientPublicKey,
-            PublicKey serverPublicKey, X509Certificate clientCertificate, X509Certificate serverCertificate,
-            Float latitude, Float longitude, float scaleFactor) throws CertificateEncodingException {
+                                            String serverURI, byte[] pskIdentity, byte[] pskKey, PrivateKey clientPrivateKey, PublicKey clientPublicKey,
+                                            PublicKey serverPublicKey, X509Certificate clientCertificate, X509Certificate serverCertificate,
+                                            Float latitude, Float longitude, float scaleFactor) throws CertificateEncodingException {
 
-        locationInstance = new MyLocation(latitude, longitude, scaleFactor);
+        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -360,7 +362,9 @@ public class LeshanClientDemo {
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
+        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new TemperatureSensor());
+        initializer.setInstancesForObject(OBJECT_ID_HUMIDITY_SENSOR, new HumiditySensor());
+//        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
         List<LwM2mObjectEnabler> enablers = initializer.createAll();
 
         // Create CoAP Config
@@ -383,9 +387,8 @@ public class LeshanClientDemo {
 
         // Display client public key to easily add it in demo servers.
         if (clientPublicKey != null) {
-            PublicKey rawPublicKey = clientPublicKey;
-            if (rawPublicKey instanceof ECPublicKey) {
-                ECPublicKey ecPublicKey = (ECPublicKey) rawPublicKey;
+            if (clientPublicKey instanceof ECPublicKey) {
+                ECPublicKey ecPublicKey = (ECPublicKey) clientPublicKey;
                 // Get x coordinate
                 byte[] x = ecPublicKey.getW().getAffineX().toByteArray();
                 if (x[0] == 0)
@@ -402,7 +405,7 @@ public class LeshanClientDemo {
                 LOG.info(
                         "Client uses RPK : \n Elliptic Curve parameters  : {} \n Public x coord : {} \n Public y coord : {} \n Public Key (Hex): {} \n Private Key (Hex): {}",
                         params, Hex.encodeHexString(x), Hex.encodeHexString(y),
-                        Hex.encodeHexString(rawPublicKey.getEncoded()),
+                        Hex.encodeHexString(clientPublicKey.getEncoded()),
                         Hex.encodeHexString(clientPrivateKey.getEncoded()));
 
             } else {
