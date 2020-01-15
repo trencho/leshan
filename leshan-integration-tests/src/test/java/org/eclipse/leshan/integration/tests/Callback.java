@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Callback<T extends LwM2mResponse> implements ResponseCallback<T>, ErrorCallback {
 

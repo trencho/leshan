@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import java.util.Date;
-import java.util.Map;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
@@ -25,6 +22,9 @@ import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
+
+import java.util.Date;
+import java.util.Map;
 
 public class ReadResponse extends AbstractLwM2mResponse {
 

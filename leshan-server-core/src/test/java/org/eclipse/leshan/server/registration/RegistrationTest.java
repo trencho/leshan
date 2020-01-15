@@ -15,16 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import static org.junit.Assert.*;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-
 import org.eclipse.leshan.Link;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.registration.Registration.Builder;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class RegistrationTest {
 

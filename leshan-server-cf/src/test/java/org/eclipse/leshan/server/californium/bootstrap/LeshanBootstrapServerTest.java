@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import static org.junit.Assert.assertEquals;
-
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.response.BootstrapResponse;
@@ -32,6 +28,10 @@ import org.eclipse.leshan.server.bootstrap.BootstrapSessionManager;
 import org.eclipse.leshan.server.bootstrap.DefaultBootstrapHandler;
 import org.eclipse.leshan.server.bootstrap.LwM2mBootstrapRequestSender;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+
+import static org.junit.Assert.assertEquals;
 
 public class LeshanBootstrapServerTest {
 

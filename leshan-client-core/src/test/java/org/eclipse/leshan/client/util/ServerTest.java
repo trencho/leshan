@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.util;
 
-import static org.junit.Assert.assertEquals;
-
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.client.servers.Server;
 import org.eclipse.leshan.core.request.Identity;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+
+import static org.junit.Assert.assertEquals;
 
 public class ServerTest {
 

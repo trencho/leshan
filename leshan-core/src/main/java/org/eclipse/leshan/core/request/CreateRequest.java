@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.CreateResponse;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * A Lightweight M2M request for creating Object Instance(s) within the LWM2M Client.
@@ -286,10 +286,7 @@ public class CreateRequest extends AbstractDownlinkRequest<CreateResponse> {
         } else if (!instances.equals(other.instances))
             return false;
         if (resources == null) {
-            if (other.resources != null)
-                return false;
-        } else if (!resources.equals(other.resources))
-            return false;
-        return true;
+            return other.resources == null;
+        } else return resources.equals(other.resources);
     }
 }

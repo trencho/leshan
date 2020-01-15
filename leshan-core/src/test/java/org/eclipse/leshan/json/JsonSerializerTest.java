@@ -16,12 +16,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.json;
 
-import java.util.ArrayList;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class JsonSerializerTest {
 

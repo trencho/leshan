@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
+import redis.clients.jedis.Jedis;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import redis.clients.jedis.Jedis;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * Utility class providing locking methods based on the Redis SETNX primitive (see

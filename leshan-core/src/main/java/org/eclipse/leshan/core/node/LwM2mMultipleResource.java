@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,8 +27,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
 
 /**
  * A resource which contains several resource instances.
@@ -216,12 +216,9 @@ public class LwM2mMultipleResource implements LwM2mResource {
         if (type != other.type)
             return false;
         if (values == null) {
-            if (other.values != null)
-                return false;
+            return other.values == null;
             // Custom equals to handle byte arrays
-        } else if (!internalMapEquals(values, other.values))
-            return false;
-        return true;
+        } else return internalMapEquals(values, other.values);
     }
 
     /**

@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.text;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Date;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -34,6 +31,9 @@ import org.eclipse.leshan.util.Base64;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 public class LwM2mNodeTextEncoder {
 
@@ -99,7 +99,7 @@ public class LwM2mNodeTextEncoder {
                 break;
             case OBJLNK:
                 ObjectLink objlnk = (ObjectLink) val;
-                strValue = String.valueOf(objlnk.getObjectId() + ":" + objlnk.getObjectInstanceId());
+                strValue = objlnk.getObjectId() + ":" + objlnk.getObjectInstanceId();
                 break;
             case OPAQUE:
                 byte[] binaryValue = (byte[]) val;

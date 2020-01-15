@@ -15,11 +15,10 @@
  ******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.security.Principal;
+import org.eclipse.californium.elements.PrincipalEndpointContextMatcher;
 
 import javax.security.auth.x500.X500Principal;
-
-import org.eclipse.californium.elements.PrincipalEndpointContextMatcher;
+import java.security.Principal;
 
 /**
  * LWM2M principal based endpoint context matcher.

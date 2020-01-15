@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap.demo;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.SecurityMode;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
@@ -32,6 +25,13 @@ import org.eclipse.leshan.server.security.SecurityInfo;
 import org.eclipse.leshan.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link BootstrapSecurityStore} which use a {@link BootstrapConfigStore} to device credentials.

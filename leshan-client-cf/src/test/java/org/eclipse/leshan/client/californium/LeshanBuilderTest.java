@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectEnabler;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class LeshanBuilderTest {
 

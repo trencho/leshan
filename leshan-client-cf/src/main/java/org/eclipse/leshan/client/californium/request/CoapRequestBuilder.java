@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium.request;
 
-import java.net.InetSocketAddress;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.elements.AddressEndpointContext;
 import org.eclipse.leshan.Link;
@@ -29,6 +25,10 @@ import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.core.request.UplinkRequestVisitor;
+
+import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 public class CoapRequestBuilder implements UplinkRequestVisitor {
 

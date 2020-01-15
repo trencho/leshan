@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
+import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
+import org.eclipse.leshan.util.SecurityUtil;
+import org.eclipse.leshan.util.StringUtils;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.util.Map;
-
-import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
-import org.eclipse.leshan.util.SecurityUtil;
-import org.eclipse.leshan.util.StringUtils;
 
 /**
  * Check a BootstrapConfig is correct. This is a complex process, we need to check if the different objects are in

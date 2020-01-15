@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
+import org.eclipse.leshan.core.observation.Observation;
+
 import java.net.InetSocketAddress;
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.eclipse.leshan.core.observation.Observation;
 
 /**
  * A store for registrations and observations. This interface is also responsible to handle registration expiration.

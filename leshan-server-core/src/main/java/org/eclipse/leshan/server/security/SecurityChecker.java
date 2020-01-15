@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.security;
 
-import java.security.PublicKey;
-import java.util.List;
-
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.security.PublicKey;
+import java.util.List;
 
 /**
  * Ensure that client with given endpoint name and {@link Identity} authenticated itself in an expected way.

@@ -18,10 +18,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
@@ -29,6 +25,10 @@ import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DummyInstanceEnabler extends SimpleInstanceEnabler {
 

@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.util.json;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * An abstract class to easily create serializer/deserializer class based on "minimal-json".

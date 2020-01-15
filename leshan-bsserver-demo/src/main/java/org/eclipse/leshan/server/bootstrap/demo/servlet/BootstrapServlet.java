@@ -16,21 +16,6 @@
 
 package org.eclipse.leshan.server.bootstrap.demo.servlet;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.reflect.Type;
-import java.nio.charset.StandardCharsets;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
-import org.eclipse.leshan.server.bootstrap.EditableBootstrapConfigStore;
-import org.eclipse.leshan.server.bootstrap.InvalidConfigurationException;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -41,6 +26,19 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.google.gson.JsonSyntaxException;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
+import org.eclipse.leshan.server.bootstrap.EditableBootstrapConfigStore;
+import org.eclipse.leshan.server.bootstrap.InvalidConfigurationException;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Servlet for REST API in charge of adding bootstrap information to the bootstrap server.

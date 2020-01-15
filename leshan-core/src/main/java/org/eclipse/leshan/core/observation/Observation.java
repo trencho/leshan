@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.observation;
 
+import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.util.Hex;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.leshan.core.node.LwM2mPath;
-import org.eclipse.leshan.core.request.ContentFormat;
-import org.eclipse.leshan.util.Hex;
 
 /**
  * An observation of a resource provided by a LWM2M Client.
@@ -137,10 +137,7 @@ public class Observation {
         } else if (!path.equals(other.path))
             return false;
         if (registrationId == null) {
-            if (other.registrationId != null)
-                return false;
-        } else if (!registrationId.equals(other.registrationId))
-            return false;
-        return true;
+            return other.registrationId == null;
+        } else return registrationId.equals(other.registrationId);
     }
 }

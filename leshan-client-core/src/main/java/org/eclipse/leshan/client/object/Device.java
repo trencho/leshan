@@ -17,13 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
@@ -33,6 +26,13 @@ import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TimeZone;
 
 /**
  * A simple {@link LwM2mInstanceEnabler} for the Device (3) object.

@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.ObserveResponse;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Lightweight M2M request for observing changes of a specific Resource, Resources within an Object Instance or for
@@ -186,8 +186,6 @@ public class ObserveRequest extends AbstractDownlinkRequest<ObserveResponse> {
         if (getClass() != obj.getClass())
             return false;
         ObserveRequest other = (ObserveRequest) obj;
-        if (format != other.format)
-            return false;
-        return true;
+        return format == other.format;
     }
 }

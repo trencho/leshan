@@ -16,8 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium.bootstrap;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.MessageObserverAdapter;
 import org.eclipse.californium.core.coap.Response;
@@ -29,6 +27,8 @@ import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.response.BootstrapFinishResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
  * A CoAP {@link Resource} in charge of handling the Bootstrap Finish indication from the bootstrap server.

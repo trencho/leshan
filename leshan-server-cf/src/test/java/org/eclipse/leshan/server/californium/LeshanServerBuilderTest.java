@@ -15,11 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import static org.junit.Assert.*;
-
 import org.eclipse.leshan.server.security.InMemorySecurityStore;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class LeshanServerBuilderTest {
 

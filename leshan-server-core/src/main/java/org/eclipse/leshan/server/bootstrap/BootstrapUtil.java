@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
@@ -25,6 +22,9 @@ import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ACLConfig;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerConfig;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class BootstrapUtil {
     public static LwM2mObjectInstance convertToSecurityInstance(int instanceId, ServerSecurity securityConfig) {

@@ -16,12 +16,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Security;
@@ -35,6 +29,16 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.queue.StaticClientAwakeTimeProvider;
 import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Helper for running a server and executing a client against it.

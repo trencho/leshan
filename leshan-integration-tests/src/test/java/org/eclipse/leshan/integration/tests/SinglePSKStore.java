@@ -15,14 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import java.net.InetSocketAddress;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.californium.scandium.util.SecretUtil;
 import org.eclipse.californium.scandium.util.ServerNames;
+
+import javax.crypto.SecretKey;
+import java.net.InetSocketAddress;
 
 public class SinglePSKStore implements PskStore {
 

@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.observation;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -48,6 +39,15 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
 
 /**
  * Implementation of the {@link ObservationService} accessing the persisted observation via the provided

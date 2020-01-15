@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.DownlinkRequest;
 import org.eclipse.leshan.core.request.Identity;
@@ -26,6 +24,8 @@ import org.eclipse.leshan.server.security.SecurityChecker;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Implementation of a session manager.

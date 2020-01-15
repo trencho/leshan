@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.tlv;
 
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
@@ -40,6 +36,10 @@ import org.eclipse.leshan.tlv.TlvException;
 import org.eclipse.leshan.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LwM2mNodeTlvDecoder {
 

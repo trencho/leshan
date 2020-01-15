@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.model;
 
-import java.util.Collection;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.Collection;
 
 /**
  * A LwM2mModelProvider which uses only one model for all registered clients without taking into account object version

@@ -16,31 +16,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
-import java.security.AlgorithmParameters;
-import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.KeyStore;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.spec.ECGenParameterSpec;
-import java.security.spec.ECParameterSpec;
-import java.security.spec.ECPoint;
-import java.security.spec.ECPrivateKeySpec;
-import java.security.spec.ECPublicKeySpec;
-import java.security.spec.KeySpec;
-import java.util.List;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.observe.ObservationStore;
@@ -66,6 +41,30 @@ import org.eclipse.leshan.server.security.InMemorySecurityStore;
 import org.eclipse.leshan.server.security.SecurityChecker;
 import org.eclipse.leshan.server.security.SecurityStore;
 import org.eclipse.leshan.util.Hex;
+
+import javax.crypto.SecretKey;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.KeySpec;
+import java.util.List;
 
 public class SecureIntegrationTestHelper extends IntegrationTestHelper {
 

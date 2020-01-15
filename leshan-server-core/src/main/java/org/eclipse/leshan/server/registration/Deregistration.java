@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
+import org.eclipse.leshan.core.observation.Observation;
+
 import java.util.Collection;
 import java.util.Collections;
-
-import org.eclipse.leshan.core.observation.Observation;
 
 /**
  * A Deregistration contains all informations which are removed after a client was unregistered.

@@ -15,16 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
-import java.lang.reflect.Type;
-
-import org.eclipse.leshan.core.response.DiscoverResponse;
-import org.eclipse.leshan.core.response.LwM2mResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.eclipse.leshan.core.response.DiscoverResponse;
+import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
+
+import java.lang.reflect.Type;
 
 public class ResponseSerializer implements JsonSerializer<LwM2mResponse> {
 

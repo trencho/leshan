@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mNode;
@@ -29,6 +25,10 @@ import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map;
 
 /**
  * The request to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object
@@ -412,10 +412,7 @@ public class WriteRequest extends AbstractDownlinkRequest<WriteResponse> {
         if (mode != other.mode)
             return false;
         if (node == null) {
-            if (other.node != null)
-                return false;
-        } else if (!node.equals(other.node))
-            return false;
-        return true;
+            return other.node == null;
+        } else return node.equals(other.node);
     }
 }

@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Collection;
-
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.Endpoint;
@@ -49,6 +41,14 @@ import org.eclipse.leshan.core.californium.EndpointFactory;
 import org.eclipse.leshan.core.request.Identity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class CaliforniumEndpointsManager implements EndpointsManager {
 

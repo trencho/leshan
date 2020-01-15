@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.eclipse.leshan.server.queue.PresenceListener;
 import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PresenceCounter implements PresenceListener {
     private AtomicInteger nbAwake = new AtomicInteger(0);

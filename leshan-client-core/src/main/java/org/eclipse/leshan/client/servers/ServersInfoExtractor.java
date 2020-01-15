@@ -16,8 +16,20 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.servers;
 
-import static org.eclipse.leshan.LwM2mId.*;
-import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
+import org.eclipse.leshan.LwM2mId;
+import org.eclipse.leshan.SecurityMode;
+import org.eclipse.leshan.client.request.ServerIdentity;
+import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.core.node.LwM2mObject;
+import org.eclipse.leshan.core.node.LwM2mObjectInstance;
+import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.util.SecurityUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -35,20 +47,19 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Map;
 
-import org.eclipse.leshan.LwM2mId;
-import org.eclipse.leshan.SecurityMode;
-import org.eclipse.leshan.client.request.ServerIdentity;
-import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
-import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
-import org.eclipse.leshan.core.node.LwM2mObject;
-import org.eclipse.leshan.core.node.LwM2mObjectInstance;
-import org.eclipse.leshan.core.node.LwM2mResource;
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.ReadRequest;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.util.SecurityUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.eclipse.leshan.LwM2mId.SECURITY;
+import static org.eclipse.leshan.LwM2mId.SEC_BOOTSTRAP;
+import static org.eclipse.leshan.LwM2mId.SEC_PUBKEY_IDENTITY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECRET_KEY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECURITY_MODE;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_ID;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_PUBKEY;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_URI;
+import static org.eclipse.leshan.LwM2mId.SERVER;
+import static org.eclipse.leshan.LwM2mId.SRV_BINDING;
+import static org.eclipse.leshan.LwM2mId.SRV_LIFETIME;
+import static org.eclipse.leshan.LwM2mId.SRV_SERVER_ID;
+import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
 
 /**
  * Extract from LwM2m tree servers information like server uri, security mode, ...
@@ -126,7 +137,7 @@ public class ServersInfoExtractor {
                     }
                 }
             } catch (URISyntaxException e) {
-                LOG.error(String.format("Invalid URI %s", (String) security.getResource(SEC_SERVER_URI).getValue()), e);
+                LOG.error(String.format("Invalid URI %s", security.getResource(SEC_SERVER_URI).getValue()), e);
             }
         }
         return infos;

@@ -16,13 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import static org.junit.Assert.*;
-
-import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -46,6 +39,19 @@ import org.eclipse.leshan.tlv.TlvEncoder;
 import org.eclipse.leshan.util.Hex;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Unit tests for {@link LwM2mNodeDecoder}

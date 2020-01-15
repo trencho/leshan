@@ -15,6 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan;
 
+import org.eclipse.leshan.util.StringUtils;
+import org.eclipse.leshan.util.Validate;
+
 import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -22,9 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.eclipse.leshan.util.StringUtils;
-import org.eclipse.leshan.util.Validate;
 
 /**
  * A Link as defined in http://tools.ietf.org/html/rfc6690.
@@ -251,11 +251,8 @@ public class Link implements Serializable {
         } else if (!attributes.equals(other.attributes))
             return false;
         if (url == null) {
-            if (other.url != null)
-                return false;
-        } else if (!url.equals(other.url))
-            return false;
-        return true;
+            return other.url == null;
+        } else return url.equals(other.url);
     }
 
     /**

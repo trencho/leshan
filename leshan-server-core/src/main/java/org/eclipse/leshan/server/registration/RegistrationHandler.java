@@ -17,8 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.util.Date;
-
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.request.RegisterRequest;
@@ -30,6 +28,8 @@ import org.eclipse.leshan.core.response.UpdateResponse;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Handle the client registration logic. Check if the client is allowed to register, with the wanted security scheme.
@@ -118,7 +118,7 @@ public class RegistrationHandler {
                 public void run() {
                     registrationService.fireUpdated(update, updatedRegistration.getUpdatedRegistration(),
                             updatedRegistration.getPreviousRegistration());
-                };
+                }
             };
             return new SendableResponse<>(UpdateResponse.success(), whenSent);
         }
@@ -146,7 +146,7 @@ public class RegistrationHandler {
                 public void run() {
                     registrationService.fireUnregistered(deregistration.getRegistration(),
                             deregistration.getObservations(), null);
-                };
+                }
             };
             return new SendableResponse<>(DeregisterResponse.success(), whenSent);
         } else {

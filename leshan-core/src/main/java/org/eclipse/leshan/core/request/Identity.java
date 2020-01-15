@@ -16,12 +16,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
+import org.eclipse.leshan.util.Validate;
+
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
-
-import org.eclipse.leshan.util.Validate;
 
 /**
  * Contains all data which could identify a peer like peer address, PSK identity, Raw Public Key or Certificate Common
@@ -163,10 +163,7 @@ public class Identity implements Serializable {
         } else if (!rawPublicKey.equals(other.rawPublicKey))
             return false;
         if (x509CommonName == null) {
-            if (other.x509CommonName != null)
-                return false;
-        } else if (!x509CommonName.equals(other.x509CommonName))
-            return false;
-        return true;
+            return other.x509CommonName == null;
+        } else return x509CommonName.equals(other.x509CommonName);
     }
 }

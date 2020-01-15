@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.request;
 
-import static org.junit.Assert.*;
-
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.californium.core.coap.CoAP;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
@@ -54,6 +46,15 @@ import org.eclipse.leshan.tlv.Tlv.TlvType;
 import org.eclipse.leshan.tlv.TlvDecoder;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Unit tests for {@link CoapRequestBuilder}

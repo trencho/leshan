@@ -15,12 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.json;
 
+import com.eclipsesource.json.JsonObject;
+import com.eclipsesource.json.JsonValue;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.util.json.JsonException;
 import org.eclipse.leshan.util.json.JsonSerDes;
-
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 public class JsonArrayEntrySerDes extends JsonSerDes<JsonArrayEntry> {
 
@@ -51,7 +50,7 @@ public class JsonArrayEntrySerDes extends JsonSerDes<JsonArrayEntry> {
         if (jae.getTime() != null)
             o.add("t", jae.getTime());
         return o;
-    };
+    }
 
     @Override
     public JsonArrayEntry deserialize(JsonObject o) throws JsonException {

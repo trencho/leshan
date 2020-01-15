@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.json;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -40,6 +35,11 @@ import org.eclipse.leshan.util.Base64;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class LwM2mNodeJsonEncoder {
 
@@ -131,7 +131,7 @@ public class LwM2mNodeJsonEncoder {
             resourceList = new ArrayList<>();
             for (LwM2mObjectInstance instance : object.getInstances().values()) {
                 for (LwM2mResource resource : instance.getResources().values()) {
-                    String prefixPath = Integer.toString(instance.getId()) + "/" + Integer.toString(resource.getId());
+                    String prefixPath = instance.getId() + "/" + resource.getId();
                     resourceList.addAll(lwM2mResourceToJsonArrayEntry(prefixPath, timestamp, resource));
                 }
             }

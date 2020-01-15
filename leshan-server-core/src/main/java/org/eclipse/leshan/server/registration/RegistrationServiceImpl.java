@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
+import org.eclipse.leshan.core.observation.Observation;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.eclipse.leshan.core.observation.Observation;
 
 /**
  * An implementation of {@link RegistrationService}

@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.leshan.Link;
@@ -33,6 +28,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 public class FailingTest {
 
@@ -49,7 +49,7 @@ public class FailingTest {
             builder.setCoapConfig(coapConfig);
 
             return builder;
-        };
+        }
     };
 
     @Before

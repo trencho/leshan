@@ -15,14 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import org.eclipse.leshan.util.Base64;
 import org.eclipse.leshan.util.json.JsonSerDes;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 ///!\ This class is a COPY of org.eclipse.leshan.server.bootstrap.demo.json.X509CertificateSerDes /!\
 // TODO create a leshan-demo project ?

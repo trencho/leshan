@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.tlv;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import org.eclipse.leshan.tlv.Tlv.TlvType;
+import org.junit.Test;
 
 import java.nio.ByteBuffer;
 import java.util.Date;
 
-import org.eclipse.leshan.tlv.Tlv.TlvType;
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TlvEncoderTest {
 

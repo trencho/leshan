@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.network.config.NetworkConfig.Keys;
 import org.eclipse.californium.elements.EndpointContextMatcher;
@@ -41,6 +37,10 @@ import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.util.Validate;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Helper class to build and configure a Californium based Leshan Lightweight M2M client.

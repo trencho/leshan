@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
+import org.eclipse.leshan.core.request.Identity;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.eclipse.leshan.core.request.Identity;
 
 /**
  * Simple bootstrap store implementation storing bootstrap configuration information in memory.

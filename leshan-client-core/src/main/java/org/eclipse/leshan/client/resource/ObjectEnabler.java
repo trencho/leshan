@@ -17,14 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
@@ -52,6 +44,14 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class ObjectEnabler extends BaseObjectEnabler {
 

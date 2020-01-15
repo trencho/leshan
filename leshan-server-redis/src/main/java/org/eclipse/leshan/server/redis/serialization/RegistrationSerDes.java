@@ -15,18 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis.serialization;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.eclipse.leshan.Link;
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.server.registration.Registration;
-
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.eclipse.leshan.Link;
+import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Functions for serialize and deserialize a Client in JSON.
@@ -55,7 +54,7 @@ public class RegistrationSerDes {
                 if (e.getValue() == null) {
                     at.add(e.getKey(), Json.NULL);
                 } else {
-                    at.add(e.getKey(), e.getValue().toString());
+                    at.add(e.getKey(), e.getValue());
                 }
             }
             ol.add("at", at);

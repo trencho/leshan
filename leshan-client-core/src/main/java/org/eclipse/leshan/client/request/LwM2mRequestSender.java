@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.request;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+
+import java.net.InetSocketAddress;
 
 public interface LwM2mRequestSender {
 

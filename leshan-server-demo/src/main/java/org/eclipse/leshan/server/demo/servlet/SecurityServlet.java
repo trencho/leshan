@@ -15,18 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet;
 
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.Collection;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.eclipsesource.json.JsonObject;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.leshan.server.demo.servlet.json.PublicKeySerDes;
 import org.eclipse.leshan.server.demo.servlet.json.SecurityDeserializer;
@@ -38,10 +30,16 @@ import org.eclipse.leshan.server.security.SecurityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.eclipsesource.json.JsonObject;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
 
 /**
  * Service HTTP REST API calls for security information.

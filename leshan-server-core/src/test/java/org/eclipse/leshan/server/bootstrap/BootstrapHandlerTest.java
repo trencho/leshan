@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import static org.junit.Assert.*;
-
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
@@ -41,6 +33,17 @@ import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandlerTest.MockRequestSender.Mode;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class BootstrapHandlerTest {
 
@@ -145,7 +148,7 @@ public class BootstrapHandlerTest {
 
         public enum Mode {
             ALWAYS_SUCCESS, ALWAYS_FAILURE, NO_RESPONSE
-        };
+        }
 
         private Mode mode;
         private ErrorCallback errorCallback;

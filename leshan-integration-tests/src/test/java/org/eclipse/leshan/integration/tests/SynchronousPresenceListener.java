@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import org.eclipse.leshan.server.queue.PresenceListener;
+import org.eclipse.leshan.server.registration.Registration;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import org.eclipse.leshan.server.queue.PresenceListener;
-import org.eclipse.leshan.server.registration.Registration;
 
 public class SynchronousPresenceListener implements PresenceListener {
     private CountDownLatch awakeLatch = new CountDownLatch(1);

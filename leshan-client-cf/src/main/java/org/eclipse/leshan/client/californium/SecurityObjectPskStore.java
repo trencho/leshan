@@ -16,16 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import static org.eclipse.leshan.LwM2mId.*;
-import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
-
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.californium.scandium.util.SecretUtil;
@@ -38,6 +28,19 @@ import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.crypto.SecretKey;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+
+import static org.eclipse.leshan.LwM2mId.SECURITY;
+import static org.eclipse.leshan.LwM2mId.SEC_PUBKEY_IDENTITY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECRET_KEY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECURITY_MODE;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_URI;
+import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
 
 /**
  * a {@link PskStore} which search PSK credentials in Lwm2m Security object.
@@ -111,7 +114,7 @@ public class SecurityObjectPskStore implements PskStore {
                         return new PskPublicInformation(new String(pskIdentity));
                     }
                 } catch (URISyntaxException e) {
-                    LOG.error(String.format("Invalid URI %s", (String) security.getResource(SEC_SERVER_URI).getValue()),
+                    LOG.error(String.format("Invalid URI %s", security.getResource(SEC_SERVER_URI).getValue()),
                             e);
                 }
             }

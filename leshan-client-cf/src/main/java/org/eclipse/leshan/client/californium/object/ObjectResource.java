@@ -19,10 +19,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium.object;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
-import java.util.List;
-
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.server.resources.CoapExchange;
@@ -66,6 +62,10 @@ import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteAttributesResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.List;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
  * A CoAP {@link Resource} in charge of handling requests for of a lwM2M Object.

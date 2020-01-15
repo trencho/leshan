@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import java.util.List;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
+
+import java.util.List;
 
 public class CancelObservationResponse extends ObserveResponse {
 

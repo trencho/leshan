@@ -18,12 +18,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.utils;
 
-import java.util.Date;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.codec.CodecException;
@@ -32,6 +26,11 @@ import org.eclipse.leshan.util.Hex;
 import org.eclipse.leshan.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Date;
 
 /**
  * A {@link LwM2mValueConverter} which will do some magic conversion.

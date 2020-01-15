@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ContentFormat;
+
+import java.util.List;
 
 public interface LwM2mNodeEncoder {
 

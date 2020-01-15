@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.tlv;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -40,6 +34,12 @@ import org.eclipse.leshan.tlv.TlvEncoder;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map.Entry;
 
 /**
  * TLV encoder for {@link LwM2mNode}.

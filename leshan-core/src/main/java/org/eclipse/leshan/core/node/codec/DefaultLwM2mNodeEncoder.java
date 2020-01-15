@@ -16,8 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -30,6 +28,8 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * A default {@link LwM2mNodeEncoder} which support default {@link ContentFormat} :

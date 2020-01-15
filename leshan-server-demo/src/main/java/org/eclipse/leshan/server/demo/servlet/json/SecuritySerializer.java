@@ -15,20 +15,19 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
-import java.lang.reflect.Type;
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-
-import org.eclipse.leshan.server.security.SecurityInfo;
-import org.eclipse.leshan.util.Base64;
-import org.eclipse.leshan.util.Hex;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.eclipse.leshan.server.security.SecurityInfo;
+import org.eclipse.leshan.util.Base64;
+import org.eclipse.leshan.util.Hex;
+
+import java.lang.reflect.Type;
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 
 // /!\ This class is a COPY of org.eclipse.leshan.server.bootstrap.demo.json.SecuritySerializer /!\
 public class SecuritySerializer implements JsonSerializer<SecurityInfo> {

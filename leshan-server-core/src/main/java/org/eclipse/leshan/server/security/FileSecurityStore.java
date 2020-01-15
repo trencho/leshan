@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.security;
 
+import org.eclipse.leshan.util.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import org.eclipse.leshan.util.Validate;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A {@link SecurityStore} which persists {@link SecurityInfo} in a file.
@@ -89,7 +89,7 @@ public class FileSecurityStore extends InMemorySecurityStore {
             return;
         }
 
-        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));) {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
             SecurityInfo[] infos = (SecurityInfo[]) in.readObject();
 
             if (infos != null) {
@@ -115,7 +115,7 @@ public class FileSecurityStore extends InMemorySecurityStore {
                 }
                 file.createNewFile();
             }
-            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));) {
+            try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename))) {
                 out.writeObject(this.getAll().toArray(new SecurityInfo[0]));
             }
         } catch (IOException e) {

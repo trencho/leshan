@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.request;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
-
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -61,6 +59,8 @@ import org.eclipse.leshan.server.californium.observation.ObserveUtil;
 import org.eclipse.leshan.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
 
 /**
  * This class is able to create a {@link LwM2mResponse} from a CoAP {@link Response}.

@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.util.Collection;
-
 import org.eclipse.leshan.core.observation.Observation;
+
+import java.util.Collection;
 
 /**
  * Listen for client registration events.

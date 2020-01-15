@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.observe.ObservationStore;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
+
+import java.net.InetSocketAddress;
 
 /**
  * Class used to delegate CoAP endpoint creation in all Leshan Builders.

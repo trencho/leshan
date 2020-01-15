@@ -15,16 +15,18 @@
  *******************************************************************************/
 package org.eclipse.leshan.tlv;
 
-import static org.junit.Assert.*;
-
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.util.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Unit test for {@link TlvDecoder}

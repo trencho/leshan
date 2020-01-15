@@ -15,13 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
-import static org.junit.Assert.*;
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.junit.Test;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 public class LwM2MResourceTest {
 

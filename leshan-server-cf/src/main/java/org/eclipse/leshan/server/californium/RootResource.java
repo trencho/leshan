@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import java.util.List;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.core.server.resources.CoapExchange;
+
+import java.util.List;
 
 /**
  * A default root resource.

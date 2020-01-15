@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.server;
 
-import static org.junit.Assert.fail;
-
-import java.util.Map;
-
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.Test;
+
+import java.util.Map;
+
+import static org.junit.Assert.fail;
 
 public class SerializationTests {
 

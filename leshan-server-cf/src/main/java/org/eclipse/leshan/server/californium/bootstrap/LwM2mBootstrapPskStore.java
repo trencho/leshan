@@ -15,16 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import java.net.InetSocketAddress;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.californium.scandium.util.SecretUtil;
 import org.eclipse.californium.scandium.util.ServerNames;
 import org.eclipse.leshan.server.security.BootstrapSecurityStore;
 import org.eclipse.leshan.server.security.SecurityInfo;
+
+import javax.crypto.SecretKey;
+import java.net.InetSocketAddress;
 
 /**
  * PSK Store to feed a Bootstrap server.

@@ -15,20 +15,20 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import org.eclipse.leshan.ResponseCode;
+import org.eclipse.leshan.client.observer.LwM2mClientObserver;
+import org.eclipse.leshan.client.servers.Server;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.leshan.ResponseCode;
-import org.eclipse.leshan.client.observer.LwM2mClientObserver;
-import org.eclipse.leshan.client.servers.Server;
-
 public class SynchronousClientObserver implements LwM2mClientObserver {
 
     private CountDownLatch registerLatch = new CountDownLatch(1);
     private AtomicBoolean registerSucceed = new AtomicBoolean(false);
-    private AtomicBoolean registerFailed = new AtomicBoolean(false);;
+    private AtomicBoolean registerFailed = new AtomicBoolean(false);
 
     private CountDownLatch updateLatch = new CountDownLatch(1);
     private AtomicBoolean updateSucceed = new AtomicBoolean(false);

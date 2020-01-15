@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.net.Inet4Address;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.queue.PresenceService;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.net.Inet4Address;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * tests the implementation of {@link PresenceService}

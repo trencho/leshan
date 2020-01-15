@@ -16,9 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import java.net.InetSocketAddress;
-import java.util.Collection;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.Request;
@@ -73,6 +70,9 @@ import org.eclipse.leshan.server.security.SecurityStore;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.util.Collection;
 
 /**
  * A Lightweight M2M server.

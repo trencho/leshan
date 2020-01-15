@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import java.net.InetSocketAddress;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.californium.scandium.util.SecretUtil;
@@ -27,6 +23,9 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationStore;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.eclipse.leshan.server.security.SecurityStore;
+
+import javax.crypto.SecretKey;
+import java.net.InetSocketAddress;
 
 /**
  * A {@link PskStore} which retrieve PSK information from Leshan {@link SecurityStore}.

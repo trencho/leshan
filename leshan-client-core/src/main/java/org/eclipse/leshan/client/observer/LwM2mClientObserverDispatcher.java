@@ -11,10 +11,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.observer;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.client.servers.Server;
+
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A dispatcher for LwM2mClientObserver. It allow several observers on a LwM2mClient.

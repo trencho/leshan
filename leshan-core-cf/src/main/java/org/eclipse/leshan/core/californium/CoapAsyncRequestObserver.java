@@ -18,11 +18,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.request.exception.RequestCanceledException;
@@ -31,6 +26,11 @@ import org.eclipse.leshan.core.request.exception.SendFailedException;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A Californium message observer for a CoAP request.

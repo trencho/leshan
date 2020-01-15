@@ -15,15 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.tlv;
 
+import org.eclipse.leshan.core.node.ObjectLink;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-
-import org.eclipse.leshan.core.node.ObjectLink;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TlvEncoder {
 

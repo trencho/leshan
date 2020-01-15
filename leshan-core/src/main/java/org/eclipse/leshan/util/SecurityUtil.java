@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.util;
 
+import org.eclipse.leshan.core.credentials.CredentialsReader;
+
 import java.io.InputStream;
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -27,8 +29,6 @@ import java.security.cert.X509Certificate;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-
-import org.eclipse.leshan.core.credentials.CredentialsReader;
 
 public class SecurityUtil {
 

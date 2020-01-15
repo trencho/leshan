@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
 
 /**
  * A resource with a single value.
@@ -189,14 +189,12 @@ public class LwM2mSingleResource implements LwM2mResource {
         if (type != other.type)
             return false;
         if (value == null) {
-            if (other.value != null)
-                return false;
+            return other.value == null;
         } else {
             // Custom equals to handle byte arrays
             return type == Type.OPAQUE ? Arrays.equals((byte[]) value, (byte[]) other.value)
                     : value.equals(other.value);
         }
-        return true;
     }
 
     @Override

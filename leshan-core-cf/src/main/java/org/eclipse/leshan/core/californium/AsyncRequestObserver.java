@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
+
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * A dedicated {@link CoapAsyncRequestObserver} for LWM2M.

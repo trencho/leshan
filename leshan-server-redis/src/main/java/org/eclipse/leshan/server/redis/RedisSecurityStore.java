@@ -15,19 +15,18 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import org.eclipse.leshan.server.redis.serialization.SecurityInfoSerDes;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.eclipse.leshan.server.security.SecurityStore;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
 import redis.clients.util.Pool;
+
+import java.util.Collection;
+import java.util.LinkedList;
 
 /**
  * A {@link SecurityStore} implementation based on Redis.

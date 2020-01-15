@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.security;
 
+import org.eclipse.leshan.util.Validate;
+
 import java.io.Serializable;
 import java.security.PublicKey;
 import java.util.Arrays;
-
-import org.eclipse.leshan.util.Validate;
 
 /**
  * The security info for a client.
@@ -190,9 +190,7 @@ public class SecurityInfo implements Serializable {
                 return false;
         } else if (!rawPublicKey.equals(other.rawPublicKey))
             return false;
-        if (useX509Cert != other.useX509Cert)
-            return false;
-        return true;
+        return useX509Cert == other.useX509Cert;
     }
 
     @Override

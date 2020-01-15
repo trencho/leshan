@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
@@ -43,6 +37,20 @@ import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
 import org.eclipse.leshan.server.bootstrap.BootstrapSessionManager.BootstrapPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.CANCELLED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.DELETE_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.FINISH_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.INTERNAL_SERVER_ERROR;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.NO_BOOTSTRAP_CONFIG;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.UNAUTHORIZED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_ACL_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SECURITY_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SERVER_FAILED;
 
 /**
  * A default implementation for {@link BootstrapHandler.

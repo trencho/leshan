@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.model;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.LwM2mModelRepository;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * A LwM2mModelProvider which supports object versioning. It returns a LwM2mModel taking into account object version

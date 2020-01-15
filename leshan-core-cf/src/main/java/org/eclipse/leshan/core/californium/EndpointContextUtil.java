@@ -17,14 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.net.InetSocketAddress;
-import java.security.Principal;
-import java.security.PublicKey;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.security.auth.x500.X500Principal;
-
 import org.eclipse.californium.elements.AddressEndpointContext;
 import org.eclipse.californium.elements.DtlsEndpointContext;
 import org.eclipse.californium.elements.EndpointContext;
@@ -33,6 +25,13 @@ import org.eclipse.californium.elements.auth.PreSharedKeyIdentity;
 import org.eclipse.californium.elements.auth.RawPublicKeyIdentity;
 import org.eclipse.californium.elements.auth.X509CertPath;
 import org.eclipse.leshan.core.request.Identity;
+
+import javax.security.auth.x500.X500Principal;
+import java.net.InetSocketAddress;
+import java.security.Principal;
+import java.security.PublicKey;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Utility class used to handle Californium {@link EndpointContext} in Leshan.

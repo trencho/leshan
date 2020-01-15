@@ -18,13 +18,6 @@
 
 package org.eclipse.leshan.server.bootstrap.demo;
 
-import java.io.File;
-import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
-import java.util.List;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -52,6 +45,13 @@ import org.eclipse.leshan.server.californium.bootstrap.LeshanBootstrapServerBuil
 import org.eclipse.leshan.util.SecurityUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
 
 public class LeshanBootstrapServerDemo {
 

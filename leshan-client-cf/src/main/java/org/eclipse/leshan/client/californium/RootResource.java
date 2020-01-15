@@ -16,10 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
-import java.util.List;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
@@ -30,6 +26,10 @@ import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.response.BootstrapDeleteResponse;
 import org.eclipse.leshan.util.StringUtils;
+
+import java.util.List;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
  * A root {@link CoapResource} resource in charge of handling Bootstrap Delete requests targeting the "/" URI.

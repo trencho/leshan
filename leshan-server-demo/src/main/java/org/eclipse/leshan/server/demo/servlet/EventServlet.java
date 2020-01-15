@@ -15,14 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
@@ -43,8 +37,12 @@ import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventServlet extends EventSourceServlet {
 

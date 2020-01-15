@@ -15,13 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.registration;
 
-import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-
 import org.eclipse.leshan.Link;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.server.californium.registration.InMemoryRegistrationStore;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationStore;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
@@ -29,6 +25,9 @@ import org.eclipse.leshan.server.registration.UpdatedRegistration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 
 public class InMemoryRegistrationStoreTest {
 

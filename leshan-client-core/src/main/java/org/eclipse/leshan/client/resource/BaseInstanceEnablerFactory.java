@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
-import java.util.Collection;
-
 import org.eclipse.leshan.core.model.ObjectModel;
+
+import java.util.Collection;
 
 public abstract class BaseInstanceEnablerFactory implements LwM2mInstanceEnablerFactory {
 

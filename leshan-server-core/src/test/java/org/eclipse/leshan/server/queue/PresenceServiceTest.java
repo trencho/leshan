@@ -15,15 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.queue;
 
-import static org.junit.Assert.*;
-
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.registration.Registration;
 import org.junit.Test;
+
+import java.net.Inet4Address;
+import java.net.UnknownHostException;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * tests the implementation of {@link PresenceService}

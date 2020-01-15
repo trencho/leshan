@@ -15,6 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.tlv;
 
+import org.eclipse.leshan.core.node.ObjectLink;
+import org.eclipse.leshan.tlv.Tlv.TlvType;
+import org.eclipse.leshan.util.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigInteger;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
@@ -25,12 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.eclipse.leshan.core.node.ObjectLink;
-import org.eclipse.leshan.tlv.Tlv.TlvType;
-import org.eclipse.leshan.util.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TlvDecoder {
 
@@ -134,7 +134,7 @@ public class TlvDecoder {
                         // skip the children, it will be decoded by the view
                         // HACK the cast is necessary for binary backward compatibility bug introduce in Java 9
                         // https://github.com/apache/felix/pull/114
-                        ((Buffer) input).position(((Buffer) input).position() + length);
+                        ((Buffer) input).position(input.position() + length);
 
                         Tlv tlv = new Tlv(type, children, null, identifier);
                         tlvs.add(tlv);

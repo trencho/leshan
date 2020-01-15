@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
+import org.eclipse.leshan.core.node.codec.tlv.LwM2mNodeTlvDecoder;
+import org.eclipse.leshan.util.Validate;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.leshan.core.node.codec.tlv.LwM2mNodeTlvDecoder;
-import org.eclipse.leshan.util.Validate;
 
 /**
  * An instance of {@link LwM2mObject}.
@@ -142,13 +142,8 @@ public class LwM2mObjectInstance implements LwM2mNode {
             return false;
         }
         if (resources == null) {
-            if (other.resources != null) {
-                return false;
-            }
-        } else if (!resources.equals(other.resources)) {
-            return false;
-        }
-        return true;
+            return other.resources == null;
+        } else return resources.equals(other.resources);
     }
 
 }

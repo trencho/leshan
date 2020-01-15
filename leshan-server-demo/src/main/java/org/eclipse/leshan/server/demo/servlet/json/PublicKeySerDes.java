@@ -15,15 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
-import java.security.PublicKey;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-
+import com.eclipsesource.json.JsonObject;
 import org.eclipse.leshan.util.Base64;
 import org.eclipse.leshan.util.Hex;
 import org.eclipse.leshan.util.json.JsonSerDes;
 
-import com.eclipsesource.json.JsonObject;
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
 
 ///!\ This class is a COPY of org.eclipse.leshan.server.bootstrap.demo.json.PublicKeySerDes /!\
 //TODO create a leshan-demo project ?

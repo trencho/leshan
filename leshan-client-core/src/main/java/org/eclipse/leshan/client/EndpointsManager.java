@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.client;
 
-import java.util.Collection;
-
 import org.eclipse.leshan.client.servers.Server;
 import org.eclipse.leshan.client.servers.ServerInfo;
+
+import java.util.Collection;
 
 public interface EndpointsManager {
 

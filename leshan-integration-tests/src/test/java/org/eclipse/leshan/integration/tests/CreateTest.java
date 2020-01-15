@@ -18,11 +18,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.core.request.ContentFormat.*;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mObject;
@@ -39,6 +34,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import static org.eclipse.leshan.core.request.ContentFormat.JSON;
+import static org.eclipse.leshan.core.request.ContentFormat.TLV;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class CreateTest {
 
@@ -199,7 +202,7 @@ public class CreateTest {
     public void cannot_create_mandatory_single_object() throws InterruptedException {
         // try to create another instance of device object
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(3, new LwM2mResource[] { LwM2mSingleResource.newStringResource(3, "v123") }));
+                new CreateRequest(3, LwM2mSingleResource.newStringResource(3, "v123")));
 
         // verify result
         assertEquals(ResponseCode.BAD_REQUEST, response.getCode());
@@ -210,7 +213,7 @@ public class CreateTest {
     @Test
     public void cannot_create_instance_of_security_object() throws InterruptedException {
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(0, new LwM2mResource[] { LwM2mSingleResource.newStringResource(0, "new.dest") }));
+                new CreateRequest(0, LwM2mSingleResource.newStringResource(0, "new.dest")));
 
         // verify result
         assertEquals(ResponseCode.NOT_FOUND, response.getCode());

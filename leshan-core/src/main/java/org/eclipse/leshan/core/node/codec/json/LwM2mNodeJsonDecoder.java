@@ -15,18 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.json;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -47,6 +35,18 @@ import org.eclipse.leshan.json.LwM2mJsonException;
 import org.eclipse.leshan.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class LwM2mNodeJsonDecoder {
 
@@ -163,11 +163,7 @@ public class LwM2mNodeJsonDecoder {
                 timestamp = baseTime;
             }
         } else {
-            if (time != null) {
-                timestamp = time;
-            } else {
-                timestamp = null;
-            }
+            timestamp = time;
         }
         return timestamp;
     }
@@ -205,7 +201,7 @@ public class LwM2mNodeJsonDecoder {
 
         // Ensure there is at least one entry for null timestamp
         if (result.isEmpty()) {
-            result.put((Long) null, new ArrayList<JsonArrayEntry>());
+            result.put(null, new ArrayList<JsonArrayEntry>());
         }
 
         return result;

@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.Link;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.RegisterResponse;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A Lightweight M2M request for sending the LWM2M Client properties required by the LWM2M Server to contact the LWM2M

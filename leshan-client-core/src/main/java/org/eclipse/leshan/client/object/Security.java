@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
-import static org.eclipse.leshan.LwM2mId.*;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.leshan.SecurityMode;
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
@@ -32,6 +27,17 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.eclipse.leshan.LwM2mId.SEC_BOOTSTRAP;
+import static org.eclipse.leshan.LwM2mId.SEC_PUBKEY_IDENTITY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECRET_KEY;
+import static org.eclipse.leshan.LwM2mId.SEC_SECURITY_MODE;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_ID;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_PUBKEY;
+import static org.eclipse.leshan.LwM2mId.SEC_SERVER_URI;
 
 /**
  * A simple {@link LwM2mInstanceEnabler} for the Security (0) object.

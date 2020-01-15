@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import java.util.Arrays;
-
 import org.eclipse.leshan.Link;
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
+
+import java.util.Arrays;
 
 public class DiscoverResponse extends AbstractLwM2mResponse {
 

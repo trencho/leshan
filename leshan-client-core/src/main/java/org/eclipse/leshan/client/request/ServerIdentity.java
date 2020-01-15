@@ -16,9 +16,9 @@
 
 package org.eclipse.leshan.client.request;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.request.Identity;
+
+import java.net.InetSocketAddress;
 
 /**
  * Extend the identity with client relevant additional information. Introduce roles for the identity and makes those

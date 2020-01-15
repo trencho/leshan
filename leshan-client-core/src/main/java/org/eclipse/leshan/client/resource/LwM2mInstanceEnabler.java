@@ -18,8 +18,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
-import java.util.List;
-
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
@@ -29,6 +27,8 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.List;
 
 /**
  * A contract for managing a LWM2M object instance on a LWM2M client.

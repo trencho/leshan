@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.observation;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.Map;
-import java.util.Set;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.leshan.core.californium.EndpointContextUtil;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -35,6 +30,11 @@ import org.eclipse.leshan.server.registration.Registration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.Map;
+import java.util.Set;
 
 public class ObservationServiceTest {
 

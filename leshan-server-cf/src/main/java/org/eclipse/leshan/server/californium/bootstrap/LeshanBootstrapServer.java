@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -39,6 +37,8 @@ import org.eclipse.leshan.server.security.BootstrapSecurityStore;
 import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 /**
  * A Lightweight M2M server, serving bootstrap information on /bs.

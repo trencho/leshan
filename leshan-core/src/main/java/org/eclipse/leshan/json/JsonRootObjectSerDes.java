@@ -15,12 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.json;
 
-import org.eclipse.leshan.util.json.JsonException;
-import org.eclipse.leshan.util.json.JsonSerDes;
-
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.eclipse.leshan.util.json.JsonException;
+import org.eclipse.leshan.util.json.JsonSerDes;
 
 public class JsonRootObjectSerDes extends JsonSerDes<JsonRootObject> {
 
@@ -41,7 +40,7 @@ public class JsonRootObjectSerDes extends JsonSerDes<JsonRootObject> {
             o.add("bt", jro.getBaseTime());
 
         return o;
-    };
+    }
 
     @Override
     public JsonRootObject deserialize(JsonObject o) throws JsonException {

@@ -15,17 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.servers;
 
+import org.eclipse.leshan.LwM2m;
+import org.eclipse.leshan.SecurityMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-
-import org.eclipse.leshan.LwM2m;
-import org.eclipse.leshan.SecurityMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ServerInfo {
 

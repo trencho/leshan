@@ -16,14 +16,15 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import static org.junit.Assert.*;
-
 import org.eclipse.leshan.Link;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class QueueModeTest {
 

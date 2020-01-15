@@ -17,9 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
@@ -30,6 +27,9 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A simple {@link LwM2mInstanceEnabler} for the Server (1) object.

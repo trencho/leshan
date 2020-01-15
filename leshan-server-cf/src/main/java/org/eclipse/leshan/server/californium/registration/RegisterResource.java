@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.registration;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
@@ -41,6 +35,12 @@ import org.eclipse.leshan.server.registration.RegistrationHandler;
 import org.eclipse.leshan.server.registration.RegistrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
  * A CoAP {@link Resource} in charge of handling clients registration requests.

@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.text;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Date;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -30,6 +26,10 @@ import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Date;
 
 public class LwM2mNodeTextDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeTextDecoder.class);

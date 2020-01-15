@@ -16,12 +16,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.attributes;
 
+import org.eclipse.leshan.util.Validate;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.leshan.util.Validate;
 
 /**
  * Represents an LwM2m attribute that can be attached to an object, instance or resource.
@@ -171,10 +171,7 @@ public class Attribute {
         } else if (!model.equals(other.model))
             return false;
         if (value == null) {
-            if (other.value != null)
-                return false;
-        } else if (!value.equals(other.value))
-            return false;
-        return true;
+            return other.value == null;
+        } else return value.equals(other.value);
     }
 }

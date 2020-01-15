@@ -15,18 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.model.StaticModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
 import org.eclipse.leshan.server.security.InMemorySecurityStore;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.util.Pool;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 public class RedisIntegrationTestHelper extends IntegrationTestHelper {
     @Override

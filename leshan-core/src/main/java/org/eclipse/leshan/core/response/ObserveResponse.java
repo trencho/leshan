@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import java.util.List;
-
 import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
+
+import java.util.List;
 
 /**
  * Specialized ReadResponse to a Observe request, with the corresponding Observation.
