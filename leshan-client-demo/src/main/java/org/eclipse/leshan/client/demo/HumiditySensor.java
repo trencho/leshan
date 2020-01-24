@@ -12,7 +12,6 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -22,14 +21,13 @@ public class HumiditySensor extends BaseInstanceEnabler {
 
     private static final int SENSOR_VALUE = 5700;
     private static final int UNITS = 5701;
-    private static final int TIMESTAMP = 5702;
     private static final int MIN_MEASURED_VALUE = 5601;
     private static final int MAX_MEASURED_VALUE = 5602;
     private static final int MIN_RANGE_VALUE = 5603;
     private static final int MAX_RANGE_VALUE = 5604;
     private static final String SENSOR_UNITS = "%";
     private static final int RESET_MIN_MAX_MEASURED_VALUES = 5605;
-    private static final List<Integer> supportedResources = Arrays.asList(SENSOR_VALUE, UNITS, TIMESTAMP, MAX_MEASURED_VALUE,
+    private static final List<Integer> supportedResources = Arrays.asList(SENSOR_VALUE, UNITS, MAX_MEASURED_VALUE,
             MIN_MEASURED_VALUE, RESET_MIN_MAX_MEASURED_VALUES, MAX_RANGE_VALUE, MIN_RANGE_VALUE);
 
     static final double minHumidValue = 20;
@@ -82,8 +80,6 @@ public class HumiditySensor extends BaseInstanceEnabler {
             return ReadResponse.success(resourceId, getTwoDigitValue(maxHumidValue));
         case UNITS:
             return ReadResponse.success(resourceId, SENSOR_UNITS);
-        case TIMESTAMP:
-            return ReadResponse.success(resourceId, getCurrentTime());
         default:
             return super.read(identity, resourceId);
         }
@@ -142,10 +138,6 @@ public class HumiditySensor extends BaseInstanceEnabler {
     private void resetMinMaxMeasuredValues() {
         minMeasuredValue = currentHumidity;
         maxMeasuredValue = currentHumidity;
-    }
-
-    private Date getCurrentTime() {
-        return new Date();
     }
 
     @Override
