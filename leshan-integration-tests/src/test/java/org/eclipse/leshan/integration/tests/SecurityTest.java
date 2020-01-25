@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Token;
@@ -49,6 +40,24 @@ import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_ENDPOINT;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_PSK_KEY;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_ENDPOINT;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_KEY;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SecurityTest {
 
