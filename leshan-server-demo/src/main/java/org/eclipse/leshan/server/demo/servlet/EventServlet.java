@@ -17,6 +17,12 @@ package org.eclipse.leshan.server.demo.servlet;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.mongodb.MongoClient;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
@@ -36,11 +42,21 @@ import org.eclipse.leshan.server.registration.RegistrationListener;
 import org.eclipse.leshan.server.registration.RegistrationUpdate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.IOException;
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -102,14 +118,14 @@ public class EventServlet extends EventSourceServlet {
 
         @Override
         public void onSleeping(Registration registration) {
-            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
+            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
 
             sendEvent(EVENT_SLEEPING, data, registration.getEndpoint());
         }
 
         @Override
         public void onAwake(Registration registration) {
-            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
+            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
             sendEvent(EVENT_AWAKE, data, registration.getEndpoint());
         }
     };
@@ -128,9 +144,50 @@ public class EventServlet extends EventSourceServlet {
             }
 
             if (registration != null) {
-                String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\",\"res\":\"")
-                        .append(observation.getPath().toString()).append("\",\"val\":")
-                        .append(gson.toJson(response.getContent())).append("}").toString();
+                String data = "{\"ep\":\"" + registration.getEndpoint() + "\",\"res\":\"" +
+                        observation.getPath().toString() + "\",\"val\":" +
+                        gson.toJson(response.getContent()) + "}";
+
+                // ********Saving into database**************************
+                Gson gson = new Gson();
+                JsonObject content = new JsonParser().parse(gson.toJson(response.getContent())).getAsJsonObject();
+
+                String measurementCode = observation.getPath().toString().split("/")[1];
+                String measurementName = "UNKNOWN";
+                ClassLoader classLoader = getClass().getClassLoader();
+                try {
+                    InputStream is = classLoader.getResourceAsStream("models/" + measurementCode + ".xml");
+                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                    org.w3c.dom.Document doc = dBuilder.parse(is);
+                    Element rootElement = doc.getDocumentElement();
+                    measurementName = getString("Name", rootElement);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date date = toNearestWholeHour();
+                String timestamp = dateFormat.format(date);
+
+                try {
+                    MongoClient mongoClient = new MongoClient("localhost", 27017);
+                    MongoDatabase database = mongoClient.getDatabase("local");
+                    MongoCollection<Document> collection = database.getCollection("events");
+                    JsonObject resources = content.getAsJsonObject("resources");
+                    String event = resources.toString();
+                    Document document = new Document();
+                    document.put("client_ep", registration.getEndpoint());
+                    document.put("measurement", measurementName);
+                    document.put("event", event);
+                    document.put("timestamp", timestamp);
+                    collection.insertOne(document);
+                    mongoClient.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.err.println(e.getClass().getName() + ": " + e.getMessage());
+                    System.exit(0);
+                }
 
                 sendEvent(EVENT_NOTIFICATION, data, registration.getEndpoint());
             }
@@ -222,7 +279,7 @@ public class EventServlet extends EventSourceServlet {
         }
 
         @Override
-        public void onOpen(Emitter emitter) throws IOException {
+        public void onOpen(Emitter emitter) {
             this.emitter = emitter;
             eventSources.add(this);
             if (endpoint != null) {
@@ -248,5 +305,31 @@ public class EventServlet extends EventSourceServlet {
         public String getEndpoint() {
             return endpoint;
         }
+    }
+
+    private static Date toNearestWholeHour() {
+        Calendar c = new GregorianCalendar();
+        c.setTime(new Date());
+
+        if (c.get(Calendar.MINUTE) >= 30)
+            c.add(Calendar.HOUR, 1);
+
+        c.set(Calendar.MINUTE, 0);
+        c.set(Calendar.SECOND, 0);
+
+        return c.getTime();
+    }
+
+    protected static String getString(String tagName, Element element) {
+        NodeList list = element.getElementsByTagName(tagName);
+        if (list != null && list.getLength() > 0) {
+            NodeList subList = list.item(0).getChildNodes();
+
+            if (subList != null && subList.getLength() > 0) {
+                return subList.item(0).getNodeValue();
+            }
+        }
+
+        return null;
     }
 }
