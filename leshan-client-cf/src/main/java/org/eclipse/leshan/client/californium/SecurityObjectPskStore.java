@@ -48,7 +48,7 @@ import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
 public class SecurityObjectPskStore implements PskStore {
     private static final Logger LOG = LoggerFactory.getLogger(SecurityObjectPskStore.class);
 
-    private final LwM2mObjectEnabler securityEnabler;
+    protected final LwM2mObjectEnabler securityEnabler;
 
     /**
      * Warning : The securityEnabler should not contains 2 or more entries with the same identity. This is not a LWM2M

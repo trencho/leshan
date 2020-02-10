@@ -36,7 +36,7 @@ import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapRespons
  */
 public class RootResource extends LwM2mClientCoapResource {
 
-    private CoapServer coapServer;
+    protected CoapServer coapServer;
 
     public RootResource(BootstrapHandler bootstrapHandler, CoapServer coapServer) {
         super("", bootstrapHandler);

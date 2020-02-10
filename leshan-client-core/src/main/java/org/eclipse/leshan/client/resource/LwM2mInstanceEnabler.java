@@ -18,6 +18,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
+import java.util.List;
+
+import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.request.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
@@ -27,8 +30,6 @@ import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
-
-import java.util.List;
 
 /**
  * A contract for managing a LWM2M object instance on a LWM2M client.
@@ -70,6 +71,13 @@ public interface LwM2mInstanceEnabler {
      * @param model the model of this instance
      */
     void setModel(ObjectModel model);
+
+    /**
+     * Set the lwm2mclient linked to this instance. It should only be called by {@link ObjectEnabler}.
+     * 
+     * @param client the {@link LwM2mClient} which hold this instance.
+     */
+    void setLwM2mClient(LwM2mClient client);
 
     /**
      * Adds a callback handler that gets notified about changes to any of this LWM2M object instance's resources.

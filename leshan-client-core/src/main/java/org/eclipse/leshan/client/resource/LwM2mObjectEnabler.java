@@ -16,7 +16,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
+import java.util.List;
+
+import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.request.ServerIdentity;
+import org.eclipse.leshan.client.resource.listener.ObjectListener;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
@@ -40,8 +44,6 @@ import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteAttributesResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
-
-import java.util.List;
 
 public interface LwM2mObjectEnabler {
 
@@ -73,7 +75,11 @@ public interface LwM2mObjectEnabler {
 
     ObserveResponse observe(ServerIdentity identity, ObserveRequest request);
 
-    void setNotifySender(NotifySender sender);
+    void addListener(ObjectListener listener);
+
+    void removeListener(ObjectListener listener);
+
+    void setLwM2mClient(LwM2mClient client);
 
     ContentFormat getDefaultEncodingFormat(DownlinkRequest<?> request);
 }
