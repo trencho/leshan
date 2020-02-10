@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
+import org.eclipse.leshan.client.resource.listener.ObjectListener;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.leshan.client.resource.listener.ObjectListener;
 
 /**
  * An {@link ObjectListener} which is able to store notification during transaction and raise all grouped event at the

@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
+import org.eclipse.leshan.client.LwM2mClient;
+import org.eclipse.leshan.client.resource.listener.ObjectListener;
+import org.eclipse.leshan.client.resource.listener.ObjectsListener;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.eclipse.leshan.client.LwM2mClient;
-import org.eclipse.leshan.client.resource.listener.ObjectListener;
-import org.eclipse.leshan.client.resource.listener.ObjectsListener;
 
 public class LwM2mObjectTree {
 
