@@ -56,7 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 import javax.jmdns.JmDNS;
 import javax.jmdns.ServiceInfo;
@@ -89,6 +89,8 @@ public class LeshanServerDemo {
 
     private static final Logger LOG = LoggerFactory.getLogger(LeshanServerDemo.class);
 
+    // /!\ This class is a COPY of org.eclipse.leshan.client.demo.LeshanClientDemo.modelPaths /!\
+    // TODO create a leshan-demo project ?
     private final static String[] modelPaths = new String[] { "31024.xml",
 
                             "10241.xml", "10242.xml", "10243.xml", "10244.xml", "10245.xml", "10246.xml", "10247.xml",

@@ -24,6 +24,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 import org.eclipse.californium.core.network.Endpoint;
+import org.eclipse.jetty.servlets.EventSource;
+import org.eclipse.jetty.servlets.EventSourceServlet;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.response.ObserveResponse;
@@ -33,8 +35,6 @@ import org.eclipse.leshan.server.demo.servlet.json.RegistrationSerializer;
 import org.eclipse.leshan.server.demo.servlet.log.CoapMessage;
 import org.eclipse.leshan.server.demo.servlet.log.CoapMessageListener;
 import org.eclipse.leshan.server.demo.servlet.log.CoapMessageTracer;
-import org.eclipse.leshan.server.demo.utils.EventSource;
-import org.eclipse.leshan.server.demo.utils.EventSourceServlet;
 import org.eclipse.leshan.server.observation.ObservationListener;
 import org.eclipse.leshan.server.queue.PresenceListener;
 import org.eclipse.leshan.server.registration.Registration;
@@ -103,7 +103,10 @@ public class EventServlet extends EventSourceServlet {
         @Override
         public void updated(RegistrationUpdate update, Registration updatedRegistration,
                 Registration previousRegistration) {
-            String jReg = EventServlet.this.gson.toJson(updatedRegistration);
+            RegUpdate regUpdate = new RegUpdate();
+            regUpdate.registration = updatedRegistration;
+            regUpdate.update = update;
+            String jReg = EventServlet.this.gson.toJson(regUpdate);
             sendEvent(EVENT_UPDATED, jReg, updatedRegistration.getEndpoint());
         }
 
@@ -120,14 +123,14 @@ public class EventServlet extends EventSourceServlet {
 
         @Override
         public void onSleeping(Registration registration) {
-            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
+            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
 
             sendEvent(EVENT_SLEEPING, data, registration.getEndpoint());
         }
 
         @Override
         public void onAwake(Registration registration) {
-            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
+            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
             sendEvent(EVENT_AWAKE, data, registration.getEndpoint());
         }
     };
@@ -146,9 +149,9 @@ public class EventServlet extends EventSourceServlet {
             }
 
             if (registration != null) {
-                String data = "{\"ep\":\"" + registration.getEndpoint() + "\",\"res\":\"" +
-                        observation.getPath().toString() + "\",\"val\":" +
-                        gson.toJson(response.getContent()) + "}";
+                String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\",\"res\":\"")
+                        .append(observation.getPath().toString()).append("\",\"val\":")
+                        .append(gson.toJson(response.getContent())).append("}").toString();
 
                 // ********Saving into database**************************
                 Gson gson = new Gson();
@@ -285,7 +288,7 @@ public class EventServlet extends EventSourceServlet {
         }
 
         @Override
-        public void onOpen(Emitter emitter) {
+        public void onOpen(Emitter emitter) throws IOException {
             this.emitter = emitter;
             eventSources.add(this);
             if (endpoint != null) {
@@ -337,5 +340,11 @@ public class EventServlet extends EventSourceServlet {
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unused")
+    private class RegUpdate {
+        public Registration registration;
+        public RegistrationUpdate update;
     }
 }

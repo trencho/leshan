@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.ScanParams;
 import redis.clients.jedis.ScanResult;
-import redis.clients.util.Pool;
+import redis.clients.jedis.util.Pool;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -295,7 +295,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
                         }
                     }
 
-                    cursor = sr.getStringCursor();
+                    cursor = sr.getCursor();
                 } while (!"0".equals(cursor) && scanResult.isEmpty());
 
                 this.cursor = cursor;

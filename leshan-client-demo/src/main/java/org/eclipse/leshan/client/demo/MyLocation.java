@@ -22,9 +22,12 @@ public class MyLocation extends BaseInstanceEnabler {
     private static final Logger LOG = LoggerFactory.getLogger(MyLocation.class);
 
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 5);
+    private static final Random RANDOM = new Random();
 
     private float latitude;
     private float longitude;
+    private float scaleFactor;
+    private Date timestamp;
 
     public MyLocation() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Location"));
@@ -64,7 +67,7 @@ public class MyLocation extends BaseInstanceEnabler {
             case 1:
                 return ReadResponse.success(resourceid, getLongitude());
             case 5:
-                return ReadResponse.success(resourceid, getCurrentTime());
+                return ReadResponse.success(resourceid, getTimestamp());
             default:
                 return super.read(identity, resourceid);
         }
@@ -90,6 +93,39 @@ public class MyLocation extends BaseInstanceEnabler {
         fireResourcesChange(0, 1, 5);
     }
 
+    public void moveLocation(String nextMove) {
+        switch (nextMove.charAt(0)) {
+            case 'w':
+                moveLatitude(1.0f);
+                LOG.info("Move to North {}/{}", getLatitude(), getLongitude());
+                break;
+            case 'a':
+                moveLongitude(-1.0f);
+                LOG.info("Move to East {}/{}", getLatitude(), getLongitude());
+                break;
+            case 's':
+                moveLatitude(-1.0f);
+                LOG.info("Move to South {}/{}", getLatitude(), getLongitude());
+                break;
+            case 'd':
+                moveLongitude(1.0f);
+                LOG.info("Move to West {}/{}", getLatitude(), getLongitude());
+                break;
+        }
+    }
+
+    private void moveLatitude(float delta) {
+        latitude = latitude + delta * scaleFactor;
+        timestamp = new Date();
+        fireResourcesChange(0, 5);
+    }
+
+    private void moveLongitude(float delta) {
+        longitude = longitude + delta * scaleFactor;
+        timestamp = new Date();
+        fireResourcesChange(1, 5);
+    }
+
     public float getLatitude() {
         return latitude;
     }
@@ -98,7 +134,7 @@ public class MyLocation extends BaseInstanceEnabler {
         return longitude;
     }
 
-    public Date getCurrentTime() {
+    public Date getTimestamp() {
         return new Date();
     }
 

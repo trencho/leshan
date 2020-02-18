@@ -30,7 +30,7 @@ Contributors:
         <dependency>
             <groupId>org.jmdns</groupId>
             <artifactId>jmdns</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.5</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.leshan</groupId>
@@ -62,7 +62,7 @@ Contributors:
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-continuation</artifactId>
+            <artifactId>jetty-servlets</artifactId>
         </dependency>
         <dependency>
             <groupId>com.google.code.gson</groupId>
