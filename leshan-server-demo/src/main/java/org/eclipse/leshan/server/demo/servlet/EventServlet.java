@@ -60,6 +60,8 @@ import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static org.eclipse.leshan.LwM2mId.LOCATION;
+
 public class EventServlet extends EventSourceServlet {
 
     private static final String EVENT_DEREGISTRATION = "DEREGISTRATION";
@@ -154,16 +156,20 @@ public class EventServlet extends EventSourceServlet {
 
                 String measurementCode = observation.getPath().toString().split("/")[1];
                 String measurementName = "UNKNOWN";
-                ClassLoader classLoader = getClass().getClassLoader();
-                try {
-                    InputStream is = classLoader.getResourceAsStream("models/" + measurementCode + ".xml");
-                    DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                    DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-                    org.w3c.dom.Document doc = dBuilder.parse(is);
-                    Element rootElement = doc.getDocumentElement();
-                    measurementName = getString("Name", rootElement);
-                } catch (Exception e) {
-                    e.printStackTrace();
+                if(Integer.parseInt(measurementCode) == LOCATION) {
+                    measurementName = "location";
+                } else {
+                    ClassLoader classLoader = getClass().getClassLoader();
+                    try {
+                        InputStream is = classLoader.getResourceAsStream("models/" + measurementCode + ".xml");
+                        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+                        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+                        org.w3c.dom.Document doc = dBuilder.parse(is);
+                        Element rootElement = doc.getDocumentElement();
+                        measurementName = getString("Name", rootElement);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

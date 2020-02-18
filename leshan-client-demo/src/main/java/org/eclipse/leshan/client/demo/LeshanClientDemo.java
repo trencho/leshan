@@ -49,7 +49,6 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 import static org.eclipse.leshan.LwM2mId.DEVICE;
 import static org.eclipse.leshan.LwM2mId.LOCATION;
@@ -277,33 +276,33 @@ public class LeshanClientDemo {
         Float latitude = null;
         Float longitude = null;
         float scaleFactor = 1.0f;
-        // get initial Location
-        if (cl.hasOption("pos")) {
-            try {
-                String pos = cl.getOptionValue("pos");
-                int colon = pos.indexOf(':');
-                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
-                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                    formatter.printHelp(USAGE, options);
-                    return;
-                }
-                latitude = Float.valueOf(pos.substring(0, colon));
-                longitude = Float.valueOf(pos.substring(colon + 1));
-            } catch (NumberFormatException e) {
-                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
-        if (cl.hasOption("sf")) {
-            try {
-                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
-            } catch (NumberFormatException e) {
-                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
+//         get initial Location
+//        if (cl.hasOption("pos")) {
+//            try {
+//                String pos = cl.getOptionValue("pos");
+//                int colon = pos.indexOf(':');
+//                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
+//                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+//                    formatter.printHelp(USAGE, options);
+//                    return;
+//                }
+//                latitude = Float.valueOf(pos.substring(0, colon));
+//                longitude = Float.valueOf(pos.substring(colon + 1));
+//            } catch (NumberFormatException e) {
+//                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+//                formatter.printHelp(USAGE, options);
+//                return;
+//            }
+//        }
+//        if (cl.hasOption("sf")) {
+//            try {
+//                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
+//            } catch (NumberFormatException e) {
+//                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
+//                formatter.printHelp(USAGE, options);
+//                return;
+//            }
+//        }
         try {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), serverURI, pskIdentity, pskKey,
                     clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate, latitude,
@@ -319,7 +318,7 @@ public class LeshanClientDemo {
                                             PublicKey serverPublicKey, X509Certificate clientCertificate, X509Certificate serverCertificate,
                                             Float latitude, Float longitude, float scaleFactor) throws CertificateEncodingException {
 
-        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
+//        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -361,7 +360,7 @@ public class LeshanClientDemo {
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
-        initializer.setInstancesForObject(LOCATION, locationInstance);
+        initializer.setInstancesForObject(LOCATION, new MyLocation());
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new TemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_HUMIDITY_SENSOR, new HumiditySensor());
 //        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
@@ -419,8 +418,8 @@ public class LeshanClientDemo {
                     Hex.encodeHexString(clientPrivateKey.getEncoded()));
         }
 
-        LOG.info("Press 'w','a','s','d' to change reported Location ({},{}).", locationInstance.getLatitude(),
-                locationInstance.getLongitude());
+//        LOG.info("Press 'w','a','s','d' to change reported Location ({},{}).", locationInstance.getLatitude(),
+//                locationInstance.getLongitude());
 
         // Start the client
         client.start();
@@ -433,12 +432,12 @@ public class LeshanClientDemo {
             }
         });
 
-        // Change the location through the Console
-        try (Scanner scanner = new Scanner(System.in)) {
-            while (scanner.hasNext()) {
-                String nextMove = scanner.next();
-                locationInstance.moveLocation(nextMove);
-            }
-        }
+//        // Change the location through the Console
+//        try (Scanner scanner = new Scanner(System.in)) {
+//            while (scanner.hasNext()) {
+//                String nextMove = scanner.next();
+//                locationInstance.moveLocation(nextMove);
+//            }
+//        }
     }
 }

@@ -39,7 +39,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
             @Override
             public void run() {
                 try {
-                    adjustTemperature();
+                    readTemperature();
                 } catch (Exception e) {
                     System.out.println("Error reading sensor");
                     e.printStackTrace();
@@ -52,7 +52,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
 //            @Override
 //            public void run() {
 //                try {
-//                    adjustTemperature();
+//                    readTemperature();
 //                } catch (Exception e) {
 //                    System.out.println("Error reading sensor");
 //                    e.printStackTrace();
@@ -91,7 +91,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
         return toBeTruncated.setScale(2, RoundingMode.HALF_UP).doubleValue();
     }
 
-    private void adjustTemperature() throws Exception {
+    private void readTemperature() throws Exception {
         Runtime rt = Runtime.getRuntime();
         Process p = rt.exec("python3 /home/pi/Desktop/TempHumSensor/AdafruitDHT.py 11 4");
         BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
