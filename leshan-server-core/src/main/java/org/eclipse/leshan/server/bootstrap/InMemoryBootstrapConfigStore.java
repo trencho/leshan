@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.leshan.SecurityMode;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple bootstrap store implementation storing bootstrap configuration information in memory.
@@ -129,11 +129,8 @@ public class InMemoryBootstrapConfigStore implements EditableBootstrapConfigStor
             } else if (!identity.equals(other.identity))
                 return false;
             if (serverUrl == null) {
-                if (other.serverUrl != null)
-                    return false;
-            } else if (!serverUrl.equals(other.serverUrl))
-                return false;
-            return true;
+                return other.serverUrl == null;
+            } else return serverUrl.equals(other.serverUrl);
         }
     }
 }

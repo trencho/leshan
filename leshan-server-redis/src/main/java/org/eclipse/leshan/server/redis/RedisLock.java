@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.params.SetParams;
+
+import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Utility class providing locking methods based on the Redis SETNX primitive (see
