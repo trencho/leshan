@@ -24,23 +24,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.registration;
 
-import org.eclipse.californium.core.coap.Token;
-import org.eclipse.californium.core.observe.ObservationUtil;
-import org.eclipse.californium.elements.EndpointContext;
-import org.eclipse.leshan.core.observation.Observation;
-import org.eclipse.leshan.server.Destroyable;
-import org.eclipse.leshan.server.Startable;
-import org.eclipse.leshan.server.Stoppable;
-import org.eclipse.leshan.server.californium.observation.ObserveUtil;
-import org.eclipse.leshan.server.registration.Deregistration;
-import org.eclipse.leshan.server.registration.ExpirationListener;
-import org.eclipse.leshan.server.registration.Registration;
-import org.eclipse.leshan.server.registration.RegistrationUpdate;
-import org.eclipse.leshan.server.registration.UpdatedRegistration;
-import org.eclipse.leshan.util.NamedThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,6 +41,24 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.eclipse.californium.core.coap.Token;
+import org.eclipse.californium.core.observe.ObservationStoreException;
+import org.eclipse.californium.core.observe.ObservationUtil;
+import org.eclipse.californium.elements.EndpointContext;
+import org.eclipse.leshan.core.observation.Observation;
+import org.eclipse.leshan.server.Destroyable;
+import org.eclipse.leshan.server.Startable;
+import org.eclipse.leshan.server.Stoppable;
+import org.eclipse.leshan.server.californium.observation.ObserveUtil;
+import org.eclipse.leshan.server.registration.Deregistration;
+import org.eclipse.leshan.server.registration.ExpirationListener;
+import org.eclipse.leshan.server.registration.Registration;
+import org.eclipse.leshan.server.registration.RegistrationUpdate;
+import org.eclipse.leshan.server.registration.UpdatedRegistration;
+import org.eclipse.leshan.util.NamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An in memory store for registration and observation.
@@ -292,18 +293,18 @@ public class InMemoryRegistrationStore implements CaliforniumRegistrationStore, 
 
     @Override
     public org.eclipse.californium.core.observe.Observation putIfAbsent(Token token,
-            org.eclipse.californium.core.observe.Observation obs) {
+            org.eclipse.californium.core.observe.Observation obs) throws ObservationStoreException {
         return add(token, obs, true);
     }
 
     @Override
     public org.eclipse.californium.core.observe.Observation put(Token token,
-            org.eclipse.californium.core.observe.Observation obs) {
+            org.eclipse.californium.core.observe.Observation obs) throws ObservationStoreException {
         return add(token, obs, false);
     }
 
     private org.eclipse.californium.core.observe.Observation add(Token token,
-            org.eclipse.californium.core.observe.Observation obs, boolean ifAbsent) {
+            org.eclipse.californium.core.observe.Observation obs, boolean ifAbsent) throws ObservationStoreException {
         org.eclipse.californium.core.observe.Observation previousObservation = null;
         if (obs != null) {
             try {
@@ -427,10 +428,11 @@ public class InMemoryRegistrationStore implements CaliforniumRegistrationStore, 
         return ObserveUtil.createLwM2mObservation(cfObs.getRequest());
     }
 
-    private String validateObservation(org.eclipse.californium.core.observe.Observation observation) {
+    private String validateObservation(org.eclipse.californium.core.observe.Observation observation)
+            throws ObservationStoreException {
         String endpoint = ObserveUtil.validateCoapObservation(observation);
         if (getRegistration(ObserveUtil.extractRegistrationId(observation)) == null) {
-            throw new IllegalStateException("no registration for this Id");
+            throw new ObservationStoreException("no registration for this Id");
         }
 
         return endpoint;

@@ -20,6 +20,7 @@
 package org.eclipse.leshan.server.redis;
 
 import org.eclipse.californium.core.coap.Token;
+import org.eclipse.californium.core.observe.ObservationStoreException;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.server.Destroyable;
@@ -531,18 +532,18 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
 
     @Override
     public org.eclipse.californium.core.observe.Observation putIfAbsent(Token token,
-            org.eclipse.californium.core.observe.Observation obs) {
+            org.eclipse.californium.core.observe.Observation obs) throws ObservationStoreException {
         return add(token, obs, true);
     }
 
     @Override
     public org.eclipse.californium.core.observe.Observation put(Token token,
-            org.eclipse.californium.core.observe.Observation obs) {
+            org.eclipse.californium.core.observe.Observation obs) throws ObservationStoreException {
         return add(token, obs, false);
     }
 
     private org.eclipse.californium.core.observe.Observation add(Token token,
-            org.eclipse.californium.core.observe.Observation obs, boolean ifAbsent) {
+            org.eclipse.californium.core.observe.Observation obs, boolean ifAbsent) throws ObservationStoreException {
         String endpoint = ObserveUtil.validateCoapObservation(obs);
         org.eclipse.californium.core.observe.Observation previousObservation = null;
 
@@ -554,7 +555,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
 
                 String registrationId = ObserveUtil.extractRegistrationId(obs);
                 if (!j.exists(toRegIdKey(registrationId)))
-                    throw new IllegalStateException("no registration for this Id");
+                    throw new ObservationStoreException("no registration for this Id");
                 byte[] key = toKey(OBS_TKN, obs.getRequest().getToken().getBytes());
                 byte[] serializeObs = serializeObs(obs);
                 byte[] previousValue = null;
