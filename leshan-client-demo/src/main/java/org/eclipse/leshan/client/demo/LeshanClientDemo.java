@@ -312,54 +312,52 @@ public class LeshanClientDemo {
             localPort = Integer.parseInt(cl.getOptionValue("lp"));
         }
 
-        Float latitude = null;
-        Float longitude = null;
-        Float scaleFactor = 1.0f;
-        // get initial Location
-        if (cl.hasOption("pos")) {
-            try {
-                String pos = cl.getOptionValue("pos");
-                int colon = pos.indexOf(':');
-                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
-                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                    formatter.printHelp(USAGE, options);
-                    return;
-                }
-                latitude = Float.valueOf(pos.substring(0, colon));
-                longitude = Float.valueOf(pos.substring(colon + 1));
-            } catch (NumberFormatException e) {
-                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
-        if (cl.hasOption("sf")) {
-            try {
-                scaleFactor = Float.valueOf(cl.getOptionValue("sf"));
-            } catch (NumberFormatException e) {
-                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
+//        Float latitude = null;
+//        Float longitude = null;
+//        float scaleFactor = 1.0f;
+//         get initial Location
+//        if (cl.hasOption("pos")) {
+//            try {
+//                String pos = cl.getOptionValue("pos");
+//                int colon = pos.indexOf(':');
+//                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
+//                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+//                    formatter.printHelp(USAGE, options);
+//                    return;
+//                }
+//                latitude = Float.valueOf(pos.substring(0, colon));
+//                longitude = Float.valueOf(pos.substring(colon + 1));
+//            } catch (NumberFormatException e) {
+//                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+//                formatter.printHelp(USAGE, options);
+//                return;
+//            }
+//        }
+//        if (cl.hasOption("sf")) {
+//            try {
+//                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
+//            } catch (NumberFormatException e) {
+//                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
+//                formatter.printHelp(USAGE, options);
+//                return;
+//            }
+//        }
         try {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), lifetime, serverURI, pskIdentity,
-                    pskKey, clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate,
-                    latitude, longitude, scaleFactor);
+                    pskKey, clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate);
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
-            return;
         }
     }
 
     public static void createAndStartClient(String endpoint, String localAddress, int localPort, boolean needBootstrap,
             int lifetime, String serverURI, byte[] pskIdentity, byte[] pskKey, PrivateKey clientPrivateKey,
             PublicKey clientPublicKey, PublicKey serverPublicKey, X509Certificate clientCertificate,
-            X509Certificate serverCertificate, Float latitude, Float longitude, float scaleFactor)
+            X509Certificate serverCertificate)
             throws CertificateEncodingException {
 
-//        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
+        MyLocation locationInstance = new MyLocation();
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -440,9 +438,8 @@ public class LeshanClientDemo {
 
         // Display client public key to easily add it in demo servers.
         if (clientPublicKey != null) {
-            PublicKey rawPublicKey = clientPublicKey;
-            if (rawPublicKey instanceof ECPublicKey) {
-                ECPublicKey ecPublicKey = (ECPublicKey) rawPublicKey;
+            if (clientPublicKey instanceof ECPublicKey) {
+                ECPublicKey ecPublicKey = (ECPublicKey) clientPublicKey;
                 // Get x coordinate
                 byte[] x = ecPublicKey.getW().getAffineX().toByteArray();
                 if (x[0] == 0)
@@ -459,7 +456,7 @@ public class LeshanClientDemo {
                 LOG.info(
                         "Client uses RPK : \n Elliptic Curve parameters  : {} \n Public x coord : {} \n Public y coord : {} \n Public Key (Hex): {} \n Private Key (Hex): {}",
                         params, Hex.encodeHexString(x), Hex.encodeHexString(y),
-                        Hex.encodeHexString(rawPublicKey.getEncoded()),
+                        Hex.encodeHexString(clientPublicKey.getEncoded()),
                         Hex.encodeHexString(clientPrivateKey.getEncoded()));
 
             } else {
@@ -474,24 +471,23 @@ public class LeshanClientDemo {
         }
 
         // Print commands help
-        StringBuilder commandsHelp = new StringBuilder("Commands available :");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - create <objectId> : to enable a new object.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - delete <objectId> : to disable a new object.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - update : to trigger a registration update.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - w : to move to North.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - a : to move to East.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - s : to move to South.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - d : to move to West.");
-        commandsHelp.append(System.lineSeparator());
-        LOG.info(commandsHelp.toString());
+        String commandsHelp = "Commands available :" + System.lineSeparator() +
+                System.lineSeparator() +
+                "  - create <objectId> : to enable a new object." +
+                System.lineSeparator() +
+                "  - delete <objectId> : to disable a new object." +
+                System.lineSeparator() +
+                "  - update : to trigger a registration update." +
+                System.lineSeparator() +
+                "  - w : to move to North." +
+                System.lineSeparator() +
+                "  - a : to move to East." +
+                System.lineSeparator() +
+                "  - s : to move to South." +
+                System.lineSeparator() +
+                "  - d : to move to West." +
+                System.lineSeparator();
+        LOG.info(commandsHelp);
 
         // Start the client
         client.start();
@@ -504,53 +500,53 @@ public class LeshanClientDemo {
             }
         });
 
-        // Change the location through the Console
-        try (Scanner scanner = new Scanner(System.in)) {
-            List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
-            while (scanner.hasNext()) {
-                String command = scanner.next();
-                if (command.startsWith("create")) {
-                    try {
-                        int objectId = scanner.nextInt();
-                        if (client.getObjectTree().getObjectEnabler(objectId) != null) {
-                            LOG.info("Object {} already enabled.", objectId);
-                        }
-                        if (model.getObjectModel(objectId) == null) {
-                            LOG.info("Unable to enable Object {} : there no model for this.", objectId);
-                        } else {
-                            ObjectsInitializer objectsInitializer = new ObjectsInitializer(model);
-                            objectsInitializer.setDummyInstancesForObject(objectId);
-                            LwM2mObjectEnabler object = objectsInitializer.create(objectId);
-                            client.getObjectTree().addObjectEnabler(object);
-                        }
-                    } catch (Exception e) {
-                        // skip last token
-                        scanner.next();
-                        LOG.info("Invalid syntax, <objectid> must be an integer : create <objectId>");
-                    }
-                } else if (command.startsWith("delete")) {
-                    try {
-                        int objectId = scanner.nextInt();
-                        if (objectId == 0 || objectId == 0 || objectId == 3) {
-                            LOG.info("Object {} can not be disabled.", objectId);
-                        } else if (client.getObjectTree().getObjectEnabler(objectId) == null) {
-                            LOG.info("Object {} is not enabled.", objectId);
-                        } else {
-                            client.getObjectTree().removeObjectEnabler(objectId);
-                        }
-                    } catch (Exception e) {
-                        // skip last token
-                        scanner.next();
-                        LOG.info("\"Invalid syntax, <objectid> must be an integer : delete <objectId>");
-                    }
-                } else if (command.startsWith("update")) {
-                    client.triggerRegistrationUpdate();
-                } else if (command.length() == 1 && wasdCommands.contains(command.charAt(0))) {
-                    locationInstance.moveLocation(command);
-                } else {
-                    LOG.info("Unknown command '{}'", command);
-                }
-            }
-        }
+//         Change the location through the Console
+//        try (Scanner scanner = new Scanner(System.in)) {
+//            List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
+//            while (scanner.hasNext()) {
+//                String command = scanner.next();
+//                if (command.startsWith("create")) {
+//                    try {
+//                        int objectId = scanner.nextInt();
+//                        if (client.getObjectTree().getObjectEnabler(objectId) != null) {
+//                            LOG.info("Object {} already enabled.", objectId);
+//                        }
+//                        if (model.getObjectModel(objectId) == null) {
+//                            LOG.info("Unable to enable Object {} : there no model for this.", objectId);
+//                        } else {
+//                            ObjectsInitializer objectsInitializer = new ObjectsInitializer(model);
+//                            objectsInitializer.setDummyInstancesForObject(objectId);
+//                            LwM2mObjectEnabler object = objectsInitializer.create(objectId);
+//                            client.getObjectTree().addObjectEnabler(object);
+//                        }
+//                    } catch (Exception e) {
+//                        // skip last token
+//                        scanner.next();
+//                        LOG.info("Invalid syntax, <objectid> must be an integer : create <objectId>");
+//                    }
+//                } else if (command.startsWith("delete")) {
+//                    try {
+//                        int objectId = scanner.nextInt();
+//                        if (objectId == 0 || objectId == 3) {
+//                            LOG.info("Object {} can not be disabled.", objectId);
+//                        } else if (client.getObjectTree().getObjectEnabler(objectId) == null) {
+//                            LOG.info("Object {} is not enabled.", objectId);
+//                        } else {
+//                            client.getObjectTree().removeObjectEnabler(objectId);
+//                        }
+//                    } catch (Exception e) {
+//                        // skip last token
+//                        scanner.next();
+//                        LOG.info("\"Invalid syntax, <objectid> must be an integer : delete <objectId>");
+//                    }
+//                } else if (command.startsWith("update")) {
+//                    client.triggerRegistrationUpdate();
+//                } else if (command.length() == 1 && wasdCommands.contains(command.charAt(0))) {
+//                    locationInstance.moveLocation(command);
+//                } else {
+//                    LOG.info("Unknown command '{}'", command);
+//                }
+//            }
+//        }
     }
 }
