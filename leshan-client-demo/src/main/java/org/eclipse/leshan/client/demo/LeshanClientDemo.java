@@ -18,12 +18,34 @@
 
 package org.eclipse.leshan.client.demo;
 
+import static org.eclipse.leshan.LwM2mId.*;
+import static org.eclipse.leshan.client.object.Security.*;
+
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Option.Builder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.californium.core.network.config.NetworkConfig;
+import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.leshan.LwM2m;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
@@ -35,6 +57,8 @@ import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.StaticModel;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.util.Hex;
 import org.eclipse.leshan.util.SecurityUtil;
@@ -104,10 +128,40 @@ public class LeshanClientDemo {
     private final static int DEFAULT_LIFETIME = 5 * 60; // 5min in seconds
     private final static String USAGE = "java -jar leshan-client-demo.jar [OPTION]\n\n";
 
+    private static MyLocation locationInstance;
+
     public static void main(final String[] args) {
 
         // Define options for command line tools
         Options options = new Options();
+
+        final StringBuilder PSKChapter = new StringBuilder();
+        PSKChapter.append("\n .");
+        PSKChapter.append("\n .");
+        PSKChapter.append("\n ================================[ PSK ]=================================");
+        PSKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
+        PSKChapter.append("\n | To use PSK, -i and -p options should be used together.               |");
+        PSKChapter.append("\n ------------------------------------------------------------------------");
+
+        final StringBuilder RPKChapter = new StringBuilder();
+        RPKChapter.append("\n .");
+        RPKChapter.append("\n .");
+        RPKChapter.append("\n ================================[ RPK ]=================================");
+        RPKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
+        RPKChapter.append("\n | To use RPK, -cpubk -cprik -spubk options should be used together.    |");
+        RPKChapter.append("\n | To get helps about files format and how to generate it, see :        |");
+        RPKChapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
+        RPKChapter.append("\n ------------------------------------------------------------------------");
+
+        final StringBuilder X509Chapter = new StringBuilder();
+        X509Chapter.append("\n .");
+        X509Chapter.append("\n .");
+        X509Chapter.append("\n ================================[X509]==================================");
+        X509Chapter.append("\n | By default Leshan demo use non secure connection.                    |");
+        X509Chapter.append("\n | To use X509, -ccert -cprik -scert options should be used together.   |");
+        X509Chapter.append("\n | To get helps about files format and how to generate it, see :        |");
+        X509Chapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
+        X509Chapter.append("\n ------------------------------------------------------------------------");
 
         options.addOption("h", "help", false, "Display help information.");
         options.addOption("n", true, String.format(
@@ -120,6 +174,13 @@ public class LeshanClientDemo {
                 "Set the local CoAP port of the Client.\n  Default: A valid port value is between 0 and 65535.");
         options.addOption("u", true, String.format("Set the LWM2M or Bootstrap server URL.\nDefault: localhost:%d.",
                 LwM2m.DEFAULT_COAP_PORT));
+        options.addOption("ocf",
+                "activate support of old/unofficial content format .\n See https://github.com/eclipse/leshan/pull/720");
+        options.addOption("oc", "activate support of old/deprecated cipher suites.");
+        Builder aa = Option.builder("aa");
+        aa.desc("Use additional attributes at registration time, syntax is \n -aa attrName1=attrValue1 attrName2=\\\"attrValue2\\\" ...");
+        aa.hasArgs();
+        options.addOption(aa.build());
         options.addOption("pos", true,
                 "Set the initial location (latitude, longitude) of the device to be reported by the Location object.\n Format: lat_float:long_float");
         String PSKChapter = "\n ." +
@@ -248,6 +309,33 @@ public class LeshanClientDemo {
             lifetime = DEFAULT_LIFETIME;
         }
 
+        // Get additional attributes
+        Map<String, String> additionalAttributes = null;
+        if (cl.hasOption("aa")) {
+            additionalAttributes = new HashMap<>();
+            Pattern p1 = Pattern.compile("(.*)=\"(.*)\"");
+            Pattern p2 = Pattern.compile("(.*)=(.*)");
+            String[] values = cl.getOptionValues("aa");
+            for (String v : values) {
+                Matcher m = p1.matcher(v);
+                if (m.matches()) {
+                    String attrName = m.group(1);
+                    String attrValue = m.group(2);
+                    additionalAttributes.put(attrName, attrValue);
+                } else {
+                    m = p2.matcher(v);
+                    if (m.matches()) {
+                        String attrName = m.group(1);
+                        String attrValue = m.group(2);
+                        additionalAttributes.put(attrName, attrValue);
+                    } else {
+                        System.err.println(String.format("Invalid syntax for additional attributes : %s", v));
+                        return;
+                    }
+                }
+            }
+        }
+
         // Get server URI
         String serverURI;
         if (cl.hasOption("u")) {
@@ -344,8 +432,10 @@ public class LeshanClientDemo {
             }
         }
         try {
-            createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), lifetime, serverURI, pskIdentity,
-                    pskKey, clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate);
+            createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), additionalAttributes, lifetime,
+                    serverURI, pskIdentity, pskKey, clientPrivateKey, clientPublicKey, serverPublicKey,
+                    clientCertificate, serverCertificate, latitude, longitude, scaleFactor, cl.hasOption("ocf"),
+                    cl.hasOption("oc"));
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
@@ -353,12 +443,13 @@ public class LeshanClientDemo {
     }
 
     public static void createAndStartClient(String endpoint, String localAddress, int localPort, boolean needBootstrap,
-            int lifetime, String serverURI, byte[] pskIdentity, byte[] pskKey, PrivateKey clientPrivateKey,
-            PublicKey clientPublicKey, PublicKey serverPublicKey, X509Certificate clientCertificate,
-            X509Certificate serverCertificate)
+            Map<String, String> additionalAttributes, int lifetime, String serverURI, byte[] pskIdentity, byte[] pskKey,
+            PrivateKey clientPrivateKey, PublicKey clientPublicKey, PublicKey serverPublicKey,
+            X509Certificate clientCertificate, X509Certificate serverCertificate, Float latitude, Float longitude,
+            float scaleFactor, boolean supportOldFormat, boolean supportDeprecatedCiphers)
             throws CertificateEncodingException {
 
-        MyLocation locationInstance = new MyLocation();
+        locationInstance = new MyLocation(latitude, longitude, scaleFactor);
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -401,7 +492,7 @@ public class LeshanClientDemo {
             }
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
-        initializer.setInstancesForObject(LOCATION, new MyLocation());
+        initializer.setInstancesForObject(LOCATION, locationInstance);
         initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new TemperatureSensor());
         initializer.setInstancesForObject(OBJECT_ID_HUMIDITY_SENSOR, new HumiditySensor());
 //        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
@@ -418,11 +509,21 @@ public class LeshanClientDemo {
             coapConfig.store(configFile);
         }
 
+        // Create DTLS Config
+        DtlsConnectorConfig.Builder dtlsConfig = new DtlsConnectorConfig.Builder();
+        dtlsConfig.setRecommendedCipherSuitesOnly(!supportDeprecatedCiphers);
+
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
         builder.setLocalAddress(localAddress, localPort);
         builder.setObjects(enablers);
         builder.setCoapConfig(coapConfig);
+        builder.setDtlsConfig(dtlsConfig);
+        if (supportOldFormat) {
+            builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
+            builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
+        }
+        builder.setAdditionalAttributes(additionalAttributes);
         final LeshanClient client = builder.build();
 
         client.getObjectTree().addListener(new ObjectsListenerAdapter() {
@@ -472,23 +573,24 @@ public class LeshanClientDemo {
         }
 
         // Print commands help
-        String commandsHelp = "Commands available :" + System.lineSeparator() +
-                System.lineSeparator() +
-                "  - create <objectId> : to enable a new object." +
-                System.lineSeparator() +
-                "  - delete <objectId> : to disable a new object." +
-                System.lineSeparator() +
-                "  - update : to trigger a registration update." +
-                System.lineSeparator() +
-                "  - w : to move to North." +
-                System.lineSeparator() +
-                "  - a : to move to East." +
-                System.lineSeparator() +
-                "  - s : to move to South." +
-                System.lineSeparator() +
-                "  - d : to move to West." +
-                System.lineSeparator();
-        LOG.info(commandsHelp);
+        StringBuilder commandsHelp = new StringBuilder("Commands available :");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - create <objectId> : to enable a new object.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - delete <objectId> : to disable a new object.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - update : to trigger a registration update.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - w : to move to North.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - a : to move to East.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - s : to move to South.");
+        commandsHelp.append(System.lineSeparator());
+        commandsHelp.append("  - d : to move to West.");
+        commandsHelp.append(System.lineSeparator());
+        LOG.info(commandsHelp.toString());
 
         // Start the client
         client.start();
