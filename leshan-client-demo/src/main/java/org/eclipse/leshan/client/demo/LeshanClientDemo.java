@@ -18,25 +18,6 @@
 
 package org.eclipse.leshan.client.demo;
 
-import static org.eclipse.leshan.LwM2mId.*;
-import static org.eclipse.leshan.client.object.Security.*;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -74,8 +55,12 @@ import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.eclipse.leshan.LwM2mId.DEVICE;
 import static org.eclipse.leshan.LwM2mId.LOCATION;
@@ -128,40 +113,10 @@ public class LeshanClientDemo {
     private final static int DEFAULT_LIFETIME = 5 * 60; // 5min in seconds
     private final static String USAGE = "java -jar leshan-client-demo.jar [OPTION]\n\n";
 
-    private static MyLocation locationInstance;
-
     public static void main(final String[] args) {
 
         // Define options for command line tools
         Options options = new Options();
-
-        final StringBuilder PSKChapter = new StringBuilder();
-        PSKChapter.append("\n .");
-        PSKChapter.append("\n .");
-        PSKChapter.append("\n ================================[ PSK ]=================================");
-        PSKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        PSKChapter.append("\n | To use PSK, -i and -p options should be used together.               |");
-        PSKChapter.append("\n ------------------------------------------------------------------------");
-
-        final StringBuilder RPKChapter = new StringBuilder();
-        RPKChapter.append("\n .");
-        RPKChapter.append("\n .");
-        RPKChapter.append("\n ================================[ RPK ]=================================");
-        RPKChapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        RPKChapter.append("\n | To use RPK, -cpubk -cprik -spubk options should be used together.    |");
-        RPKChapter.append("\n | To get helps about files format and how to generate it, see :        |");
-        RPKChapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
-        RPKChapter.append("\n ------------------------------------------------------------------------");
-
-        final StringBuilder X509Chapter = new StringBuilder();
-        X509Chapter.append("\n .");
-        X509Chapter.append("\n .");
-        X509Chapter.append("\n ================================[X509]==================================");
-        X509Chapter.append("\n | By default Leshan demo use non secure connection.                    |");
-        X509Chapter.append("\n | To use X509, -ccert -cprik -scert options should be used together.   |");
-        X509Chapter.append("\n | To get helps about files format and how to generate it, see :        |");
-        X509Chapter.append("\n | See https://github.com/eclipse/leshan/wiki/Credential-files-format   |");
-        X509Chapter.append("\n ------------------------------------------------------------------------");
 
         options.addOption("h", "help", false, "Display help information.");
         options.addOption("n", true, String.format(
@@ -449,7 +404,7 @@ public class LeshanClientDemo {
             float scaleFactor, boolean supportOldFormat, boolean supportDeprecatedCiphers)
             throws CertificateEncodingException {
 
-        locationInstance = new MyLocation(latitude, longitude, scaleFactor);
+        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -573,24 +528,23 @@ public class LeshanClientDemo {
         }
 
         // Print commands help
-        StringBuilder commandsHelp = new StringBuilder("Commands available :");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - create <objectId> : to enable a new object.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - delete <objectId> : to disable a new object.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - update : to trigger a registration update.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - w : to move to North.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - a : to move to East.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - s : to move to South.");
-        commandsHelp.append(System.lineSeparator());
-        commandsHelp.append("  - d : to move to West.");
-        commandsHelp.append(System.lineSeparator());
-        LOG.info(commandsHelp.toString());
+        String commandsHelp = "Commands available :" + System.lineSeparator() +
+                System.lineSeparator() +
+                "  - create <objectId> : to enable a new object." +
+                System.lineSeparator() +
+                "  - delete <objectId> : to disable a new object." +
+                System.lineSeparator() +
+                "  - update : to trigger a registration update." +
+                System.lineSeparator() +
+                "  - w : to move to North." +
+                System.lineSeparator() +
+                "  - a : to move to East." +
+                System.lineSeparator() +
+                "  - s : to move to South." +
+                System.lineSeparator() +
+                "  - d : to move to West." +
+                System.lineSeparator();
+        LOG.info(commandsHelp);
 
         // Start the client
         client.start();
@@ -603,7 +557,7 @@ public class LeshanClientDemo {
             }
         });
 
-//         Change the location through the Console
+        // Change the location through the Console
         try (Scanner scanner = new Scanner(System.in)) {
             List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
             while (scanner.hasNext()) {
