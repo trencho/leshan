@@ -51,6 +51,7 @@ import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
 
 import static org.eclipse.leshan.LwM2mId.DEVICE;
 import static org.eclipse.leshan.LwM2mId.LOCATION;
@@ -312,36 +313,36 @@ public class LeshanClientDemo {
             localPort = Integer.parseInt(cl.getOptionValue("lp"));
         }
 
-//        Float latitude = null;
-//        Float longitude = null;
-//        float scaleFactor = 1.0f;
+        Float latitude = null;
+        Float longitude = null;
+        float scaleFactor = 1.0f;
 //         get initial Location
-//        if (cl.hasOption("pos")) {
-//            try {
-//                String pos = cl.getOptionValue("pos");
-//                int colon = pos.indexOf(':');
-//                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
-//                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-//                    formatter.printHelp(USAGE, options);
-//                    return;
-//                }
-//                latitude = Float.valueOf(pos.substring(0, colon));
-//                longitude = Float.valueOf(pos.substring(colon + 1));
-//            } catch (NumberFormatException e) {
-//                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-//                formatter.printHelp(USAGE, options);
-//                return;
-//            }
-//        }
-//        if (cl.hasOption("sf")) {
-//            try {
-//                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
-//            } catch (NumberFormatException e) {
-//                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
-//                formatter.printHelp(USAGE, options);
-//                return;
-//            }
-//        }
+        if (cl.hasOption("pos")) {
+            try {
+                String pos = cl.getOptionValue("pos");
+                int colon = pos.indexOf(':');
+                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
+                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+                    formatter.printHelp(USAGE, options);
+                    return;
+                }
+                latitude = Float.valueOf(pos.substring(0, colon));
+                longitude = Float.valueOf(pos.substring(colon + 1));
+            } catch (NumberFormatException e) {
+                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
+                formatter.printHelp(USAGE, options);
+                return;
+            }
+        }
+        if (cl.hasOption("sf")) {
+            try {
+                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
+            } catch (NumberFormatException e) {
+                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
+                formatter.printHelp(USAGE, options);
+                return;
+            }
+        }
         try {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), lifetime, serverURI, pskIdentity,
                     pskKey, clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate);
@@ -501,52 +502,52 @@ public class LeshanClientDemo {
         });
 
 //         Change the location through the Console
-//        try (Scanner scanner = new Scanner(System.in)) {
-//            List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
-//            while (scanner.hasNext()) {
-//                String command = scanner.next();
-//                if (command.startsWith("create")) {
-//                    try {
-//                        int objectId = scanner.nextInt();
-//                        if (client.getObjectTree().getObjectEnabler(objectId) != null) {
-//                            LOG.info("Object {} already enabled.", objectId);
-//                        }
-//                        if (model.getObjectModel(objectId) == null) {
-//                            LOG.info("Unable to enable Object {} : there no model for this.", objectId);
-//                        } else {
-//                            ObjectsInitializer objectsInitializer = new ObjectsInitializer(model);
-//                            objectsInitializer.setDummyInstancesForObject(objectId);
-//                            LwM2mObjectEnabler object = objectsInitializer.create(objectId);
-//                            client.getObjectTree().addObjectEnabler(object);
-//                        }
-//                    } catch (Exception e) {
-//                        // skip last token
-//                        scanner.next();
-//                        LOG.info("Invalid syntax, <objectid> must be an integer : create <objectId>");
-//                    }
-//                } else if (command.startsWith("delete")) {
-//                    try {
-//                        int objectId = scanner.nextInt();
-//                        if (objectId == 0 || objectId == 3) {
-//                            LOG.info("Object {} can not be disabled.", objectId);
-//                        } else if (client.getObjectTree().getObjectEnabler(objectId) == null) {
-//                            LOG.info("Object {} is not enabled.", objectId);
-//                        } else {
-//                            client.getObjectTree().removeObjectEnabler(objectId);
-//                        }
-//                    } catch (Exception e) {
-//                        // skip last token
-//                        scanner.next();
-//                        LOG.info("\"Invalid syntax, <objectid> must be an integer : delete <objectId>");
-//                    }
-//                } else if (command.startsWith("update")) {
-//                    client.triggerRegistrationUpdate();
-//                } else if (command.length() == 1 && wasdCommands.contains(command.charAt(0))) {
-//                    locationInstance.moveLocation(command);
-//                } else {
-//                    LOG.info("Unknown command '{}'", command);
-//                }
-//            }
-//        }
+        try (Scanner scanner = new Scanner(System.in)) {
+            List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
+            while (scanner.hasNext()) {
+                String command = scanner.next();
+                if (command.startsWith("create")) {
+                    try {
+                        int objectId = scanner.nextInt();
+                        if (client.getObjectTree().getObjectEnabler(objectId) != null) {
+                            LOG.info("Object {} already enabled.", objectId);
+                        }
+                        if (model.getObjectModel(objectId) == null) {
+                            LOG.info("Unable to enable Object {} : there no model for this.", objectId);
+                        } else {
+                            ObjectsInitializer objectsInitializer = new ObjectsInitializer(model);
+                            objectsInitializer.setDummyInstancesForObject(objectId);
+                            LwM2mObjectEnabler object = objectsInitializer.create(objectId);
+                            client.getObjectTree().addObjectEnabler(object);
+                        }
+                    } catch (Exception e) {
+                        // skip last token
+                        scanner.next();
+                        LOG.info("Invalid syntax, <objectid> must be an integer : create <objectId>");
+                    }
+                } else if (command.startsWith("delete")) {
+                    try {
+                        int objectId = scanner.nextInt();
+                        if (objectId == 0 || objectId == 3) {
+                            LOG.info("Object {} can not be disabled.", objectId);
+                        } else if (client.getObjectTree().getObjectEnabler(objectId) == null) {
+                            LOG.info("Object {} is not enabled.", objectId);
+                        } else {
+                            client.getObjectTree().removeObjectEnabler(objectId);
+                        }
+                    } catch (Exception e) {
+                        // skip last token
+                        scanner.next();
+                        LOG.info("\"Invalid syntax, <objectid> must be an integer : delete <objectId>");
+                    }
+                } else if (command.startsWith("update")) {
+                    client.triggerRegistrationUpdate();
+                } else if (command.length() == 1 && wasdCommands.contains(command.charAt(0))) {
+                    locationInstance.moveLocation(command);
+                } else {
+                    LOG.info("Unknown command '{}'", command);
+                }
+            }
+        }
     }
 }
