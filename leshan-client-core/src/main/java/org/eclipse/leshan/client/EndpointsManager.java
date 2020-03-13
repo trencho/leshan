@@ -26,7 +26,9 @@ public interface EndpointsManager {
 
     Collection<Server> createEndpoints(Collection<? extends ServerInfo> serverInfo);
 
-    void forceReconnection(Server server);
+    long getMaxCommunicationPeriodFor(Server server, long lifetimeInSeconds);
+
+    void forceReconnection(Server server, boolean resume);
 
     void start();
 

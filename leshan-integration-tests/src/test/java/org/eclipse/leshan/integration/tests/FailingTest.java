@@ -15,6 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.Callable;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.leshan.Link;
@@ -132,7 +139,7 @@ public class FailingTest {
         // Request should timedout in ~1s we don't send ACK
         callback.waitForResponse(1500);
         Assert.assertTrue("we should timeout", callback.getException() instanceof TimeoutException);
-
+        assertEquals(TimeoutException.Type.COAP_TIMEOUT, ((TimeoutException) callback.getException()).getType());
     }
 
     @Test
@@ -157,5 +164,6 @@ public class FailingTest {
         Assert.assertTrue("we should still wait for response", callback.getException() == null);
         callback.waitForResponse(2000);
         Assert.assertTrue("we should timeout", callback.getException() instanceof TimeoutException);
+        assertEquals(TimeoutException.Type.RESPONSE_TIMEOUT, ((TimeoutException) callback.getException()).getType());
     }
 }

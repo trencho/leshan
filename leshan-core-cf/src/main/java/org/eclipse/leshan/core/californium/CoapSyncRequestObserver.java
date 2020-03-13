@@ -19,9 +19,12 @@ package org.eclipse.leshan.core.californium;
 
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
+import org.eclipse.californium.scandium.dtls.DtlsHandshakeTimeoutException;
+import org.eclipse.californium.elements.exception.EndpointUnconnectedException;
 import org.eclipse.leshan.core.request.exception.RequestCanceledException;
 import org.eclipse.leshan.core.request.exception.RequestRejectedException;
 import org.eclipse.leshan.core.request.exception.SendFailedException;
+import org.eclipse.leshan.core.request.exception.UnconnectedPeerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +97,14 @@ public class CoapSyncRequestObserver extends AbstractRequestObserver {
 
     @Override
     public void onSendError(Throwable error) {
-        exception.set(new SendFailedException(error, "Request %s cannot be sent", coapRequest, error.getMessage()));
+        if (error instanceof DtlsHandshakeTimeoutException) {
+            coapTimeout.set(true);
+        } else if (error instanceof EndpointUnconnectedException) {
+            exception.set(new UnconnectedPeerException(error,
+                    "Unable to send request %s : peer is not connected (no DTLS connection)", coapRequest.getURI()));
+        } else {
+            exception.set(new SendFailedException(error, "Request %s cannot be sent", coapRequest, error.getMessage()));
+        }
         latch.countDown();
     }
 
