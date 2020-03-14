@@ -55,8 +55,10 @@ import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.G
 import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_ID;
 import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_KEY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 

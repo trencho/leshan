@@ -16,21 +16,17 @@
 package org.eclipse.leshan.integration.tests;
 
 import org.eclipse.leshan.ResponseCode;
-import org.eclipse.leshan.client.observer.LwM2mClientObserver;
-import org.eclipse.leshan.client.servers.Server;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.eclipse.leshan.ResponseCode;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.servers.Server;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
 

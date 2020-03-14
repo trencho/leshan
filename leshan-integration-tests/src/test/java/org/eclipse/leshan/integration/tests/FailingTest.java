@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.leshan.Link;
@@ -40,6 +33,8 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+
+import static org.junit.Assert.assertEquals;
 
 public class FailingTest {
 
