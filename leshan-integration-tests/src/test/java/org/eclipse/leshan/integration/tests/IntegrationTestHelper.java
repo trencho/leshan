@@ -251,7 +251,7 @@ public class IntegrationTestHelper {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (TimeoutException e) {
-            // timeou means no registration
+            // timeout means no registration
             return;
         }
         fail("No update registration expected");
@@ -279,7 +279,7 @@ public class IntegrationTestHelper {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } catch (TimeoutException e) {
-            // timeou means no registration
+            // timeout means no registration
             return;
         }
         fail("No de-registration expected");
