@@ -88,8 +88,7 @@ public class EventServlet extends EventSourceServlet {
 
     private final CoapMessageTracer coapMessageTracer;
 
-    private Set<LeshanEventSource> eventSources = Collections
-            .newSetFromMap(new ConcurrentHashMap<LeshanEventSource, Boolean>());
+    private Set<LeshanEventSource> eventSources = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final RegistrationListener registrationListener = new RegistrationListener() {
 
@@ -123,14 +122,14 @@ public class EventServlet extends EventSourceServlet {
 
         @Override
         public void onSleeping(Registration registration) {
-            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
+            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
 
             sendEvent(EVENT_SLEEPING, data, registration.getEndpoint());
         }
 
         @Override
         public void onAwake(Registration registration) {
-            String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\"}").toString();
+            String data = "{\"ep\":\"" + registration.getEndpoint() + "\"}";
             sendEvent(EVENT_AWAKE, data, registration.getEndpoint());
         }
     };
@@ -149,13 +148,13 @@ public class EventServlet extends EventSourceServlet {
             }
 
             if (registration != null) {
-                String data = new StringBuilder("{\"ep\":\"").append(registration.getEndpoint()).append("\",\"res\":\"")
-                        .append(observation.getPath().toString()).append("\",\"val\":")
-                        .append(gson.toJson(response.getContent())).append("}").toString();
+                String data = "{\"ep\":\"" + registration.getEndpoint() + "\",\"res\":\"" +
+                        observation.getPath().toString() + "\",\"val\":" +
+                        gson.toJson(response.getContent()) + "}";
 
                 // ********Saving into database**************************
                 Gson gson = new Gson();
-                JsonObject content = new JsonParser().parse(gson.toJson(response.getContent())).getAsJsonObject();
+                JsonObject content = JsonParser.parseString(gson.toJson(response.getContent())).getAsJsonObject();
 
                 String measurementCode = observation.getPath().toString().split("/")[1];
                 String measurementName = "UNKNOWN";
@@ -288,7 +287,7 @@ public class EventServlet extends EventSourceServlet {
         }
 
         @Override
-        public void onOpen(Emitter emitter) throws IOException {
+        public void onOpen(Emitter emitter) {
             this.emitter = emitter;
             eventSources.add(this);
             if (endpoint != null) {
@@ -343,7 +342,7 @@ public class EventServlet extends EventSourceServlet {
     }
 
     @SuppressWarnings("unused")
-    private class RegUpdate {
+    private static class RegUpdate {
         public Registration registration;
         public RegistrationUpdate update;
     }
