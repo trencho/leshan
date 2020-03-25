@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import java.security.Principal;
-import java.security.PublicKey;
-
-import javax.security.auth.x500.X500Principal;
-
 import org.eclipse.californium.elements.auth.PreSharedKeyIdentity;
 import org.eclipse.californium.elements.auth.RawPublicKeyIdentity;
 import org.eclipse.californium.elements.auth.X509CertPath;
@@ -27,6 +22,10 @@ import org.eclipse.californium.elements.util.LeastRecentlyUsedCache.Predicate;
 import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.leshan.core.californium.EndpointContextUtil;
 import org.eclipse.leshan.server.security.SecurityInfo;
+
+import javax.security.auth.x500.X500Principal;
+import java.security.Principal;
+import java.security.PublicKey;
 
 /**
  * This class is responsible to remove DTLS connection for a given SecurityInfo.
