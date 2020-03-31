@@ -6,6 +6,8 @@ import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.util.NamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -15,15 +17,6 @@ import java.util.Random;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import org.eclipse.leshan.client.request.ServerIdentity;
-import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.response.ExecuteResponse;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.util.NamedThreadFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RandomTemperatureSensor extends BaseInstanceEnabler {
 
@@ -37,14 +30,13 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler {
     private static final int RESET_MIN_MAX_MEASURED_VALUES = 5605;
     private static final List<Integer> supportedResources = Arrays.asList(SENSOR_VALUE, UNITS, MAX_MEASURED_VALUE,
             MIN_MEASURED_VALUE, RESET_MIN_MAX_MEASURED_VALUES);
-    private final ScheduledExecutorService scheduler;
     private final Random rng = new Random();
     private double currentTemp = 20d;
     private double minMeasuredValue = currentTemp;
     private double maxMeasuredValue = currentTemp;
 
     public RandomTemperatureSensor() {
-        this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
         scheduler.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -74,8 +66,7 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler {
     @Override
     public synchronized ExecuteResponse execute(ServerIdentity identity, int resourceId, String params) {
         LOG.info("Execute on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
-        switch (resourceId) {
-        case RESET_MIN_MAX_MEASURED_VALUES:
+        if (resourceId == RESET_MIN_MAX_MEASURED_VALUES) {
             resetMinMaxMeasuredValues();
             return ExecuteResponse.success();
         }
