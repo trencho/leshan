@@ -49,7 +49,7 @@ public class MyDevice extends BaseInstanceEnabler {
 
     @Override
     public ReadResponse read(ServerIdentity identity, int resourceid) {
-        LOG.info("Read on Device Resource " + resourceid);
+        LOG.info("Read on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
         switch (resourceid) {
             case 0:
                 return ReadResponse.success(resourceid, getManufacturer());
@@ -92,9 +92,12 @@ public class MyDevice extends BaseInstanceEnabler {
 
     @Override
     public ExecuteResponse execute(ServerIdentity identity, int resourceid, String params) {
-        LOG.info("Execute on Device resource " + resourceid);
+        String withParams = null;
         if (params != null && params.length() != 0)
-            System.out.println("\t params " + params);
+            withParams = " with params " + params;
+        LOG.info("Execute on Device resource /{}/{}/{} {}", getModel().id, getId(), resourceid,
+                withParams != null ? withParams : "");
+
         if (resourceid == 4) {
             new Timer("Reboot Lwm2mClient").schedule(new TimerTask() {
                 @Override
@@ -113,7 +116,8 @@ public class MyDevice extends BaseInstanceEnabler {
 
     @Override
     public WriteResponse write(ServerIdentity identity, int resourceid, LwM2mResource value) {
-        LOG.info("Write on Device Resource " + resourceid + " value " + value);
+        LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
+
         switch (resourceid) {
             case 13:
                 return WriteResponse.notFound();

@@ -2,11 +2,11 @@
  * Copyright (c) 2013-2015 Sierra Wireless and others.
  *
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
  *
  * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
+ *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
  *
@@ -26,7 +26,17 @@ import org.apache.commons.cli.Option.Builder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.californium.core.network.config.NetworkConfig;
+import org.eclipse.californium.elements.Connector;
+import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
+import org.eclipse.californium.scandium.dtls.ClientHandshaker;
+import org.eclipse.californium.scandium.dtls.DTLSSession;
+import org.eclipse.californium.scandium.dtls.HandshakeException;
+import org.eclipse.californium.scandium.dtls.Handshaker;
+import org.eclipse.californium.scandium.dtls.ResumingClientHandshaker;
+import org.eclipse.californium.scandium.dtls.ResumingServerHandshaker;
+import org.eclipse.californium.scandium.dtls.ServerHandshaker;
+import org.eclipse.californium.scandium.dtls.SessionAdapter;
 import org.eclipse.leshan.LwM2m;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
@@ -35,6 +45,7 @@ import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.client.resource.listener.ObjectsListenerAdapter;
+import org.eclipse.leshan.core.californium.DefaultEndpointFactory;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -486,6 +497,73 @@ public class LeshanClientDemo {
         engineFactory.setReconnectOnUpdate(reconnectOnUpdate);
         engineFactory.setResumeOnConnect(!forceFullhandshake);
 
+        // configure EndpointFactory
+        DefaultEndpointFactory endpointFactory = new DefaultEndpointFactory("LWM2M CLIENT") {
+            @Override
+            protected Connector createSecuredConnector(DtlsConnectorConfig dtlsConfig) {
+
+                return new DTLSConnector(dtlsConfig) {
+                    @Override
+                    protected void onInitializeHandshaker(Handshaker handshaker) {
+                        handshaker.addSessionListener(new SessionAdapter() {
+
+                            @Override
+                            public void handshakeStarted(Handshaker handshaker) throws HandshakeException {
+                                if (handshaker instanceof ServerHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by server : STARTED ...");
+                                } else if (handshaker instanceof ResumingServerHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by server : STARTED ...");
+                                } else if (handshaker instanceof ClientHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by client : STARTED ...");
+                                } else if (handshaker instanceof ResumingClientHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by client : STARTED ...");
+                                }
+                            }
+
+                            @Override
+                            public void sessionEstablished(Handshaker handshaker, DTLSSession establishedSession)
+                                    throws HandshakeException {
+                                if (handshaker instanceof ServerHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by server : SUCCEED");
+                                } else if (handshaker instanceof ResumingServerHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by server : SUCCEED");
+                                } else if (handshaker instanceof ClientHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by client : SUCCEED");
+                                } else if (handshaker instanceof ResumingClientHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by client : SUCCEED");
+                                }
+                            }
+
+                            @Override
+                            public void handshakeFailed(Handshaker handshaker, Throwable error) {
+                                // get cause
+                                String cause;
+                                if (error != null) {
+                                    if (error.getMessage() != null) {
+                                        cause = error.getMessage();
+                                    } else {
+                                        cause = error.getClass().getName();
+                                    }
+                                } else {
+                                    cause = "unknown cause";
+                                }
+
+                                if (handshaker instanceof ServerHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by server : FAILED ({})", cause);
+                                } else if (handshaker instanceof ResumingServerHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by server : FAILED ({})", cause);
+                                } else if (handshaker instanceof ClientHandshaker) {
+                                    LOG.info("DTLS Full Handshake initiated by client : FAILED ({})", cause);
+                                } else if (handshaker instanceof ResumingClientHandshaker) {
+                                    LOG.info("DTLS abbreviated Handshake initiated by client : FAILED ({})", cause);
+                                }
+                            }
+                        });
+                    }
+                };
+            }
+        };
+
         // Create client
         LeshanClientBuilder builder = new LeshanClientBuilder(endpoint);
         builder.setLocalAddress(localAddress, localPort);
@@ -493,6 +571,7 @@ public class LeshanClientDemo {
         builder.setCoapConfig(coapConfig);
         builder.setDtlsConfig(dtlsConfig);
         builder.setRegistrationEngineFactory(engineFactory);
+        builder.setEndpointFactory(endpointFactory);
         if (supportOldFormat) {
             builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
             builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
