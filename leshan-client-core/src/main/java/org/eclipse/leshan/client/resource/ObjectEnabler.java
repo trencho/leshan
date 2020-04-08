@@ -54,6 +54,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * A specific implementation of {@link LwM2mObjectEnabler} which matchs each LWM2M instance concept to a
+ * {@link LwM2mInstanceEnabler} java instance.
+ * <p>
+ * Implementing a {@link LwM2mInstanceEnabler} then creating an {@link ObjectEnabler} with {@link ObjectsInitializer} is
+ * the easier way to implement LWM2M object in Leshan client.
+ */
 public class ObjectEnabler extends BaseObjectEnabler {
 
     protected Map<Integer, LwM2mInstanceEnabler> instances;

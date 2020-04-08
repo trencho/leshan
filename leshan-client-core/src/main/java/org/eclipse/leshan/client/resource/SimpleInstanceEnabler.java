@@ -33,6 +33,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * A simple implementation of {@link LwM2mInstanceEnabler} where all supported readable or writable LWM2M resource are
+ * store in map as a {@link LwM2mResource} java instance.
+ */
 public class SimpleInstanceEnabler extends BaseInstanceEnabler {
 
     protected Map<Integer, LwM2mResource> resources = new HashMap<>();

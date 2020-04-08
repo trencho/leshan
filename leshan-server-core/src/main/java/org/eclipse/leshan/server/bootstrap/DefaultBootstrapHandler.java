@@ -53,7 +53,7 @@ import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SE
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SERVER_FAILED;
 
 /**
- * A default implementation for {@link BootstrapHandler.
+ * A default implementation for {@link BootstrapHandler}.
  */
 public class DefaultBootstrapHandler implements BootstrapHandler {
 

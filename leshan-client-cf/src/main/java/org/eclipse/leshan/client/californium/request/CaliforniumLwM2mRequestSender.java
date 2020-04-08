@@ -35,6 +35,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A {@link LwM2mRequestSender} based on Californium(CoAP implementation).
+ */
 public class CaliforniumLwM2mRequestSender implements LwM2mRequestSender {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaliforniumLwM2mRequestSender.class);

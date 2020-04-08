@@ -34,6 +34,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A abstract implementation of {@link LwM2mInstanceEnabler}. It could be use as base for any
+ * {@link LwM2mInstanceEnabler} implementation.
+ */
 public class BaseInstanceEnabler implements LwM2mInstanceEnabler {
 
     protected List<ResourceChangedListener> listeners = new ArrayList<>();
@@ -94,7 +98,7 @@ public class BaseInstanceEnabler implements LwM2mInstanceEnabler {
      * <p>
      * Calling this method is needed to trigger NOTIFICATION when an observe relation is established.
      * 
-     * @param resourceIds
+     * @param resourceIds the list of resources which change.
      */
     public void fireResourcesChange(int... resourceIds) {
         for (ResourceChangedListener listener : listeners) {

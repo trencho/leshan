@@ -62,7 +62,7 @@ import static org.eclipse.leshan.LwM2mId.SRV_SERVER_ID;
 import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
 
 /**
- * Extract from LwM2m tree servers information like server uri, security mode, ...
+ * Extract from LwM2m object tree all the servers information like server uri, security mode, ...
  */
 public class ServersInfoExtractor {
     private static final Logger LOG = LoggerFactory.getLogger(ServersInfoExtractor.class);

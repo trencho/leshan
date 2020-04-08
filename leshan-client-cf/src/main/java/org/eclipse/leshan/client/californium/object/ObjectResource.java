@@ -69,7 +69,7 @@ import java.util.List;
 import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
- * A CoAP {@link Resource} in charge of handling requests for of a lwM2M Object.
+ * A CoAP {@link Resource} in charge of handling requests targeting a lwM2M Object.
  */
 public class ObjectResource extends LwM2mClientCoapResource implements ObjectListener {
 

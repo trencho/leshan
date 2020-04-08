@@ -61,6 +61,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * A abstract implementation of {@link LwM2mObjectEnabler}. It could be use as base for any {@link LwM2mObjectEnabler}
+ * implementation.
+ */
 public abstract class BaseObjectEnabler implements LwM2mObjectEnabler {
 
     protected final int id;

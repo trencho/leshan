@@ -24,6 +24,10 @@ import org.eclipse.leshan.client.resource.LwM2mObjectTree;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * A factory for {@link RegistrationEngine}
+ *
+ */
 public interface RegistrationEngineFactory {
 
     RegistrationEngine createRegistratioEngine(String endpoint, LwM2mObjectTree objectTree,

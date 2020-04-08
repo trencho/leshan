@@ -20,6 +20,9 @@ import org.eclipse.leshan.core.request.BindingMode;
 
 import java.util.Map;
 
+/**
+ * A Registration Update Bean.
+ */
 public class RegistrationUpdate {
 
     private final Long lifeTimeInSec;

@@ -24,6 +24,11 @@ import org.eclipse.leshan.client.resource.LwM2mObjectTree;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 
+/**
+ * A default implementation of {@link RegistrationEngineFactory}.
+ * <p>
+ * It create a {@link DefaultRegistrationEngine} which could be configured. Look at all setter available in this class.
+ */
 public class DefaultRegistrationEngineFactory implements RegistrationEngineFactory {
 
     private long requestTimeoutInMs = 2 * 60 * 1000l; // 2min in ms
@@ -68,7 +73,7 @@ public class DefaultRegistrationEngineFactory implements RegistrationEngineFacto
      * We choose a default value a bit higher to the MAX_TRANSMIT_WAIT(62-93s) which is the time from starting to send a
      * Confirmable message to the time when an acknowledgement is no longer expected.
      * 
-     * @param requestTimeoutInMs
+     * @param requestTimeoutInMs request timeout in milliseconds.
      * @return this for fluent API
      */
     public DefaultRegistrationEngineFactory setRequestTimeoutInMs(long requestTimeoutInMs) {
@@ -83,7 +88,7 @@ public class DefaultRegistrationEngineFactory implements RegistrationEngineFacto
      * <p>
      * We choose a smaller default value than other request timeout to be able to stop/destroy a device quickly.
      * 
-     * @param deregistrationTimeoutInMs
+     * @param deregistrationTimeoutInMs deregistration request timeout in milliseconds.
      * @return this for fluent API
      */
     public DefaultRegistrationEngineFactory setDeregistrationTimeoutInMs(long deregistrationTimeoutInMs) {
@@ -92,14 +97,15 @@ public class DefaultRegistrationEngineFactory implements RegistrationEngineFacto
     }
 
     /**
-     * The Bootstrap session timeout in seconds.
+     * The Bootstrap session timeout in seconds. The session begins on Bootstrap request and ends on Bootstrap finished
+     * request.
      * <p>
      * Default value is 93s.
      * <p>
      * 93s is the COAP MAX_TRANSMIT_WAIT with default config.
      * 
-     * @param bootstrapSessionTimeoutInSec
-     * @return
+     * @param bootstrapSessionTimeoutInSec the bootstrap session timeout in milliseconds.
+     * @return this for fluent API
      */
     public DefaultRegistrationEngineFactory setBootstrapSessionTimeoutInSec(int bootstrapSessionTimeoutInSec) {
         this.bootstrapSessionTimeoutInSec = bootstrapSessionTimeoutInSec;
@@ -110,8 +116,7 @@ public class DefaultRegistrationEngineFactory implements RegistrationEngineFacto
      * Time wait before to retry when a bootstrap(or registration if there isn't bootstrap server configured) failed.
      * <p>
      * Default value is 600000ms (10 minutes)
-     * 
-     * @param retryWaitingTimeInMs
+     *
      * @return this for fluent API
      */
     public DefaultRegistrationEngineFactory setRetryWaitingTimeInMs(int retryWaitingTimeInMs) {

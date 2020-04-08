@@ -24,12 +24,18 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
+import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.request.UplinkRequestVisitor;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+/**
+ * This class is able to create CoAP request from LWM2M {@link UplinkRequest}.
+ * <p>
+ * Call <code>CoapRequestBuilder#visit(lwm2mRequest)</code>, then get the result using {@link #getRequest()}
+ */
 public class CoapRequestBuilder implements UplinkRequestVisitor {
 
     protected Request coapRequest;

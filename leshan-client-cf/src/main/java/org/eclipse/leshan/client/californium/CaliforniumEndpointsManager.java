@@ -50,6 +50,9 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * An {@link EndpointsManager} based on Californium(CoAP implementation) and Scandium (DTLS implementation).
+ */
 public class CaliforniumEndpointsManager implements EndpointsManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(CaliforniumEndpointsManager.class);
