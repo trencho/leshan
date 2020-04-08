@@ -27,11 +27,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 
-import org.eclipse.leshan.LwM2m;
-import org.eclipse.leshan.SecurityMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Sensible information about a LWM2M server or a LWM2M Bootstrap sever.
  * <p>

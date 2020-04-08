@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.request;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.request.exception.ClientSleepingException;
