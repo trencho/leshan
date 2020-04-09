@@ -16,18 +16,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import org.eclipse.leshan.LwM2mId;
-import static org.junit.Assert.*;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Device;
@@ -95,8 +83,8 @@ public class IntegrationTestHelper {
     LeshanClient client;
     AtomicReference<String> currentEndpointIdentifier = new AtomicReference<String>();
 
-    private SynchronousClientObserver clientObserver = new SynchronousClientObserver();
-    private SynchronousRegistrationListener registrationListener = new SynchronousRegistrationListener() {
+    private final SynchronousClientObserver clientObserver = new SynchronousClientObserver();
+    private final SynchronousRegistrationListener registrationListener = new SynchronousRegistrationListener() {
         @Override
         public boolean accept(Registration registration) {
             return (registration != null && registration.getEndpoint().equals(currentEndpointIdentifier.get()));

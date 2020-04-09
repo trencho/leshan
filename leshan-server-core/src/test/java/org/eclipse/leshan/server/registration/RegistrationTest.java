@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import org.eclipse.leshan.Link;
-import static org.junit.Assert.*;
-
-import java.net.InetSocketAddress;
-import java.util.Map;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.request.Identity;

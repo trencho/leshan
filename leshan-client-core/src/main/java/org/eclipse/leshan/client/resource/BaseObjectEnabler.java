@@ -20,15 +20,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.resource;
 
-import org.eclipse.leshan.Link;
-import org.eclipse.leshan.LwM2mId;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.resource.listener.ObjectListener;
 import org.eclipse.leshan.client.servers.ServerIdentity;

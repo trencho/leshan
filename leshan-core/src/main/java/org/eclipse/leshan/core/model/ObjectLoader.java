@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import org.eclipse.leshan.util.StringUtils;
+import org.eclipse.leshan.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +28,6 @@ import java.io.Reader;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ObjectLoader {
 

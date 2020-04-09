@@ -17,8 +17,8 @@ package org.eclipse.leshan.server.redis.serialization;
 
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonObject;
+import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.security.SecurityInfo;
-import org.eclipse.leshan.util.Hex;
 
 import java.math.BigInteger;
 import java.security.AlgorithmParameters;
@@ -34,12 +34,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
-
-import org.eclipse.leshan.core.util.Hex;
-import org.eclipse.leshan.server.security.SecurityInfo;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
 
 /**
  * Functions for serialize and deserialize security information in JSON for storage.

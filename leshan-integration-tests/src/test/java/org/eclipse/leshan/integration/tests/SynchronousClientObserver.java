@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import org.eclipse.leshan.ResponseCode;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.ResponseCode;
@@ -37,20 +31,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
 
     private CountDownLatch registerLatch = new CountDownLatch(1);
-    private AtomicBoolean registerSucceed = new AtomicBoolean(false);
-    private AtomicBoolean registerFailed = new AtomicBoolean(false);
+    private final AtomicBoolean registerSucceed = new AtomicBoolean(false);
+    private final AtomicBoolean registerFailed = new AtomicBoolean(false);
 
     private CountDownLatch updateLatch = new CountDownLatch(1);
-    private AtomicBoolean updateSucceed = new AtomicBoolean(false);
-    private AtomicBoolean updateFailed = new AtomicBoolean(false);
+    private final AtomicBoolean updateSucceed = new AtomicBoolean(false);
+    private final AtomicBoolean updateFailed = new AtomicBoolean(false);
 
     private CountDownLatch deregisterLatch = new CountDownLatch(1);
-    private AtomicBoolean deregisterSucceed = new AtomicBoolean(false);
-    private AtomicBoolean deregisterFailed = new AtomicBoolean(false);
+    private final AtomicBoolean deregisterSucceed = new AtomicBoolean(false);
+    private final AtomicBoolean deregisterFailed = new AtomicBoolean(false);
 
     private CountDownLatch bootstrapLatch = new CountDownLatch(1);
-    private AtomicBoolean bootstrapSucceed = new AtomicBoolean(false);
-    private AtomicBoolean bootstrapFailed = new AtomicBoolean(false);
+    private final AtomicBoolean bootstrapSucceed = new AtomicBoolean(false);
+    private final AtomicBoolean bootstrapFailed = new AtomicBoolean(false);
 
     @Override
     public void onBootstrapSuccess(ServerIdentity bsserver, BootstrapRequest request) {

@@ -16,14 +16,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.attributes;
 
-import org.eclipse.leshan.util.Validate;
+import org.eclipse.leshan.core.util.Validate;
 
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import org.eclipse.leshan.core.util.Validate;
 
 /**
  * Represents an LwM2m attribute that can be attached to an object, instance or resource.
@@ -61,7 +59,7 @@ public class Attribute {
         }
     }
 
-    private static Map<String, AttributeModel> modelMap;
+    private static final Map<String, AttributeModel> modelMap;
 
     static {
         modelMap = new HashMap<>();

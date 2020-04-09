@@ -15,18 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.json;
 
-import org.eclipse.leshan.core.util.json.JsonException;
-import org.eclipse.leshan.core.util.json.JsonSerDes;
-
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
-import org.eclipse.leshan.util.json.JsonException;
-import org.eclipse.leshan.util.json.JsonSerDes;
+import org.eclipse.leshan.core.util.json.JsonException;
+import org.eclipse.leshan.core.util.json.JsonSerDes;
 
 public class JsonRootObjectSerDes extends JsonSerDes<JsonRootObject> {
 
-    private JsonArrayEntrySerDes serDes = new JsonArrayEntrySerDes();
+    private final JsonArrayEntrySerDes serDes = new JsonArrayEntrySerDes();
 
     @Override
     public JsonObject jSerialize(JsonRootObject jro) throws JsonException {

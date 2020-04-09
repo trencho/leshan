@@ -16,16 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import static org.eclipse.leshan.client.servers.ServerIdentity.SYSTEM;
-import static org.eclipse.leshan.core.LwM2mId.*;
-
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.californium.scandium.util.SecretUtil;
@@ -45,12 +35,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
-import static org.eclipse.leshan.LwM2mId.SECURITY;
-import static org.eclipse.leshan.LwM2mId.SEC_PUBKEY_IDENTITY;
-import static org.eclipse.leshan.LwM2mId.SEC_SECRET_KEY;
-import static org.eclipse.leshan.LwM2mId.SEC_SECURITY_MODE;
-import static org.eclipse.leshan.LwM2mId.SEC_SERVER_URI;
-import static org.eclipse.leshan.client.request.ServerIdentity.SYSTEM;
+import static org.eclipse.leshan.client.servers.ServerIdentity.SYSTEM;
+import static org.eclipse.leshan.core.LwM2mId.SECURITY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_PUBKEY_IDENTITY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SECRET_KEY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SECURITY_MODE;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SERVER_URI;
 
 /**
  * a {@link PskStore} which search PSK credentials in Lwm2m Security object.

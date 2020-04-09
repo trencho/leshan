@@ -17,13 +17,13 @@ package org.eclipse.leshan.server.demo.servlet.log;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.californium.core.coap.CoAP.Type;
-import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.californium.core.coap.EmptyMessage;
 import org.eclipse.californium.core.coap.Option;
 import org.eclipse.californium.core.coap.OptionNumberRegistry;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
+import org.eclipse.leshan.core.util.Hex;
 
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;

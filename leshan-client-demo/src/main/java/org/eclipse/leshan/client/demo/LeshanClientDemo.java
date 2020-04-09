@@ -18,25 +18,6 @@
 
 package org.eclipse.leshan.client.demo;
 
-import static org.eclipse.leshan.client.object.Security.*;
-import static org.eclipse.leshan.core.LwM2mId.*;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -93,10 +74,6 @@ import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.eclipse.leshan.LwM2mId.DEVICE;
-import static org.eclipse.leshan.LwM2mId.LOCATION;
-import static org.eclipse.leshan.LwM2mId.SECURITY;
-import static org.eclipse.leshan.LwM2mId.SERVER;
 import static org.eclipse.leshan.client.object.Security.noSec;
 import static org.eclipse.leshan.client.object.Security.noSecBootstap;
 import static org.eclipse.leshan.client.object.Security.psk;
@@ -105,6 +82,10 @@ import static org.eclipse.leshan.client.object.Security.rpk;
 import static org.eclipse.leshan.client.object.Security.rpkBootstrap;
 import static org.eclipse.leshan.client.object.Security.x509;
 import static org.eclipse.leshan.client.object.Security.x509Bootstrap;
+import static org.eclipse.leshan.core.LwM2mId.DEVICE;
+import static org.eclipse.leshan.core.LwM2mId.LOCATION;
+import static org.eclipse.leshan.core.LwM2mId.SECURITY;
+import static org.eclipse.leshan.core.LwM2mId.SERVER;
 
 public class LeshanClientDemo {
 

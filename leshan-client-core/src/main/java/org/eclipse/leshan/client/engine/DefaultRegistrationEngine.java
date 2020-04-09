@@ -15,21 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
-import org.eclipse.leshan.LwM2m;
-import org.eclipse.leshan.ResponseCode;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.RegistrationUpdate;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
@@ -58,15 +43,18 @@ import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Manage the registration life-cycle:
@@ -95,11 +83,11 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     // Time between bootstrap retry should incremental
     private final int retryWaitingTimeInMs;
     // Time between 2 update requests (used only if it is smaller than the lifetime)
-    private Integer communicationPeriodInMs;
+    private final Integer communicationPeriodInMs;
     // True if client should re-initiate a connection (DTLS) on registration update
-    private boolean reconnectOnUpdate;
+    private final boolean reconnectOnUpdate;
     // True if client should try to resume connection if possible.
-    private boolean resumeOnConnect;
+    private final boolean resumeOnConnect;
 
     private enum Status {
         SUCCESS, FAILURE, TIMEOUT
@@ -124,7 +112,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     private Future<?> bootstrapFuture;
     private Future<?> registerFuture;
     private Future<?> updateFuture;
-    private Object taskLock = new Object(); // a lock to avoid several task to be executed at the same time
+    private final Object taskLock = new Object(); // a lock to avoid several task to be executed at the same time
     private final ScheduledExecutorService schedExecutor;
     private final boolean attachedExecutor;
 
@@ -678,8 +666,8 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
 
     private class QueueUpdateTask implements Runnable {
 
-        private RegistrationUpdate registrationUpdate;
-        private ServerIdentity server;
+        private final RegistrationUpdate registrationUpdate;
+        private final ServerIdentity server;
 
         public QueueUpdateTask(ServerIdentity server, RegistrationUpdate registrationUpdate) {
             this.registrationUpdate = registrationUpdate;

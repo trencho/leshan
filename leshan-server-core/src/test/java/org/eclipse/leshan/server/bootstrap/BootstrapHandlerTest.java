@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import org.eclipse.leshan.ResponseCode;
-import static org.junit.Assert.*;
-
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
@@ -223,11 +214,11 @@ public class BootstrapHandlerTest {
 
     private static class MockBootstrapSessionManager implements BootstrapSessionManager {
 
-        private boolean authorized;
+        private final boolean authorized;
         private BootstrapSession lastSession;
         private BootstrapFailureCause lastFailureCause;
-        private List<BootstrapSession> endedSession = new ArrayList<BootstrapSession>();
-        private Map<BootstrapSession, BootstrapFailureCause> failureCauses = new HashMap<>();
+        private final List<BootstrapSession> endedSession = new ArrayList<BootstrapSession>();
+        private final Map<BootstrapSession, BootstrapFailureCause> failureCauses = new HashMap<>();
 
         public MockBootstrapSessionManager(boolean authorized) {
             this.authorized = authorized;

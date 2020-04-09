@@ -16,8 +16,8 @@
 package org.eclipse.leshan.core.tlv;
 
 import org.eclipse.leshan.core.node.ObjectLink;
-import org.eclipse.leshan.tlv.Tlv.TlvType;
-import org.eclipse.leshan.util.Hex;
+import org.eclipse.leshan.core.tlv.Tlv.TlvType;
+import org.eclipse.leshan.core.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +31,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.eclipse.leshan.core.node.ObjectLink;
-import org.eclipse.leshan.core.tlv.Tlv.TlvType;
-import org.eclipse.leshan.core.util.Hex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class TlvDecoder {
 

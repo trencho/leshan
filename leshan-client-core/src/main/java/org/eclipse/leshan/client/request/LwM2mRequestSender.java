@@ -29,8 +29,6 @@ import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 
-import java.net.InetSocketAddress;
-
 /**
  * A {@link LwM2mRequestSender} is responsible to send LWM2M {@link UplinkRequest} for a given {@link ServerIdentity}.
  */

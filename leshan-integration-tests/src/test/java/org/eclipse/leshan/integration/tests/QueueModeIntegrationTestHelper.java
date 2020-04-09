@@ -16,13 +16,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import org.eclipse.leshan.LwM2mId;
-import static org.junit.Assert.*;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;

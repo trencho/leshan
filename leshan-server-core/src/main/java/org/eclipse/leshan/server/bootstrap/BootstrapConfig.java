@@ -15,7 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import org.eclipse.leshan.SecurityMode;
+import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.request.BindingMode;
 
 import java.io.Serializable;
@@ -24,9 +24,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.leshan.core.SecurityMode;
-import org.eclipse.leshan.core.request.BindingMode;
 
 /**
  * A client configuration to apply to a device during a bootstrap session.

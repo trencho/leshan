@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
-import org.eclipse.leshan.SecurityMode;
-import org.eclipse.leshan.client.request.ServerIdentity;
-import static org.eclipse.leshan.core.LwM2mId.*;
-
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
@@ -38,13 +31,13 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.eclipse.leshan.LwM2mId.SEC_BOOTSTRAP;
-import static org.eclipse.leshan.LwM2mId.SEC_PUBKEY_IDENTITY;
-import static org.eclipse.leshan.LwM2mId.SEC_SECRET_KEY;
-import static org.eclipse.leshan.LwM2mId.SEC_SECURITY_MODE;
-import static org.eclipse.leshan.LwM2mId.SEC_SERVER_ID;
-import static org.eclipse.leshan.LwM2mId.SEC_SERVER_PUBKEY;
-import static org.eclipse.leshan.LwM2mId.SEC_SERVER_URI;
+import static org.eclipse.leshan.core.LwM2mId.SEC_BOOTSTRAP;
+import static org.eclipse.leshan.core.LwM2mId.SEC_PUBKEY_IDENTITY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SECRET_KEY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SECURITY_MODE;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SERVER_ID;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SERVER_PUBKEY;
+import static org.eclipse.leshan.core.LwM2mId.SEC_SERVER_URI;
 
 /**
  * A simple {@link LwM2mInstanceEnabler} for the Security (0) object.

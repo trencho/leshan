@@ -11,10 +11,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.observer;
 
-import org.eclipse.leshan.ResponseCode;
-import org.eclipse.leshan.client.servers.Server;
-import java.util.concurrent.CopyOnWriteArrayList;
-
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -29,7 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  */
 public class LwM2mClientObserverDispatcher implements LwM2mClientObserver {
-    private CopyOnWriteArrayList<LwM2mClientObserver> observers = new CopyOnWriteArrayList<>();
+    private final CopyOnWriteArrayList<LwM2mClientObserver> observers = new CopyOnWriteArrayList<>();
 
     public void addObserver(LwM2mClientObserver observer) {
         observers.add(observer);

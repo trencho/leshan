@@ -17,11 +17,9 @@
 
 package org.eclipse.leshan.core.json;
 
-import org.eclipse.leshan.core.util.json.JsonException;
-
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.ParseException;
-import org.eclipse.leshan.util.json.JsonException;
+import org.eclipse.leshan.core.util.json.JsonException;
 
 /**
  * Helper for encoding/decoding LWM2M JSON format

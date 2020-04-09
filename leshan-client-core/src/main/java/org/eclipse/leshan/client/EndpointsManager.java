@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client;
 
-import org.eclipse.leshan.client.servers.Server;
-import java.util.Collection;
-
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerInfo;
 

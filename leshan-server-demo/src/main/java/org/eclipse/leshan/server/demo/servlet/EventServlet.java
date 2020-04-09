@@ -60,7 +60,7 @@ import java.util.GregorianCalendar;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.eclipse.leshan.LwM2mId.LOCATION;
+import static org.eclipse.leshan.core.LwM2mId.LOCATION;
 
 public class EventServlet extends EventSourceServlet {
 
@@ -88,7 +88,7 @@ public class EventServlet extends EventSourceServlet {
 
     private final CoapMessageTracer coapMessageTracer;
 
-    private Set<LeshanEventSource> eventSources = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private final Set<LeshanEventSource> eventSources = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final RegistrationListener registrationListener = new RegistrationListener() {
 
@@ -279,7 +279,7 @@ public class EventServlet extends EventSourceServlet {
 
     private class LeshanEventSource implements EventSource {
 
-        private String endpoint;
+        private final String endpoint;
         private Emitter emitter;
 
         public LeshanEventSource(String endpoint) {

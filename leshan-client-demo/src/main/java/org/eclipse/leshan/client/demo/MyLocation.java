@@ -1,11 +1,5 @@
 package org.eclipse.leshan.client.demo;
 
-import org.eclipse.leshan.client.request.ServerIdentity;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -29,7 +23,7 @@ public class MyLocation extends BaseInstanceEnabler {
 
     private float latitude;
     private float longitude;
-    private float scaleFactor;
+    private final float scaleFactor;
     private Date timestamp;
 
     public MyLocation() {

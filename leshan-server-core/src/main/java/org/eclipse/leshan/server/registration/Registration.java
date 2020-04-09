@@ -16,13 +16,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import org.eclipse.leshan.Link;
+import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.attributes.Attribute;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.util.StringUtils;
-import org.eclipse.leshan.util.Validate;
+import org.eclipse.leshan.core.util.StringUtils;
+import org.eclipse.leshan.core.util.Validate;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -36,14 +36,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.attributes.Attribute;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.core.util.Validate;
 
 /**
  * An immutable structure which represent a LW-M2M client registration on the server

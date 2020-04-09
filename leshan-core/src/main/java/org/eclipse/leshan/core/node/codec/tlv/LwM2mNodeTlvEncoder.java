@@ -29,8 +29,8 @@ import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.node.codec.LwM2mValueConverter;
 import org.eclipse.leshan.core.tlv.Tlv;
-import org.eclipse.leshan.core.tlv.TlvEncoder;
 import org.eclipse.leshan.core.tlv.Tlv.TlvType;
+import org.eclipse.leshan.core.tlv.TlvEncoder;
 import org.eclipse.leshan.core.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,7 +70,7 @@ public class LwM2mNodeTlvEncoder {
         private LwM2mValueConverter converter;
 
         // visitor output
-        private ByteArrayOutputStream out = new ByteArrayOutputStream();
+        private final ByteArrayOutputStream out = new ByteArrayOutputStream();
 
         @Override
         public void visit(LwM2mObject object) {

@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import org.eclipse.leshan.ResponseCode;
-import java.util.Date;
-import java.util.Map;
-
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;

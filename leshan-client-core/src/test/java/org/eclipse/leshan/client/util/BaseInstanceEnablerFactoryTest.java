@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.util;
 
-import org.eclipse.leshan.LwM2mId;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnablerFactory;
 import org.eclipse.leshan.client.resource.DummyInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;

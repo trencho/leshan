@@ -20,7 +20,7 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.util.Hex;
+import org.eclipse.leshan.core.util.Hex;
 
 import java.net.InetSocketAddress;
 import java.security.KeyFactory;
@@ -28,14 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
-
-import org.eclipse.californium.elements.EndpointContext;
-import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.core.util.Hex;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonValue;
 
 /**
  * Functions for serializing and deserializing a Californium {@link EndpointContext} in JSON.

@@ -16,10 +16,6 @@
 
 package org.eclipse.leshan.server.registration;
 
-import org.eclipse.leshan.Link;
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.Identity;
 import org.junit.Assert;

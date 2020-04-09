@@ -16,12 +16,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.core.ResponseCode.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.DiscoverRequest;
@@ -30,8 +24,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.eclipse.leshan.ResponseCode.CONTENT;
-import static org.eclipse.leshan.ResponseCode.NOT_FOUND;
+import static org.eclipse.leshan.core.ResponseCode.CONTENT;
+import static org.eclipse.leshan.core.ResponseCode.NOT_FOUND;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
@@ -40,7 +34,7 @@ import static org.junit.Assert.assertNotNull;
 
 public class DiscoverTest {
 
-    private IntegrationTestHelper helper = new IntegrationTestHelper();
+    private final IntegrationTestHelper helper = new IntegrationTestHelper();
 
     @Before
     public void start() {

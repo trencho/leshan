@@ -17,13 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.util;
 
-import org.eclipse.leshan.LwM2mId;
-import org.eclipse.leshan.client.request.ServerIdentity;
-import static org.junit.Assert.assertTrue;
-
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;

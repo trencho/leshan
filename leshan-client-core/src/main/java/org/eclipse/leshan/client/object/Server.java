@@ -17,11 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
-import org.eclipse.leshan.client.request.ServerIdentity;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;

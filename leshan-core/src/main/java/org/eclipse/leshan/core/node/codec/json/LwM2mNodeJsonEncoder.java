@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.json;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.json.JsonArrayEntry;
 import org.eclipse.leshan.core.json.JsonRootObject;
 import org.eclipse.leshan.core.json.LwM2mJson;

@@ -1,6 +1,6 @@
 package org.eclipse.leshan.client.demo;
 
-import org.eclipse.leshan.util.NamedThreadFactory;
+import org.eclipse.leshan.core.util.NamedThreadFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

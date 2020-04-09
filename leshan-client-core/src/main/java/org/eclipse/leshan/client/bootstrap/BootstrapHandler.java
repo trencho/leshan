@@ -16,11 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.bootstrap;
 
-import org.eclipse.leshan.client.request.ServerIdentity;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;

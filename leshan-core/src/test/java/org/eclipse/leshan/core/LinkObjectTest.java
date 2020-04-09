@@ -23,9 +23,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
-import org.eclipse.leshan.core.Link;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class LinkObjectTest {
 

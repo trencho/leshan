@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
-import java.util.Map;
-
 import org.eclipse.leshan.client.RegistrationUpdate;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.request.Identity;
+
+import java.util.Map;
 
 /**
  * Manage the registration life-cycle:

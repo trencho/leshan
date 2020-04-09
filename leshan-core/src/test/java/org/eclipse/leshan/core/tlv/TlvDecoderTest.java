@@ -16,10 +16,6 @@
 package org.eclipse.leshan.core.tlv;
 
 import org.eclipse.leshan.core.node.ObjectLink;
-import org.eclipse.leshan.core.tlv.Tlv;
-import org.eclipse.leshan.core.tlv.TlvDecoder;
-import org.eclipse.leshan.core.tlv.TlvEncoder;
-import org.eclipse.leshan.core.tlv.TlvException;
 import org.eclipse.leshan.core.util.Hex;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -37,7 +33,7 @@ import static org.junit.Assert.fail;
  */
 public class TlvDecoderTest {
 
-    private static Logger LOG = LoggerFactory.getLogger(TlvDecoderTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TlvDecoderTest.class);
 
     @Test
     public void decode_device_object() throws TlvException {

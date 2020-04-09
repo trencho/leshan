@@ -15,8 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core;
 
-import org.eclipse.leshan.util.StringUtils;
-import org.eclipse.leshan.util.Validate;
+import org.eclipse.leshan.core.util.StringUtils;
+import org.eclipse.leshan.core.util.Validate;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -25,9 +25,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.core.util.Validate;
 
 /**
  * A Link as defined in http://tools.ietf.org/html/rfc6690.

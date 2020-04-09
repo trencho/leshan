@@ -15,17 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import org.eclipse.leshan.SecurityMode;
+import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.eclipse.leshan.core.SecurityMode;
-import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
 
 /**
  * Simple bootstrap store implementation storing bootstrap configuration information in memory.

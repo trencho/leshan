@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.util;
 
-import org.eclipse.leshan.client.servers.Server;
-import static org.junit.Assert.assertEquals;
-
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.request.Identity;
 import org.junit.Test;
