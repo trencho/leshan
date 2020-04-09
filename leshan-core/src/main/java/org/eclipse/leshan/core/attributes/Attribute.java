@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.leshan.core.util.Validate;
+
 /**
  * Represents an LwM2m attribute that can be attached to an object, instance or resource.
  * 

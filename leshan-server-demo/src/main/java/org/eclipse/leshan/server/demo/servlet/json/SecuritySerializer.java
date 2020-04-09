@@ -15,6 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
+import java.lang.reflect.Type;
+import java.security.PublicKey;
+import java.security.interfaces.ECPublicKey;
+import java.util.Arrays;
+
+import org.eclipse.leshan.core.util.Base64;
+import org.eclipse.leshan.core.util.Hex;
+import org.eclipse.leshan.server.security.SecurityInfo;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;

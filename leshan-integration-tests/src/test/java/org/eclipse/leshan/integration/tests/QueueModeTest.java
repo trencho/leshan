@@ -17,6 +17,9 @@
 package org.eclipse.leshan.integration.tests;
 
 import org.eclipse.leshan.Link;
+import static org.junit.Assert.*;
+
+import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.junit.After;

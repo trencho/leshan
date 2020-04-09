@@ -19,7 +19,7 @@
 package org.eclipse.leshan.client.resource;
 
 import org.eclipse.leshan.client.LwM2mClient;
-import org.eclipse.leshan.client.request.ServerIdentity;
+import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;

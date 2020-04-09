@@ -20,7 +20,7 @@ import com.eclipsesource.json.JsonObject;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.util.json.JsonSerDes;
+import org.eclipse.leshan.core.util.json.JsonSerDes;
 
 public class ResourceModelSerDes extends JsonSerDes<ResourceModel> {
 

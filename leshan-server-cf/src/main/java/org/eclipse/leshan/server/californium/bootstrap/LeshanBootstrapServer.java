@@ -24,6 +24,7 @@ import org.eclipse.californium.core.server.resources.Resource;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.server.Destroyable;
 import org.eclipse.leshan.server.Startable;
 import org.eclipse.leshan.server.Stoppable;
@@ -34,7 +35,6 @@ import org.eclipse.leshan.server.bootstrap.BootstrapSessionManager;
 import org.eclipse.leshan.server.bootstrap.LwM2mBootstrapRequestSender;
 import org.eclipse.leshan.server.californium.RootResource;
 import org.eclipse.leshan.server.security.BootstrapSecurityStore;
-import org.eclipse.leshan.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

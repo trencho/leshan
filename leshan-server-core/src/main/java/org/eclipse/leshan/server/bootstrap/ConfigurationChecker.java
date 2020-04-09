@@ -28,6 +28,10 @@ import java.security.cert.Certificate;
 import java.util.Arrays;
 import java.util.Map;
 
+import org.eclipse.leshan.core.util.SecurityUtil;
+import org.eclipse.leshan.core.util.StringUtils;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
+
 /**
  * Check a BootstrapConfig is correct. This is a complex process, we need to check if the different objects are in
  * coherence with each other.

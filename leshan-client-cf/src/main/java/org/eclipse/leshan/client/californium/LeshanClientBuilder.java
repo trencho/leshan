@@ -20,12 +20,10 @@ import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.network.config.NetworkConfig.Keys;
 import org.eclipse.californium.elements.Connector;
-import org.eclipse.californium.elements.EndpointContextMatcher;
 import org.eclipse.californium.elements.UDPConnector;
 import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
-import org.eclipse.leshan.LwM2mId;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.engine.RegistrationEngine;
 import org.eclipse.leshan.client.engine.RegistrationEngineFactory;
@@ -34,6 +32,7 @@ import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
+import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.californium.DefaultEndpointFactory;
 import org.eclipse.leshan.core.californium.EndpointFactory;
 import org.eclipse.leshan.core.node.LwM2mNode;
@@ -42,7 +41,7 @@ import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
 import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.util.Validate;
+import org.eclipse.leshan.core.util.Validate;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -215,7 +214,6 @@ public class LeshanClientBuilder {
         networkConfig.set(Keys.MID_TRACKER, "NULL");
         networkConfig.set(Keys.MAX_ACTIVE_PEERS, 10);
         networkConfig.set(Keys.PROTOCOL_STAGE_THREAD_COUNT, 1);
-        networkConfig.set(Keys.USE_MESSAGE_OFFLOADING, false);
 
         return networkConfig;
     }
@@ -247,11 +245,6 @@ public class LeshanClientBuilder {
         }
         if (endpointFactory == null) {
             endpointFactory = new DefaultEndpointFactory("LWM2M Client") {
-                @Override
-                protected EndpointContextMatcher createSecuredContextMatcher() {
-                    return null; // use default californium one.
-                }
-
                 @Override
                 protected Connector createSecuredConnector(DtlsConnectorConfig dtlsConfig) {
                     DTLSConnector dtlsConnector = new DTLSConnector(dtlsConfig);

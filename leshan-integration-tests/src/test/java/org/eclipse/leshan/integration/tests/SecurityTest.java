@@ -135,7 +135,8 @@ public class SecurityTest {
 
         // Create new session with new credentials at client side.
         // Get connector
-        Endpoint endpoint = helper.client.coap().getServer().getEndpoint(helper.client.getAddress());
+        Endpoint endpoint = helper.client.coap().getServer()
+                .getEndpoint(helper.client.getAddress(helper.getCurrentRegisteredServer()));
         DTLSConnector connector = (DTLSConnector) ((CoapEndpoint) endpoint).getConnector();
         // Clear DTLS session to force new handshake
         connector.clearConnectionState();

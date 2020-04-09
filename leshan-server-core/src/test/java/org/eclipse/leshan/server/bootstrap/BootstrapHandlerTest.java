@@ -16,6 +16,15 @@
 package org.eclipse.leshan.server.bootstrap;
 
 import org.eclipse.leshan.ResponseCode;
+import static org.junit.Assert.*;
+
+import java.net.InetSocketAddress;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;

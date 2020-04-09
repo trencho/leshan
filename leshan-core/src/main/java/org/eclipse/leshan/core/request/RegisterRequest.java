@@ -16,6 +16,11 @@
 package org.eclipse.leshan.core.request;
 
 import org.eclipse.leshan.Link;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.RegisterResponse;
 

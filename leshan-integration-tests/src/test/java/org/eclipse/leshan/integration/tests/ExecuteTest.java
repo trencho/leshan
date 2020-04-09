@@ -20,7 +20,7 @@
 package org.eclipse.leshan.integration.tests;
 
 import org.eclipse.californium.core.coap.Response;
-import org.eclipse.leshan.ResponseCode;
+import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.ExecuteRequest;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.junit.After;

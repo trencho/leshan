@@ -26,6 +26,10 @@ import java.net.UnknownHostException;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+import org.eclipse.leshan.core.LwM2m;
+import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.registration.Registration;
+
 public class CaliforniumTestSupport {
 
     public Registration registration;

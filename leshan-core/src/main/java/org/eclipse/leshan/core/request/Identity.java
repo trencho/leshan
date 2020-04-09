@@ -23,6 +23,8 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
 
+import org.eclipse.leshan.core.util.Validate;
+
 /**
  * Contains all data which could identify a peer like peer address, PSK identity, Raw Public Key or Certificate Common
  * Name.

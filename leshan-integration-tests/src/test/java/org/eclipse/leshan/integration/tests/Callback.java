@@ -16,6 +16,11 @@
 package org.eclipse.leshan.integration.tests;
 
 import org.eclipse.leshan.ResponseCode;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;

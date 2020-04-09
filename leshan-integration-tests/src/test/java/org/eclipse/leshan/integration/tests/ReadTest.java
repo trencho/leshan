@@ -18,6 +18,13 @@
 
 package org.eclipse.leshan.integration.tests;
 
+import static org.eclipse.leshan.core.ResponseCode.*;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mObject;

@@ -27,6 +27,11 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 
+import org.eclipse.leshan.core.LwM2m;
+import org.eclipse.leshan.core.SecurityMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Sensible information about a LWM2M server or a LWM2M Bootstrap sever.
  * <p>
@@ -37,6 +42,7 @@ public class ServerInfo {
     private static final Logger LOG = LoggerFactory.getLogger(ServerInfo.class);
 
     public long serverId;
+    public boolean bootstrap = false;
     public URI serverUri;
     public SecurityMode secureMode;
 

@@ -16,7 +16,7 @@
 package org.eclipse.leshan.server.security;
 
 import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.util.Hex;
+import org.eclipse.leshan.core.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

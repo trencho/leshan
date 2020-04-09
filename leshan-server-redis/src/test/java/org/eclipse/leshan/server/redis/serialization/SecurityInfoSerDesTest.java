@@ -29,6 +29,10 @@ import java.security.spec.ECPublicKeySpec;
 import java.security.spec.KeySpec;
 
 import static org.junit.Assert.assertEquals;
+import org.eclipse.leshan.core.util.Hex;
+import org.eclipse.leshan.server.redis.serialization.SecurityInfoSerDes;
+import org.eclipse.leshan.server.security.SecurityInfo;
+import org.junit.Test;
 
 public class SecurityInfoSerDesTest {
 

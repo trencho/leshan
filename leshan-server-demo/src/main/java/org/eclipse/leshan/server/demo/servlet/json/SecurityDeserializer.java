@@ -38,6 +38,16 @@ import java.security.spec.InvalidKeySpecException;
 import java.security.spec.InvalidParameterSpecException;
 import java.security.spec.KeySpec;
 
+import org.eclipse.leshan.core.util.Hex;
+import org.eclipse.leshan.server.security.SecurityInfo;
+
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+
 public class SecurityDeserializer implements JsonDeserializer<SecurityInfo> {
 
     @Override

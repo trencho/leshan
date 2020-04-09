@@ -20,8 +20,8 @@ import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
-import org.eclipse.leshan.util.json.JsonException;
-import org.eclipse.leshan.util.json.JsonSerDes;
+import org.eclipse.leshan.core.util.json.JsonException;
+import org.eclipse.leshan.core.util.json.JsonSerDes;
 
 import java.util.ArrayList;
 import java.util.Collections;
