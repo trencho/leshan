@@ -15,13 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis;
 
-import java.util.Arrays;
-import java.util.Random;
-
 import org.eclipse.leshan.core.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.params.SetParams;
