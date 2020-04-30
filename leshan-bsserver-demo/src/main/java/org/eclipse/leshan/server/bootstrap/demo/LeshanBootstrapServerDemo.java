@@ -25,10 +25,6 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
-import org.eclipse.californium.scandium.dtls.CertificateMessage;
-import org.eclipse.californium.scandium.dtls.DTLSSession;
-import org.eclipse.californium.scandium.dtls.HandshakeException;
-import org.eclipse.californium.scandium.dtls.x509.CertificateVerifier;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -189,18 +185,7 @@ public class LeshanBootstrapServerDemo {
             builder.setCertificateChain(new X509Certificate[] { serverCertificate });
 
             // Use a certificate verifier which trust all certificates by default.
-            dtlsConfig.setCertificateVerifier(new CertificateVerifier() {
-                @Override
-                public void verifyCertificate(CertificateMessage message, DTLSSession session)
-                        throws HandshakeException {
-                    // trust all means never raise HandshakeException
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-            });
+            builder.setTrustedCertificates(new X509Certificate[0]);
         } catch (Exception e) {
             LOG.error("Unable to load embedded X.509 certificate.", e);
             System.exit(-1);

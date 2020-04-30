@@ -170,6 +170,11 @@ public class LwM2mNodeTlvEncoder {
 
         private byte[] encodeTlvValue(Object value, Type type, LwM2mPath path) {
             LOG.trace("Encoding value {} in TLV", value);
+            if (type == null) {
+                throw new CodecException(
+                        "Unable to encode value for resource {} without type(probably a executable one)", path);
+            }
+
             try {
                 switch (type) {
                 case STRING:
