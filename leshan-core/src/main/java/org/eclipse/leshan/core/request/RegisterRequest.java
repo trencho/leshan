@@ -15,15 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.RegisterResponse;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -167,10 +163,7 @@ public class RegisterRequest implements UplinkRequest<RegisterResponse> {
         if (!Arrays.equals(objectLinks, other.objectLinks))
             return false;
         if (smsNumber == null) {
-            if (other.smsNumber != null)
-                return false;
-        } else if (!smsNumber.equals(other.smsNumber))
-            return false;
-        return true;
+            return other.smsNumber == null;
+        } else return smsNumber.equals(other.smsNumber);
     }
 }
