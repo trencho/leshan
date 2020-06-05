@@ -97,6 +97,8 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
     private final int cleanLimit; // maximum number to clean in a clean period
     private final long gracePeriod; // in seconds
 
+    private final JedisLock lock;
+
     public RedisRegistrationStore(Pool<Jedis> p) {
         this(p, DEFAULT_CLEAN_PERIOD, DEFAULT_GRACE_PERIOD, DEFAULT_CLEAN_LIMIT); // default clean period 60s
     }
@@ -109,11 +111,20 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
 
     public RedisRegistrationStore(Pool<Jedis> p, ScheduledExecutorService schedExecutor, long cleanPeriodInSec,
             long lifetimeGracePeriodInSec, int cleanLimit) {
+        this(p, schedExecutor, cleanPeriodInSec, lifetimeGracePeriodInSec, cleanLimit, new SingleInstanceJedisLock());
+    }
+
+    /**
+     * @since 1.1
+     */
+    public RedisRegistrationStore(Pool<Jedis> p, ScheduledExecutorService schedExecutor, long cleanPeriodInSec,
+            long lifetimeGracePeriodInSec, int cleanLimit, JedisLock redisLock) {
         this.pool = p;
         this.schedExecutor = schedExecutor;
         this.cleanPeriod = cleanPeriodInSec;
         this.cleanLimit = cleanLimit;
         this.gracePeriod = lifetimeGracePeriodInSec;
+        this.lock = redisLock;
     }
 
     /* *************** Redis Key utility function **************** */
@@ -146,7 +157,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockKey = toLockKey(registration.getEndpoint());
 
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 // add registration
                 byte[] k = toEndpointKey(registration.getEndpoint());
@@ -177,7 +188,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
 
                 return null;
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
     }
@@ -195,7 +206,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockValue = null;
             byte[] lockKey = toLockKey(ep);
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 // Fetch the registration
                 byte[] data = j.get(toEndpointKey(ep));
@@ -225,7 +236,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
                 return new UpdatedRegistration(r, updatedRegistration);
 
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
     }
@@ -350,7 +361,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
         byte[] lockValue = null;
         byte[] lockKey = toLockKey(ep);
         try {
-            lockValue = RedisLock.acquire(j, lockKey);
+            lockValue = lock.acquire(j, lockKey);
 
             // fetch the client
             byte[] data = j.get(toEndpointKey(ep));
@@ -371,7 +382,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             }
             return null;
         } finally {
-            RedisLock.release(j, lockKey, lockValue);
+            lock.release(j, lockKey, lockValue);
         }
     }
 
@@ -449,7 +460,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockKey = toLockKey(ep);
 
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 // cancel existing observations for the same path and registration id.
                 for (Observation obs : getObservations(j, registrationId)) {
@@ -461,7 +472,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
                 }
 
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
         return removed;
@@ -481,7 +492,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockValue = null;
             byte[] lockKey = toLockKey(ep);
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 Observation observation = build(get(new Token(observationId)));
                 if (observation != null && registrationId.equals(observation.getRegistrationId())) {
@@ -491,7 +502,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
                 return null;
 
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
     }
@@ -532,11 +543,11 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockValue = null;
             byte[] lockKey = toKey(LOCK_EP, endpoint);
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 return unsafeRemoveAllObservations(j, registrationId);
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
     }
@@ -564,7 +575,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockValue = null;
             byte[] lockKey = toKey(LOCK_EP, endpoint);
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 String registrationId = ObserveUtil.extractRegistrationId(obs);
                 if (!j.exists(toRegIdKey(registrationId)))
@@ -594,7 +605,7 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
                             previousObservation.getRequest(), obs.getRequest());
                 }
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
         return previousObservation;
@@ -623,11 +634,11 @@ public class RedisRegistrationStore implements CaliforniumRegistrationStore, Sta
             byte[] lockValue = null;
             byte[] lockKey = toKey(LOCK_EP, endpoint);
             try {
-                lockValue = RedisLock.acquire(j, lockKey);
+                lockValue = lock.acquire(j, lockKey);
 
                 unsafeRemoveObservation(j, registrationId, token.getBytes());
             } finally {
-                RedisLock.release(j, lockKey, lockValue);
+                lock.release(j, lockKey, lockValue);
             }
         }
 
