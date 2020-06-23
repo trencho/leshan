@@ -31,6 +31,11 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.leshan.core.model.DDFFileParser;
+import org.eclipse.leshan.core.model.InvalidDDFFileException;
+import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.util.json.JsonException;
+
 public class Ddf2JsonGenerator {
 
     static final String DEFAULT_DDF_FILES_PATH = "ddffiles";
@@ -42,7 +47,7 @@ public class Ddf2JsonGenerator {
         }
     }
 
-    public void generate(File input, OutputStream output) throws IOException, JsonException {
+    public void generate(File input, OutputStream output) throws IOException, JsonException, InvalidDDFFileException {
         // check input exists
         if (!input.exists())
             throw new FileNotFoundException(input.toString());
@@ -60,7 +65,7 @@ public class Ddf2JsonGenerator {
         DDFFileParser ddfParser = new DDFFileParser();
         for (File f : files) {
             if (f.canRead()) {
-                objectModels.addAll(ddfParser.parse(f));
+                objectModels.addAll(ddfParser.parseEx(f));
             }
         }
 
@@ -76,7 +81,8 @@ public class Ddf2JsonGenerator {
         generate(objectModels, output);
     }
 
-    public static void main(String[] args) throws IOException, JsonException {
+    public static void main(String[] args)
+            throws FileNotFoundException, IOException, JsonException, InvalidDDFFileException {
         // default value
         String ddfFilesPath = DEFAULT_DDF_FILES_PATH;
         String outputPath = DEFAULT_OUTPUT_PATH;

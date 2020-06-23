@@ -40,6 +40,20 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.eclipse.leshan.core.model.InvalidDDFFileException;
+import org.eclipse.leshan.core.util.json.JsonException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 public class DdfList2JsonGenerator {
 
     private static final Logger LOG = LoggerFactory.getLogger(DdfList2JsonGenerator.class);
@@ -104,7 +118,7 @@ public class DdfList2JsonGenerator {
         }
     }
 
-    public static void main(String[] args) throws IOException, JsonException {
+    public static void main(String[] args) throws IOException, JsonException, InvalidDDFFileException {
         // default values
         String ddfFilesPath = Ddf2JsonGenerator.DEFAULT_DDF_FILES_PATH;
         String outputPath = Ddf2JsonGenerator.DEFAULT_OUTPUT_PATH;
