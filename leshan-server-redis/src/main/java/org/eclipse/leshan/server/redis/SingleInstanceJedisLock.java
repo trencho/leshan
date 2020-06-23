@@ -15,17 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis;
 
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Random;
-
 import org.eclipse.leshan.core.util.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Transaction;
 import redis.clients.jedis.params.SetParams;
+
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Random;
 
 /**
  * An implementation of Redis Lock for the Jedis library usable in a single instance environment.

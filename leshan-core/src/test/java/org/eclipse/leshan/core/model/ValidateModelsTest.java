@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import java.io.IOException;
-
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class ValidateModelsTest {
 

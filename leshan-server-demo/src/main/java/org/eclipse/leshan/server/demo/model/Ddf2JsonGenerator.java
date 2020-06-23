@@ -16,6 +16,7 @@
 package org.eclipse.leshan.server.demo.model;
 
 import org.eclipse.leshan.core.model.DDFFileParser;
+import org.eclipse.leshan.core.model.InvalidDDFFileException;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.util.json.JsonException;
 
@@ -30,11 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import org.eclipse.leshan.core.model.DDFFileParser;
-import org.eclipse.leshan.core.model.InvalidDDFFileException;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.util.json.JsonException;
 
 public class Ddf2JsonGenerator {
 

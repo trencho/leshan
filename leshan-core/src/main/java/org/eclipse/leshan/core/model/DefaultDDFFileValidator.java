@@ -15,8 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import java.io.IOException;
-import java.io.InputStream;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.Source;
@@ -25,9 +25,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
-
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A DDF File Validator.

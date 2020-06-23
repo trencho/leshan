@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.model;
 
-import java.io.IOException;
-
 import org.eclipse.leshan.core.model.InvalidDDFFileException;
 import org.eclipse.leshan.core.model.InvalidModelException;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.server.demo.LeshanServerDemo;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class ValidateServerDemoModelsTest {
 
