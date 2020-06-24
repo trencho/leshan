@@ -112,8 +112,9 @@ public class DDFFileParser {
      * Parse a DDF file.
      *
      * @throws InvalidDDFFileException if DDF file is not a valid.
-     * @throws IOException see {@link FileInputStream#FileInputStream(File) or DocumentBuilder#parse(InputStream)
-     *
+     * @throws IOException see {@link FileInputStream#FileInputStream(File)} or
+     *         {@link DocumentBuilder#parse(InputStream)}
+     * 
      * @since 1.1
      */
     public List<ObjectModel> parseEx(File ddfFile) throws InvalidDDFFileException, IOException {
@@ -126,8 +127,9 @@ public class DDFFileParser {
      * Parse a DDF file from an inputstream.
      *
      * @throws InvalidDDFFileException if DDF file is not a valid.
-     * @throws IOException see {@link FileInputStream#FileInputStream(File) or DocumentBuilder#parse(InputStream)
-     *
+     * @throws IOException see {@link FileInputStream#FileInputStream(File)} or
+     *         {@link DocumentBuilder#parse(InputStream)}
+     * 
      * @since 1.1
      */
     public List<ObjectModel> parseEx(InputStream inputStream, String streamName)
