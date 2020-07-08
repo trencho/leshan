@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
@@ -32,6 +27,9 @@ import org.eclipse.leshan.core.response.SendableResponse;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 

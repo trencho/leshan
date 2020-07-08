@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
+import org.eclipse.leshan.core.request.exception.InvalidRequestException;
+import org.eclipse.leshan.core.response.BootstrapResponse;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.leshan.core.request.exception.InvalidRequestException;
-import org.eclipse.leshan.core.response.BootstrapResponse;
 
 /**
  * The request to send to start a bootstrap session
@@ -79,11 +79,8 @@ public class BootstrapRequest implements UplinkRequest<BootstrapResponse> {
             return false;
         BootstrapRequest other = (BootstrapRequest) obj;
         if (endpointName == null) {
-            if (other.endpointName != null)
-                return false;
-        } else if (!endpointName.equals(other.endpointName))
-            return false;
-        return true;
+            return other.endpointName == null;
+        } else return endpointName.equals(other.endpointName);
     }
 
     @Override
