@@ -1,75 +1,55 @@
-package org.eclipse.leshan.client.demo;
+package org.eclipse.leshan.client.demo.sensor;
 
-import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class TemperatureSensor extends BaseInstanceEnabler {
+public class Temperature extends Sensor {
+
+    private static final Logger LOG = LoggerFactory.getLogger(Temperature.class);
 
     private static final String UNIT_CELSIUS = "cel";
-    private static final int SENSOR_VALUE = 5700;
-    private static final int UNITS = 5701;
-    private static final int MIN_MEASURED_VALUE = 5601;
-    private static final int MAX_MEASURED_VALUE = 5602;
-    private static final int RESET_MIN_MAX_MEASURED_VALUES = 5605;
     private static final List<Integer> supportedResources = Arrays.asList(SENSOR_VALUE, UNITS, MAX_MEASURED_VALUE,
             MIN_MEASURED_VALUE, RESET_MIN_MAX_MEASURED_VALUES);
 
-    private static double currentTemperature = 0;
-    private static double minMeasuredValue = currentTemperature;
-    private static double maxMeasuredValue = currentTemperature;
-
-    public TemperatureSensor() {
+    public Temperature() {
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
         scheduler.scheduleAtFixedRate(new Runnable() {
 
             @Override
             public void run() {
                 try {
-                    readTemperature();
+                    readValue();
                 } catch (Exception e) {
                     System.out.println("Error reading sensor");
                     e.printStackTrace();
                 }
             }
-        }, 2, 2, TimeUnit.SECONDS);
-
-//        scheduler.scheduleAtFixedRate(new Runnable() {
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    readTemperature();
-//                } catch (Exception e) {
-//                    System.out.println("Error reading sensor");
-//                    e.printStackTrace();
-//                }
-//            }
-//        }, 0, 1, TimeUnit.HOURS);
+        }, 0, 1, TimeUnit.HOURS);
     }
 
     @Override
     public synchronized ReadResponse read(ServerIdentity identity, int resourceId) {
+        LOG.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
         case MIN_MEASURED_VALUE:
             return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
         case MAX_MEASURED_VALUE:
             return ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
         case SENSOR_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(currentTemperature));
+            return ReadResponse.success(resourceId, getTwoDigitValue(currentValue));
         case UNITS:
             return ReadResponse.success(resourceId, UNIT_CELSIUS);
         default:
@@ -79,6 +59,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
 
     @Override
     public synchronized ExecuteResponse execute(ServerIdentity identity, int resourceId, String params) {
+        LOG.info("Execute on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         if (resourceId == RESET_MIN_MAX_MEASURED_VALUES) {
             resetMinMaxMeasuredValues();
             return ExecuteResponse.success();
@@ -86,12 +67,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
         return super.execute(identity, resourceId, params);
     }
 
-    private double getTwoDigitValue(double value) {
-        BigDecimal toBeTruncated = BigDecimal.valueOf(value);
-        return toBeTruncated.setScale(2, RoundingMode.HALF_UP).doubleValue();
-    }
-
-    private void readTemperature() throws Exception {
+    protected void readValue() throws Exception {
         Runtime rt = Runtime.getRuntime();
         Process p = rt.exec("python3 /home/pi/Desktop/TempHumSensor/AdafruitDHT.py 11 4");
         BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
@@ -99,7 +75,7 @@ public class TemperatureSensor extends BaseInstanceEnabler {
         if ((line = bri.readLine()) != null) {
             if (!(line.contains("Failed") || line.contains("Try again"))) {
                 String[] data = line.split(" ");
-                currentTemperature = Double.parseDouble(data[0]);
+                currentValue = Double.parseDouble(data[0]);
             } else {
                 System.out.println("Error reading sensor value");
             }
@@ -107,29 +83,12 @@ public class TemperatureSensor extends BaseInstanceEnabler {
         bri.close();
         p.waitFor();
 
-        Integer changedResource = adjustMinMaxMeasuredValue(currentTemperature);
+        Integer changedResource = adjustMinMaxMeasuredValue(currentValue);
         if (changedResource != null) {
             fireResourcesChange(SENSOR_VALUE, changedResource);
         } else {
             fireResourcesChange(SENSOR_VALUE);
         }
-    }
-
-    private synchronized Integer adjustMinMaxMeasuredValue(double newTemperature) {
-        if (newTemperature > maxMeasuredValue) {
-            maxMeasuredValue = newTemperature;
-            return MAX_MEASURED_VALUE;
-        } else if (newTemperature < minMeasuredValue) {
-            minMeasuredValue = newTemperature;
-            return MIN_MEASURED_VALUE;
-        } else {
-            return null;
-        }
-    }
-
-    private void resetMinMaxMeasuredValues() {
-        minMeasuredValue = currentTemperature;
-        maxMeasuredValue = currentTemperature;
     }
 
     @Override

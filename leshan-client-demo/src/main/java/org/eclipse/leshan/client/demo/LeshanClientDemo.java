@@ -39,6 +39,7 @@ import org.eclipse.californium.scandium.dtls.ServerHandshaker;
 import org.eclipse.californium.scandium.dtls.SessionAdapter;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
+import org.eclipse.leshan.client.demo.enums.SensorTypeEnum;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -134,8 +135,9 @@ public class LeshanClientDemo {
                             "LWM2M_WLAN_connectivity4-v1_0.xml", "LwM2M_BinaryAppDataContainer-v1_0_1.xml",
                             "LwM2M_EventLog-V1_0.xml" };
 
-    private static final int OBJECT_ID_TEMPERATURE_SENSOR = 3303;
-    private static final int OBJECT_ID_HUMIDITY_SENSOR = 3304;
+    private static final int OBJECT_ID_TEMPERATURE = 3303;
+    private static final int OBJECT_ID_HUMIDITY = 3304;
+    private static final int OBJECT_ID_PARTICULATES = 10314;
     private final static String DEFAULT_ENDPOINT = "LeshanClientDemo";
     private final static int DEFAULT_LIFETIME = 5 * 60; // 5min in seconds
     private final static String USAGE = "java -jar leshan-client-demo.jar [OPTION]\n\n";
@@ -304,7 +306,7 @@ public class LeshanClientDemo {
         // Get lifetime
         Integer communicationPeriod = null;
         if (cl.hasOption("cp")) {
-            communicationPeriod = Integer.valueOf(cl.getOptionValue("cp")) * 1000;
+            communicationPeriod = Integer.parseInt(cl.getOptionValue("cp")) * 1000;
         }
 
         // Get additional attributes for registration
@@ -426,46 +428,14 @@ public class LeshanClientDemo {
             localPort = Integer.parseInt(cl.getOptionValue("lp"));
         }
 
-        Float latitude = null;
-        Float longitude = null;
-        float scaleFactor = 1.0f;
-//         get initial Location
-        if (cl.hasOption("pos")) {
-            try {
-                String pos = cl.getOptionValue("pos");
-                int colon = pos.indexOf(':');
-                if (colon == -1 || colon == 0 || colon == pos.length() - 1) {
-                    System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                    formatter.printHelp(USAGE, options);
-                    return;
-                }
-                latitude = Float.valueOf(pos.substring(0, colon));
-                longitude = Float.valueOf(pos.substring(colon + 1));
-            } catch (NumberFormatException e) {
-                System.err.println("Position must be a set of two floats separated by a colon, e.g. 48.131:11.459");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
-        if (cl.hasOption("sf")) {
-            try {
-                scaleFactor = Float.parseFloat(cl.getOptionValue("sf"));
-            } catch (NumberFormatException e) {
-                System.err.println("Scale factor must be a float, e.g. 1.0 or 0.01");
-                formatter.printHelp(USAGE, options);
-                return;
-            }
-        }
-
         // Get models folder
         String modelsFolderPath = cl.getOptionValue("m");
 
         try {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), additionalAttributes,
                     bsAdditionalAttributes, lifetime, communicationPeriod, serverURI, pskIdentity, pskKey,
-                    clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate, latitude,
-                    longitude, scaleFactor, cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"),
-                    cl.hasOption("f"), modelsFolderPath);
+                    clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate,
+                    cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"), modelsFolderPath);
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
@@ -476,11 +446,11 @@ public class LeshanClientDemo {
             Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes, int lifetime,
             Integer communicationPeriod, String serverURI, byte[] pskIdentity, byte[] pskKey,
             PrivateKey clientPrivateKey, PublicKey clientPublicKey, PublicKey serverPublicKey,
-            X509Certificate clientCertificate, X509Certificate serverCertificate, Float latitude, Float longitude,
-            float scaleFactor, boolean supportOldFormat, boolean supportDeprecatedCiphers, boolean reconnectOnUpdate,
-            boolean forceFullhandshake, String modelsFolderPath) throws CertificateEncodingException {
+            X509Certificate clientCertificate, X509Certificate serverCertificate, boolean supportOldFormat,
+            boolean supportDeprecatedCiphers, boolean reconnectOnUpdate, boolean forceFullhandshake,
+            String modelsFolderPath) throws CertificateEncodingException {
 
-        MyLocation locationInstance = new MyLocation(latitude, longitude, scaleFactor);
+        MyLocation locationInstance = new MyLocation();
 
         // Initialize model
         List<ObjectModel> models = ObjectLoader.loadDefault();
@@ -527,9 +497,10 @@ public class LeshanClientDemo {
         }
         initializer.setInstancesForObject(DEVICE, new MyDevice());
         initializer.setInstancesForObject(LOCATION, locationInstance);
-        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new TemperatureSensor());
-        initializer.setInstancesForObject(OBJECT_ID_HUMIDITY_SENSOR, new HumiditySensor());
-//        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE_SENSOR, new RandomTemperatureSensor());
+        initializer.setInstancesForObject(OBJECT_ID_HUMIDITY, SensorTypeEnum.HUMIDITY.createSensor());
+        initializer.setInstancesForObject(OBJECT_ID_PARTICULATES, SensorTypeEnum.PM10.createSensor());
+        initializer.setInstancesForObject(OBJECT_ID_PARTICULATES, SensorTypeEnum.PM25.createSensor());
+        initializer.setInstancesForObject(OBJECT_ID_TEMPERATURE, SensorTypeEnum.TEMPERATURE.createSensor());
         List<LwM2mObjectEnabler> enablers = initializer.createAll();
 
         // Create CoAP Config
@@ -714,7 +685,6 @@ public class LeshanClientDemo {
 
         // Change the location through the Console
         try (Scanner scanner = new Scanner(System.in)) {
-            List<Character> wasdCommands = Arrays.asList('w', 'a', 's', 'd');
             while (scanner.hasNext()) {
                 String command = scanner.next();
                 if (command.startsWith("create")) {
@@ -753,8 +723,6 @@ public class LeshanClientDemo {
                     }
                 } else if (command.startsWith("update")) {
                     client.triggerRegistrationUpdate();
-                } else if (command.length() == 1 && wasdCommands.contains(command.charAt(0))) {
-                    locationInstance.moveLocation(command);
                 } else {
                     LOG.info("Unknown command '{}'", command);
                 }

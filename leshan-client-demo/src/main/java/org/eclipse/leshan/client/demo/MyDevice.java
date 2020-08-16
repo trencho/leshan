@@ -44,7 +44,7 @@ public class MyDevice extends BaseInstanceEnabler {
             public void run() {
                 fireResourcesChange(13);
             }
-        }, 5, 5, TimeUnit.SECONDS);
+        }, 0, 1, TimeUnit.HOURS);
     }
 
     @Override
