@@ -13,10 +13,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.senml;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -35,6 +31,10 @@ import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Map.Entry;
 
 public class LwM2mNodeSenMLJsonEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeSenMLJsonEncoder.class);
@@ -64,7 +64,7 @@ public class LwM2mNodeSenMLJsonEncoder {
         private LwM2mValueConverter converter;
 
         // visitor output
-        private ArrayList<SenMLRecord> records = new ArrayList<>();
+        private final ArrayList<SenMLRecord> records = new ArrayList<>();
 
         @Override
         public void visit(LwM2mObject object) {
@@ -77,7 +77,7 @@ public class LwM2mNodeSenMLJsonEncoder {
             // Create SenML records
             for (LwM2mObjectInstance instance : object.getInstances().values()) {
                 for (LwM2mResource resource : instance.getResources().values()) {
-                    String prefixPath = Integer.toString(instance.getId()) + "/" + Integer.toString(resource.getId());
+                    String prefixPath = instance.getId() + "/" + resource.getId();
                     lwM2mResourceToSenMLRecord(prefixPath, resource);
                 }
             }

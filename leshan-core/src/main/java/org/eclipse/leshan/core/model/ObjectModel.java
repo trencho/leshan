@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import org.eclipse.leshan.core.LwM2m;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

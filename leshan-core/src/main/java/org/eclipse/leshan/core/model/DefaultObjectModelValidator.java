@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.model.ResourceModel.Type;
+
+import java.util.List;
 
 public class DefaultObjectModelValidator implements ObjectModelValidator {
 

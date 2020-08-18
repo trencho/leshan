@@ -14,12 +14,11 @@
 
 package org.eclipse.leshan.senml;
 
-import java.io.ByteArrayOutputStream;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-
 import com.fasterxml.jackson.dataformat.cbor.CBORFactory;
 import com.fasterxml.jackson.dataformat.cbor.CBORGenerator;
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
+import java.io.ByteArrayOutputStream;
 
 public class SenMLCborPackSerDes {
 
