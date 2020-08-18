@@ -33,20 +33,17 @@ import java.util.Map;
  */
 public class ObjectModel {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ObjectModel.class);
-
     public static final String DEFAULT_VERSION = "1.0";
 
     private static final int OMA_OBJECT_MIN_ID = 0;
     private static final int OMA_OBJECT_MAX_ID = 1023;
 
-    // TODO in version 2.0 all field should be null-able and ObjectModelValidator should be responsible to validate it.
-    public final int id;
+    public final Integer id;
     public final String name;
     public final String description;
     public final String version;
-    public final boolean multiple;
-    public final boolean mandatory;
+    public final Boolean multiple;
+    public final Boolean mandatory;
     /** @since 1.1 */
     public final String urn;
     /** @since 1.1 */
@@ -56,20 +53,18 @@ public class ObjectModel {
 
     public final Map<Integer, ResourceModel> resources; // resources by ID
 
-    public ObjectModel(int id, String name, String description, String version, boolean multiple, boolean mandatory,
+    public ObjectModel(Integer id, String name, String description, String version, Boolean multiple, Boolean mandatory,
             ResourceModel... resources) {
         this(id, name, description, version, multiple, mandatory, Arrays.asList(resources));
     }
 
-    public ObjectModel(int id, String name, String description, String version, boolean multiple, boolean mandatory,
+    public ObjectModel(Integer id, String name, String description, String version, Boolean multiple, Boolean mandatory,
             Collection<ResourceModel> resources) {
-        this(id, name, description, version, multiple, mandatory, resources, URN.generateURN(id, version), null, "");
+        this(id, name, description, version, multiple, mandatory, resources, URN.generateURN(id, version),
+                DEFAULT_VERSION, "");
     }
 
-    /**
-     * @since 1.1
-     */
-    public ObjectModel(int id, String name, String description, String version, boolean multiple, boolean mandatory,
+    public ObjectModel(Integer id, String name, String description, String version, Boolean multiple, Boolean mandatory,
             Collection<ResourceModel> resources, String urn, String lwm2mVersion, String description2) {
 
         this.id = id;
@@ -86,7 +81,8 @@ public class ObjectModel {
         for (ResourceModel resource : resources) {
             ResourceModel old = resourcesMap.put(resource.id, resource);
             if (old != null) {
-                LOG.debug("Model already exists for resource {} of object {}. Overriding it.", resource.id, id);
+                throw new IllegalStateException(String
+                        .format("Model already exists for resource %d of object %d. Overriding it.", resource.id, id));
             }
             resourcesMap.put(resource.id, resource);
         }
@@ -95,29 +91,6 @@ public class ObjectModel {
 
     public boolean isOmaObject() {
         return id >= OMA_OBJECT_MIN_ID && id <= OMA_OBJECT_MAX_ID;
-    }
-
-    /**
-     * @return the version and if the version is null or empty return the default value 1.0
-     * @see ObjectModel#DEFAULT_VERSION
-     */
-    public String getVersion() {
-        if (version == null || version.isEmpty()) {
-            return ObjectModel.DEFAULT_VERSION;
-        }
-        return version;
-    }
-
-    /**
-     * @return the LWM2M version and if the LWM2M version is null or empty return the default value 1.0
-     * @see LwM2m#VERSION
-     * @since 1.1
-     */
-    public String getLwM2mVersion() {
-        if (lwm2mVersion == null || lwm2mVersion.isEmpty()) {
-            return LwM2m.VERSION;
-        }
-        return lwm2mVersion;
     }
 
     @Override

@@ -64,10 +64,10 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * A abstract implementation of {@link LwM2mObjectEnabler2}. It could be use as base for any {@link LwM2mObjectEnabler2}
+ * A abstract implementation of {@link LwM2mObjectEnabler}. It could be use as base for any {@link LwM2mObjectEnabler}
  * implementation.
  */
-public abstract class BaseObjectEnabler implements LwM2mObjectEnabler2 {
+public abstract class BaseObjectEnabler implements LwM2mObjectEnabler {
 
     protected final int id;
     protected final TransactionalObjectListener transactionalListener;
@@ -292,8 +292,7 @@ public abstract class BaseObjectEnabler implements LwM2mObjectEnabler2 {
         return doDelete(identity, request);
     }
 
-    // TODO fix in 2.0 this should be protected not public
-    public BootstrapDeleteResponse doDelete(ServerIdentity identity, BootstrapDeleteRequest request) {
+    protected BootstrapDeleteResponse doDelete(ServerIdentity identity, BootstrapDeleteRequest request) {
         // This should be a not implemented error, but this is not defined in the spec.
         return BootstrapDeleteResponse.internalServerError("not implemented");
     }

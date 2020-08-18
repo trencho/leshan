@@ -39,23 +39,21 @@ public class ResourceModel {
         }
     }
 
-    // TODO in version 2.0 : NONE should be added.
     public enum Type {
-        STRING, INTEGER, FLOAT, BOOLEAN, OPAQUE, TIME, OBJLNK
+        NONE, STRING, INTEGER, FLOAT, BOOLEAN, OPAQUE, TIME, OBJLNK
     }
 
-    // TODO in version 2.0 all field should be null-able and ObjectModelValidator should be responsible to validate it.
-    public final int id;
+    public final Integer id;
     public final String name;
     public final Operations operations;
-    public final boolean multiple;
-    public final boolean mandatory;
+    public final Boolean multiple;
+    public final Boolean mandatory;
     public final Type type;
     public final String rangeEnumeration;
     public final String units;
     public final String description;
 
-    public ResourceModel(int id, String name, Operations operations, boolean multiple, boolean mandatory, Type type,
+    public ResourceModel(Integer id, String name, Operations operations, Boolean multiple, Boolean mandatory, Type type,
             String rangeEnumeration, String units, String description) {
         this.id = id;
         this.name = name;

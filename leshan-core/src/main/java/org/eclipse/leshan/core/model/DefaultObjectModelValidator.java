@@ -17,6 +17,8 @@ package org.eclipse.leshan.core.model;
 
 import java.util.List;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
 public class DefaultObjectModelValidator implements ObjectModelValidator {
 
     @Override
@@ -35,11 +37,15 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
      * @throws InvalidModelException is raised when {@link ObjectModel} is Invalid
      */
     public void validate(ObjectModel object, String modelName) throws InvalidModelException {
+        // validate name
         if (object.name == null || object.name.isEmpty()) {
             throw new InvalidModelException(
                     "Model for Object (%d) in %s is invalid : Object name MUST NOT be null or empty", object.id,
                     modelName);
         }
+
+        // validate id
+        validateModelFieldNotNull(object, modelName, object.id, "id");
         if (!(0 <= object.id && object.id <= 42768)) {
             throw new InvalidModelException(
                     "Model for Object (%d) in %s is invalid : Object id MUST be between 0 and 42768", object.id,
@@ -50,8 +56,15 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
                     "Model for Object (%d) in %s is invalid : Object id is in reserved range (1024-2047)", object.id,
                     modelName);
         }
-        validateVersion(object.version, object, modelName);
+
+        // validate others fields
+        validateModelFieldNotNull(object, modelName, object.multiple, "multiple");
+        validateModelFieldNotNull(object, modelName, object.mandatory, "mandatory");
+        validateVersion(object.version, object, "version", modelName);
+        validateVersion(object.lwm2mVersion, object, "lwm2mVersion", modelName);
         validateURN(object.urn, object, modelName);
+
+        // validate resources
         if (object.resources == null || object.resources.isEmpty()) {
             throw new InvalidModelException(
                     "Model for Object %s(%d) in %s is invalid : Resource lists MUST NOT be null or empty", object.name,
@@ -71,22 +84,32 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
      * @throws InvalidModelException is raised when {@link ResourceModel} is Invalid
      */
     public void validate(ResourceModel resource, String modelName) throws InvalidModelException {
+        // validate name
         if (resource.name == null || resource.name.isEmpty()) {
             throw new InvalidModelException(
                     "Model for Resource (%d) in %s is invalid : resource name MUST NOT be null or empty", resource.id,
                     modelName);
         }
+        // validate id
+        validateResourceFieldNotNull(resource, modelName, resource.id, "id");
         if (!(0 <= resource.id && resource.id <= 32768)) {
             throw new InvalidModelException(
                     "Model for Resource (%d) in %s is invalid : Resource id MUST be between 0 and 32768", resource.id,
                     modelName);
         }
-        // TODO in 2.0 : type must be NONE
-        if (resource.operations.isExecutable() && resource.type != null) {
+
+        // validate others fields
+        validateResourceFieldNotNull(resource, modelName, resource.operations, "operations");
+        validateResourceFieldNotNull(resource, modelName, resource.multiple, "multiple");
+        validateResourceFieldNotNull(resource, modelName, resource.mandatory, "mandatory");
+
+        // validate type
+        validateResourceFieldNotNull(resource, modelName, resource.type, "type");
+        if (resource.operations.isExecutable() && resource.type != Type.NONE) {
             throw new InvalidModelException(
                     "Model for Resource %s(%d) in %s is invalid : an executable resource MUST NOT have a type(%s)",
                     resource.name, resource.id, modelName, resource.type);
-        } else if (!resource.operations.isExecutable() && resource.type == null) {
+        } else if (!resource.operations.isExecutable() && resource.type == Type.NONE) {
             throw new InvalidModelException(
                     "Model for Resource %s(%d) in %s is invalid : a none executable resource MUST have a type.",
                     resource.name, resource.id, modelName, resource.type);
@@ -121,14 +144,14 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
 
         if (urnParts.length == 6) {
             String version = urnParts[5];
-            String expectedVersion = object.getVersion();
+            String expectedVersion = object.version;
             if (!expectedVersion.equals(version)) {
                 throw new InvalidModelException(
                         "Model for Object %s(%d) in %s is invalid : URN (%s) version MUST be equals to object version (%s)",
                         object.name, object.id, modelName, urn, expectedVersion);
             }
         } else {
-            if (!ObjectModel.DEFAULT_VERSION.equals(object.getVersion())) {
+            if (!ObjectModel.DEFAULT_VERSION.equals(object.version)) {
                 throw new InvalidModelException(
                         "Model for Object %s(%d) in %s is invalid : URN (%s) version MUST be present as object version is not %s",
                         object.name, object.id, modelName, urn, ObjectModel.DEFAULT_VERSION);
@@ -136,28 +159,46 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
         }
     }
 
-    protected void validateVersion(String version, ObjectModel object, String modelName) throws InvalidModelException {
+    protected void validateVersion(String version, ObjectModel object, String fieldName, String modelName)
+            throws InvalidModelException {
         if (version == null || version.isEmpty())
-            return;
+            throw new InvalidModelException("Model for Object (%d) in %s is invalid : %s  MUST NOT be null or empty",
+                    object.id, modelName, fieldName);
         String[] versionPart = version.split("\\.");
         if (versionPart.length != 2) {
             throw new InvalidModelException(
-                    "Model for Object %s(%d) in %s is invalid : Version (%s) MUST be composed of 2 parts", object.name,
-                    object.id, modelName, version);
+                    "Model for Object %s(%d) in %s is invalid : %s (%s) MUST be composed of 2 parts", object.name,
+                    object.id, modelName, fieldName, version);
         }
         for (int i = 0; i < 2; i++) {
             try {
                 int parsedInt = Integer.parseInt(versionPart[i]);
                 if (parsedInt < 0) {
                     throw new InvalidModelException(
-                            "Model for Object %s(%d) in %s is invalid : Version (%s) part %d (%s) is not a valid integer",
-                            object.name, object.id, modelName, version, i + 1, versionPart[i]);
+                            "Model for Object %s(%d) in %s is invalid : %s (%s) part %d (%s) is not a valid integer",
+                            object.name, object.id, modelName, fieldName, version, i + 1, versionPart[i]);
                 }
             } catch (Exception e) {
                 throw new InvalidModelException(
-                        "Model for Object %s(%d) in %s is invalid : Version (%s) part %d (%s) is not a valid integer",
-                        object.name, object.id, modelName, version, i + 1, versionPart);
+                        "Model for Object %s(%d) in %s is invalid : %s (%s) part %d (%s) is not a valid integer",
+                        object.name, object.id, modelName, fieldName, version, i + 1, versionPart);
             }
+        }
+    }
+
+    protected void validateResourceFieldNotNull(ResourceModel resource, String modelName, Object fieldValue,
+            String fieldName) throws InvalidModelException {
+        if (fieldValue == null) {
+            throw new InvalidModelException("Model for Resource (%d) in %s is invalid : '%s' field MUST NOT be null",
+                    resource.id, modelName, fieldName);
+        }
+    }
+
+    protected void validateModelFieldNotNull(ObjectModel object, String modelName, Object fieldValue, String fieldName)
+            throws InvalidModelException {
+        if (fieldValue == null) {
+            throw new InvalidModelException("Model for Object (%d) in %s is invalid : '%s' field MUST NOT be null",
+                    object.id, modelName, fieldName);
         }
     }
 }

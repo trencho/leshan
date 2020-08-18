@@ -35,7 +35,7 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.CreateRequest;
 import org.eclipse.leshan.core.request.DeleteRequest;
 import org.eclipse.leshan.core.request.DiscoverRequest;
-import org.eclipse.leshan.core.request.DownlinkRequestVisitor2;
+import org.eclipse.leshan.core.request.DownlinkRequestVisitor;
 import org.eclipse.leshan.core.request.ExecuteRequest;
 import org.eclipse.leshan.core.request.LwM2mRequest;
 import org.eclipse.leshan.core.request.ObserveRequest;
@@ -71,7 +71,7 @@ import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mRespon
  * 
  * @param <T> the type of the response to build.
  */
-public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRequestVisitor2 {
+public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRequestVisitor {
 
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mResponseBuilder.class);
 
@@ -117,13 +117,8 @@ public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRe
             // handle success response:
             Link[] links;
             if (MediaTypeRegistry.APPLICATION_LINK_FORMAT != coapResponse.getOptions().getContentFormat()) {
-                // TODO change this behavior for the 2.0 :
-                // throw new InvalidResponseException("Client [%s] returned unexpected content format [%s] for [%s]",
-                // clientEndpoint, coapResponse.getOptions().getContentFormat(), request);
-                LOG.debug("Expected LWM2M Client [{}] to return application/link-format [{}] content but got [{}]",
-                        clientEndpoint, MediaTypeRegistry.APPLICATION_LINK_FORMAT,
-                        coapResponse.getOptions().getContentFormat());
-                links = new Link[] {}; // empty list
+                throw new InvalidResponseException("Client [%s] returned unexpected content format [%s] for [%s]",
+                        clientEndpoint, coapResponse.getOptions().getContentFormat(), request);
             } else {
                 links = Link.parse(coapResponse.getPayload());
             }
