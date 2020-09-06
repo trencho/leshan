@@ -24,6 +24,7 @@ import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.node.codec.LwM2mValueConverter;
@@ -88,6 +89,30 @@ public class LwM2mNodeTextEncoder {
                         "Unable to encode value for resource {} without type(probably a executable one)", path);
             }
 
+            String strValue = getStringValue(expectedType, val);
+
+            encoded = strValue.getBytes(StandardCharsets.UTF_8);
+        }
+
+        @Override
+        public void visit(LwM2mResourceInstance instance) {
+            LOG.trace("Encoding resource instance {} into text", instance);
+
+            ResourceModel rSpec = model.getResourceModel(path.getObjectId(), instance.getId());
+            Type expectedType = rSpec != null ? rSpec.type : instance.getType();
+            Object val = converter.convertValue(instance.getValue(), instance.getType(), expectedType, path);
+
+            if (expectedType == null) {
+                throw new CodecException(
+                        "Unable to encode value for resource {} without type(probably a executable one)", path);
+            }
+
+            String strValue = getStringValue(expectedType, val);
+
+            encoded = strValue.getBytes(StandardCharsets.UTF_8);
+        }
+
+        private String getStringValue(Type expectedType, Object val) {
             String strValue;
             switch (expectedType) {
             case INTEGER:
@@ -113,8 +138,7 @@ public class LwM2mNodeTextEncoder {
             default:
                 throw new CodecException("Cannot encode %s in text format for %s", val, path);
             }
-
-            encoded = strValue.getBytes(StandardCharsets.UTF_8);
+            return strValue;
         }
     }
 }

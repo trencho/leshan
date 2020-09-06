@@ -13,7 +13,6 @@
  * Contributors:
  *     Zebra Technologies - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.leshan.integration.tests;
 
 import org.eclipse.leshan.client.californium.LeshanClient;
@@ -78,6 +77,9 @@ public class IntegrationTestHelper {
     public static final int OBJLNK_SINGLE_INSTANCE_RESOURCE_ID = 7;
     public static final int INTEGER_MANDATORY_RESOURCE_ID = 8;
     public static final int STRING_MANDATORY_RESOURCE_ID = 9;
+    public static final int STRING_RESOURCE_INSTANCE_ID = 10;
+
+    public static final String MULTI_INSTANCE = "multiinstance";
 
     LeshanServer server;
     LeshanClient client;
@@ -115,9 +117,11 @@ public class IntegrationTestHelper {
                 Operations.RW, false, true, Type.INTEGER, null, null, null);
         ResourceModel stringmandatoryfield = new ResourceModel(STRING_MANDATORY_RESOURCE_ID, "stringmandatory",
                 Operations.RW, false, true, Type.STRING, null, null, null);
+        ResourceModel multiInstance = new ResourceModel(STRING_RESOURCE_INSTANCE_ID, MULTI_INSTANCE, Operations.RW,
+                true, false, Type.STRING, null, null, null);
         objectModels.add(new ObjectModel(TEST_OBJECT_ID, "testobject", null, ObjectModel.DEFAULT_VERSION, true, false,
                 stringfield, booleanfield, integerfield, floatfield, timefield, opaquefield, objlnkfield,
-                objlnkSinglefield, integermandatoryfield, stringmandatoryfield));
+                objlnkSinglefield, integermandatoryfield, stringmandatoryfield, multiInstance));
 
         return objectModels;
     }
@@ -171,6 +175,7 @@ public class IntegrationTestHelper {
         // Build Client
         LeshanClientBuilder builder = new LeshanClientBuilder(currentEndpointIdentifier.get());
         builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
+        builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
         builder.setAdditionalAttributes(additionalAttributes);
         builder.setObjects(objects);
         client = builder.build();
@@ -185,6 +190,7 @@ public class IntegrationTestHelper {
 
     protected LeshanServerBuilder createServerBuilder() {
         LeshanServerBuilder builder = new LeshanServerBuilder();
+        builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
         builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
         builder.setObjectModelProvider(new StaticModelProvider(createObjectModels()));
         builder.setLocalAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));

@@ -22,6 +22,7 @@ import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.node.codec.LwM2mValueConverter;
 import org.eclipse.leshan.core.util.Base64;
@@ -112,10 +113,15 @@ public class LwM2mNodeSenMLJsonEncoder {
             lwM2mResourceToSenMLRecord(null, resource);
         }
 
+        @Override
+        public void visit(LwM2mResourceInstance instance) {
+            throw new UnsupportedOperationException("not yet implemented");
+        }
+
         private void lwM2mResourceToSenMLRecord(String recordName, LwM2mResource resource) {
             // create resource element
             if (resource.isMultiInstances()) {
-                for (Entry<Integer, ?> entry : resource.getValues().entrySet()) {
+                for (Entry<Integer, LwM2mResourceInstance> entry : resource.getInstances().entrySet()) {
                     // compute record name for resource instance
                     String resourceInstanceRecordName;
                     if (recordName == null || recordName.isEmpty()) {
@@ -124,7 +130,7 @@ public class LwM2mNodeSenMLJsonEncoder {
                         resourceInstanceRecordName = recordName + "/" + entry.getKey();
                     }
 
-                    addSenMLRecord(resourceInstanceRecordName, resource, entry.getValue());
+                    addSenMLRecord(resourceInstanceRecordName, resource, entry.getValue().getValue());
                 }
             } else {
                 addSenMLRecord(recordName, resource, resource.getValue());

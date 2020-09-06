@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2013-2015 Sierra Wireless and others.
+ * Copyright (c) 2020 Sierra Wireless and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -13,19 +13,19 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.core.node;
+package org.eclipse.leshan.server.request;
 
 /**
- * A visitor to visit an object, an object instance, or a resource.
+ * Allow to apply custom configuration to lower layer.
+ * <p>
+ * If you are using LWM2M over CoAP this setter will help you to apply CoAP setting to you request.
+ * 
+ * @since 1.2
  */
-public interface LwM2mNodeVisitor {
+public interface LowerLayerConfig {
 
-    void visit(LwM2mObject object);
-
-    void visit(LwM2mObjectInstance instance);
-
-    void visit(LwM2mResource resource);
-
-    void visit(LwM2mResourceInstance instance);
-
+    /**
+     * @param lowerRequest the lower layer request. E.g. could be a CoAP request.
+     */
+    void apply(Object lowerRequest);
 }

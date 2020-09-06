@@ -15,8 +15,18 @@
  *     Achim Kraus (Bosch Software Innovations GmbH) - add test for write security object
  *     Achim Kraus (Bosch Software Innovations GmbH) - add test for update and replace instances
  *******************************************************************************/
-
 package org.eclipse.leshan.integration.tests;
+
+import static org.eclipse.leshan.core.ResponseCode.CHANGED;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
@@ -24,6 +34,7 @@ import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.node.codec.CodecException;
@@ -116,7 +127,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, STRING_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
     }
@@ -159,7 +170,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, BOOLEAN_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, BOOLEAN_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
     }
@@ -202,9 +213,55 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, INTEGER_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, INTEGER_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
+    }
+
+    @Test
+    public void can_write_string_resource_json_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.JSON);
+    }
+
+    @Test
+    public void can_write_string_resource_old_json_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE));
+    }
+
+    @Test
+    public void can_write_string_resource_text_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.TEXT);
+    }
+
+    @Test
+    public void can_write_string_resource_tlv_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.TLV);
+    }
+
+    @Test
+    public void can_write_string_resource_old_tlv_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE));
+    }
+
+    private void write_string_resource_instance(ContentFormat format) throws InterruptedException {
+        // read device model number
+        String valueToWrite = "newValue";
+        WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
+                new WriteRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, 0, valueToWrite, Type.STRING));
+
+        // verify result
+        assertEquals(CHANGED, response.getCode());
+        assertNotNull(response.getCoapResponse());
+        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
+
+        // read resource to check the value changed
+        ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
+                new ReadRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, 0));
+
+        // verify result
+        LwM2mResourceInstance resource = (LwM2mResourceInstance) readResponse.getContent();
+        System.out.println(resource);
+        assertEquals(valueToWrite, resource.getValue());
     }
 
     @Test
@@ -245,7 +302,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, FLOAT_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, FLOAT_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
     }
@@ -288,7 +345,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, TIME_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, TIME_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
     }
@@ -336,7 +393,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(TEST_OBJECT_ID, 0, OPAQUE_RESOURCE_ID));
+                new ReadRequest(format, TEST_OBJECT_ID, 0, OPAQUE_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertArrayEquals(expectedvalue, (byte[]) resource.getValue());
     }

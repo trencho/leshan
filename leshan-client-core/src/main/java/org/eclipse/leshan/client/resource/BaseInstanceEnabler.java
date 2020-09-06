@@ -21,8 +21,11 @@ import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
+import org.eclipse.leshan.core.node.LwM2mMultipleResource;
+import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
@@ -126,6 +129,20 @@ public class BaseInstanceEnabler implements LwM2mInstanceEnabler {
     }
 
     @Override
+    public ReadResponse read(ServerIdentity identity, int resourceId, int resourceInstance) {
+        ReadResponse response = read(identity, resourceId);
+        if (response.isFailure())
+            return response;
+        LwM2mMultipleResource resource = (LwM2mMultipleResource) response.getContent();
+        LwM2mResourceInstance resourceIn = resource.getInstance(resourceInstance);
+        if (resourceIn == null) {
+            return ReadResponse.notFound();
+        } else {
+            return ReadResponse.success(resourceIn);
+        }
+    }
+
+    @Override
     public WriteResponse write(ServerIdentity identity, boolean replace, LwM2mObjectInstance value) {
         Map<Integer, LwM2mResource> resourcesToWrite = new HashMap<>(value.getResources());
 
@@ -151,6 +168,26 @@ public class BaseInstanceEnabler implements LwM2mInstanceEnabler {
 
     @Override
     public WriteResponse write(ServerIdentity identity, int resourceid, LwM2mResource value) {
+        return WriteResponse.notFound();
+    }
+
+    @Override
+    public WriteResponse write(ServerIdentity identity, int resourceid, int resourceInstanceId,
+            LwM2mResourceInstance value) {
+        // this is a sub-optimal default implementation
+        ReadResponse response = read(ServerIdentity.SYSTEM, resourceid);
+        if (response.isSuccess()) {
+            LwM2mNode content = response.getContent();
+            if (content instanceof LwM2mMultipleResource) {
+                LwM2mMultipleResource multiresource = ((LwM2mMultipleResource) content);
+                Map<Integer, LwM2mResourceInstance> instances = new HashMap<>(multiresource.getInstances());
+                if (instances.containsKey(resourceInstanceId)) {
+                    instances.put(resourceInstanceId, value);
+                    return write(identity, resourceid,
+                            new LwM2mMultipleResource(resourceInstanceId, value.getType(), instances.values()));
+                }
+            }
+        }
         return WriteResponse.notFound();
     }
 

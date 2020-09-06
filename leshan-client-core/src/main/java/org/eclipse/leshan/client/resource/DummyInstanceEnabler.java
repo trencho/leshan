@@ -23,6 +23,7 @@ import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
@@ -57,9 +58,24 @@ public class DummyInstanceEnabler extends SimpleInstanceEnabler {
     }
 
     @Override
+    public ReadResponse read(ServerIdentity identity, int resourceid, int resourceInstance) {
+        LOG.info("Read on {} Resource /{}/{}/{}/{} ", getModel().name, getModel().id, getId(), resourceid,
+                resourceInstance);
+        return super.read(identity, resourceid, resourceInstance);
+    }
+
+    @Override
     public WriteResponse write(ServerIdentity identity, int resourceid, LwM2mResource value) {
         LOG.info("Write on {} Resource /{}/{}/{} ", getModel().name, getModel().id, getId(), resourceid);
         return super.write(identity, resourceid, value);
+    }
+
+    @Override
+    public WriteResponse write(ServerIdentity identity, int resourceid, int resourceInstance,
+            LwM2mResourceInstance value) {
+        LOG.info("Write on {} Resource  Instance/{}/{}/{}/{} ", getModel().name, getModel().id, getId(), resourceid,
+                resourceInstance);
+        return super.write(identity, resourceid, resourceInstance, value);
     }
 
     @Override

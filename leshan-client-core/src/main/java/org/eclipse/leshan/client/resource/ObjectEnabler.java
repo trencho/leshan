@@ -26,6 +26,7 @@ import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -212,7 +213,12 @@ public class ObjectEnabler extends BaseObjectEnabler {
         }
 
         // Manage Resource case
-        return instance.read(identity, path.getResourceId());
+        if (path.getResourceInstanceId() == null) {
+            return instance.read(identity, path.getResourceId());
+        }
+
+        // Manage Resource Instance case
+        return instance.read(identity, path.getResourceId(), path.getResourceInstanceId());
     }
 
     @Override
@@ -258,7 +264,13 @@ public class ObjectEnabler extends BaseObjectEnabler {
         }
 
         // Manage Resource case
-        return instance.write(identity, path.getResourceId(), (LwM2mResource) request.getNode());
+        if (path.getResourceInstanceId() == null) {
+            return instance.write(identity, path.getResourceId(), (LwM2mResource) request.getNode());
+        }
+
+        // Manage Resource Instance case
+        return instance.write(identity, path.getResourceId(), path.getResourceInstanceId(),
+                ((LwM2mResourceInstance) request.getNode()));
     }
 
     @Override
