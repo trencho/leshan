@@ -30,10 +30,14 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.eclipse.leshan.core.ResponseCode.BAD_REQUEST;
 import static org.eclipse.leshan.core.ResponseCode.CONTENT;
 import static org.eclipse.leshan.core.ResponseCode.METHOD_NOT_ALLOWED;
 import static org.eclipse.leshan.core.ResponseCode.NOT_FOUND;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.INTEGER_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.MULTI_INSTANCE;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.OPAQUE_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

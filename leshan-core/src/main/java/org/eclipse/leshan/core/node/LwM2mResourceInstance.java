@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
 import java.util.Arrays;
 import java.util.Date;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
 
 /**
  * An instance of {@link LwM2mMultipleResource}.
@@ -150,14 +150,12 @@ public class LwM2mResourceInstance implements LwM2mNode {
         if (type != other.type)
             return false;
         if (value == null) {
-            if (other.value != null)
-                return false;
+            return other.value == null;
         } else {
             // Custom equals to handle byte arrays
             return type == Type.OPAQUE ? Arrays.equals((byte[]) value, (byte[]) other.value)
                     : value.equals(other.value);
         }
-        return true;
     }
 
     @Override
