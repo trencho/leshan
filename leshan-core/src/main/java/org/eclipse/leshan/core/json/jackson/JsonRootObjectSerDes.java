@@ -15,18 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.json.jackson;
 
-import org.eclipse.leshan.core.json.JsonRootObject;
-import org.eclipse.leshan.core.util.json.JacksonJsonSerDes;
-import org.eclipse.leshan.core.util.json.JsonException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.eclipse.leshan.core.json.JsonRootObject;
+import org.eclipse.leshan.core.util.json.JacksonJsonSerDes;
+import org.eclipse.leshan.core.util.json.JsonException;
 
 public class JsonRootObjectSerDes extends JacksonJsonSerDes<JsonRootObject> {
 
-    private JsonArrayEntrySerDes serDes = new JsonArrayEntrySerDes();
+    private final JsonArrayEntrySerDes serDes = new JsonArrayEntrySerDes();
 
     @Override
     public JsonNode jSerialize(JsonRootObject jro) throws JsonException {
@@ -43,7 +42,7 @@ public class JsonRootObjectSerDes extends JacksonJsonSerDes<JsonRootObject> {
             o.put("bt", jro.getBaseTime());
 
         return o;
-    };
+    }
 
     @Override
     public JsonRootObject deserialize(JsonNode jsonNode) throws JsonException {

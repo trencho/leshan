@@ -17,16 +17,15 @@
 
 package org.eclipse.leshan.core.json.jackson;
 
-import java.io.IOException;
-
+import com.eclipsesource.json.ParseException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.leshan.core.json.JsonRootObject;
 import org.eclipse.leshan.core.json.LwM2mJsonDecoder;
 import org.eclipse.leshan.core.json.LwM2mJsonEncoder;
 import org.eclipse.leshan.core.json.LwM2mJsonException;
 import org.eclipse.leshan.core.util.json.JsonException;
 
-import com.eclipsesource.json.ParseException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
 
 /**
  * Helper for encoding/decoding LWM2M JSON format using minimal-json

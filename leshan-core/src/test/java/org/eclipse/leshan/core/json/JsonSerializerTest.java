@@ -16,8 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.json;
 
-import java.util.ArrayList;
-
 import org.eclipse.leshan.core.json.jackson.LwM2mJsonJacksonEncoderDecoder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 
 public class JsonSerializerTest {
 
-    private static Logger LOG = LoggerFactory.getLogger(JsonSerializerTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(JsonSerializerTest.class);
 
     private static final LwM2mJsonJacksonEncoderDecoder LwM2mJson = new LwM2mJsonJacksonEncoderDecoder();
 

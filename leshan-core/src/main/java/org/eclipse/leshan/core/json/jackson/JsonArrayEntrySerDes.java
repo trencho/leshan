@@ -15,17 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.json.jackson;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.leshan.core.json.JsonArrayEntry;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.json.JacksonJsonSerDes;
 import org.eclipse.leshan.core.util.json.JsonException;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class JsonArrayEntrySerDes extends JacksonJsonSerDes<JsonArrayEntry> {
 
@@ -76,7 +75,7 @@ public class JsonArrayEntrySerDes extends JacksonJsonSerDes<JsonArrayEntry> {
         if (jae.getTime() != null)
             o.put("t", jae.getTime());
         return o;
-    };
+    }
 
     @Override
     public JsonArrayEntry deserialize(JsonNode o) throws JsonException {

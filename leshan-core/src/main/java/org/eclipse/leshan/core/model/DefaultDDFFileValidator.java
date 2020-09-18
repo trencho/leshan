@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
+import org.eclipse.leshan.core.LwM2m.Version;
+import org.eclipse.leshan.core.util.Validate;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
@@ -28,11 +30,6 @@ import javax.xml.validation.Validator;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.util.Validate;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 /**
  * A DDF File Validator.
  * <p>
@@ -42,8 +39,8 @@ import org.xml.sax.SAXException;
  */
 
 public class DefaultDDFFileValidator implements DDFFileValidator {
-    private static String LWM2M_V1_0_SCHEMA_PATH = "/schemas/LWM2M.xsd";
-    private static String LWM2M_V1_1_SCHEMA_PATH = "/schemas/LWM2M-v1_1.xsd";
+    private static final String LWM2M_V1_0_SCHEMA_PATH = "/schemas/LWM2M.xsd";
+    private static final String LWM2M_V1_1_SCHEMA_PATH = "/schemas/LWM2M-v1_1.xsd";
 
     private final String schema;
 

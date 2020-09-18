@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
+import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.util.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ObjectLoader {
 

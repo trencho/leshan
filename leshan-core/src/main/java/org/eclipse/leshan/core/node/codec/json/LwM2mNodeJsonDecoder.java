@@ -51,7 +51,6 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class LwM2mNodeJsonDecoder {
 public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
 
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeJsonDecoder.class);

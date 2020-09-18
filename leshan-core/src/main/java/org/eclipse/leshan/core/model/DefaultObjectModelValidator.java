@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 

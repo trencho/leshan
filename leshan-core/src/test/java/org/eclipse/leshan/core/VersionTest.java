@@ -15,10 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core;
 
-import static org.junit.Assert.*;
-
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.junit.Test;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class VersionTest {
     @Test

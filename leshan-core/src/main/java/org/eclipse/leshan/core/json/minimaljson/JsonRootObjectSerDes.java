@@ -15,13 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.json.minimaljson;
 
-import org.eclipse.leshan.core.json.JsonRootObject;
-import org.eclipse.leshan.core.util.json.JsonException;
-import org.eclipse.leshan.core.util.json.JsonSerDes;
-
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonValue;
+import org.eclipse.leshan.core.json.JsonRootObject;
 import org.eclipse.leshan.core.util.json.JsonException;
 import org.eclipse.leshan.core.util.json.JsonSerDes;
 
