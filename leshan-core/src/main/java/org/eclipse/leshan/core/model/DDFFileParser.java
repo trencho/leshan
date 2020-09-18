@@ -15,6 +15,18 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.StringUtils;
@@ -44,10 +56,11 @@ public class DDFFileParser {
     private static final Logger LOG = LoggerFactory.getLogger(DDFFileParser.class);
 
     private final DocumentBuilderFactory factory;
+    private final DDFFileValidatorFactory ddfValidatorFactory;
     private final DDFFileValidator ddfValidator;
 
     public DDFFileParser() {
-        this(null);
+        this(null, null);
     }
 
     /**
@@ -57,9 +70,23 @@ public class DDFFileParser {
      * @since 1.1
      */
     public DDFFileParser(DDFFileValidator ddfValidator) {
+        this(ddfValidator, null);
+    }
+
+    /**
+     * Build a DDFFileParser with a given {@link DDFFileValidatorFactory}.
+     *
+     * @param ddfFileValidatorFactory a {@link DDFFileValidatorFactory} or {@code null} if no validation required.
+     */
+    public DDFFileParser(DDFFileValidatorFactory ddfFileValidatorFactory) {
+        this(null, ddfFileValidatorFactory);
+    }
+
+    private DDFFileParser(DDFFileValidator ddfValidator, DDFFileValidatorFactory ddfFileValidatorFactory) {
         factory = DocumentBuilderFactory.newInstance();
         factory.setNamespaceAware(true);
         this.ddfValidator = ddfValidator;
+        this.ddfValidatorFactory = ddfFileValidatorFactory;
     }
 
     /**
@@ -88,20 +115,33 @@ public class DDFFileParser {
 
         LOG.debug("Parsing DDF file {}", streamName);
 
-        // Parse XML file
         try {
+            // Parse XML file
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document = builder.parse(inputStream);
+
+            // Get DDF file validator
+            Version lwm2mVersion;
+            DDFFileValidator ddfFileValidator;
+            if (ddfValidatorFactory != null) {
+                lwm2mVersion = ddfValidatorFactory.extractLWM2MVersion(document, streamName);
+                ddfFileValidator = ddfValidatorFactory.create(lwm2mVersion);
+            } else {
+                lwm2mVersion = null;
+                ddfFileValidator = ddfValidator;
+            }
+
             // Validate XML against Schema
-            if (ddfValidator != null) {
-                ddfValidator.validate(document);
+            boolean validateDdf = ddfFileValidator != null;
+            if (validateDdf) {
+                ddfFileValidator.validate(document);
             }
 
             // Build list of ObjectModel
             ArrayList<ObjectModel> objects = new ArrayList<>();
             NodeList nodeList = document.getDocumentElement().getElementsByTagName("Object");
             for (int i = 0; i < nodeList.getLength(); i++) {
-                objects.add(parseObject(nodeList.item(i), streamName, ddfValidator != null));
+                objects.add(parseObject(nodeList.item(i), streamName, lwm2mVersion, validateDdf));
             }
             return objects;
         } catch (InvalidDDFFileException | SAXException e) {
@@ -111,7 +151,8 @@ public class DDFFileParser {
         }
     }
 
-    private ObjectModel parseObject(Node object, String streamName, boolean validate) throws InvalidDDFFileException {
+    private ObjectModel parseObject(Node object, String streamName, Version schemaVersion, boolean validate)
+            throws InvalidDDFFileException {
 
         Node objectType = object.getAttributes().getNamedItem("ObjectType");
         if (validate && (objectType == null || !"MODefinition".equals(objectType.getTextContent()))) {
@@ -146,8 +187,9 @@ public class DDFFileParser {
                 description = field.getTextContent();
                 break;
             case "ObjectVersion":
-                if (!StringUtils.isEmpty(field.getTextContent()))
+                if (!StringUtils.isEmpty(field.getTextContent())) {
                     version = field.getTextContent();
+                }
                 break;
             case "MultipleInstances":
                 if ("Multiple".equals(field.getTextContent())) {
@@ -178,8 +220,14 @@ public class DDFFileParser {
                 urn = field.getTextContent();
                 break;
             case "LWM2MVersion":
-                if (!StringUtils.isEmpty(field.getTextContent()))
+                if (!StringUtils.isEmpty(field.getTextContent())) {
                     lwm2mVersion = field.getTextContent();
+                    if (schemaVersion != null && !schemaVersion.toString().equals(lwm2mVersion)) {
+                        throw new InvalidDDFFileException(
+                                "LWM2MVersion is not consistent with xml shema(xsi:noNamespaceSchemaLocation) in %s : %s  expected but was %s.",
+                                streamName, schemaVersion, lwm2mVersion);
+                    }
+                }
                 break;
             case "Description2":
                 description2 = field.getTextContent();
@@ -259,6 +307,12 @@ public class DDFFileParser {
                     break;
                 case "Objlnk":
                     type = Type.OBJLNK;
+                    break;
+                case "Unsigned Integer":
+                    type = Type.UNSIGNED_INTEGER;
+                    break;
+                case "Corelnk":
+                    type = Type.CORELINK;
                     break;
                 case "":
                     type = Type.NONE;

@@ -15,6 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
+import java.util.List;
+
+import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 
 import java.util.List;
@@ -71,7 +74,7 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
                     object.id, modelName);
         }
         for (ResourceModel resource : object.resources.values()) {
-            validate(resource, modelName);
+            validate(resource, modelName, object.lwm2mVersion);
         }
     }
 
@@ -81,9 +84,10 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
      * @param resource the {@link ResourceModel} to validate
      * @param modelName a hint about where the resource come from to make debug easier. e.g a filename in model was
      *        store in a file.
+     * @param lwm2mVersion the minimal version of the specification supported by the object
      * @throws InvalidModelException is raised when {@link ResourceModel} is Invalid
      */
-    public void validate(ResourceModel resource, String modelName) throws InvalidModelException {
+    public void validate(ResourceModel resource, String modelName, String lwm2mVersion) throws InvalidModelException {
         // validate name
         if (resource.name == null || resource.name.isEmpty()) {
             throw new InvalidModelException(
@@ -114,6 +118,22 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
                     "Model for Resource %s(%d) in %s is invalid : a none executable resource MUST have a type.",
                     resource.name, resource.id, modelName, resource.type);
         }
+        if (lwm2mVersion.equals(Version.V1_0.toString()))
+            switch (resource.type) {
+            case NONE:
+            case STRING:
+            case INTEGER:
+            case FLOAT:
+            case BOOLEAN:
+            case OPAQUE:
+            case TIME:
+            case OBJLNK:
+                return;
+            default:
+                throw new InvalidModelException(
+                        "Model for Resource (%d) in %s is invalid : Resource type % is not supported by LWM2M v%s",
+                        resource.id, modelName, resource.type, lwm2mVersion);
+            }
     }
 
     protected void validateURN(String urn, ObjectModel object, String modelName) throws InvalidModelException {
@@ -161,29 +181,12 @@ public class DefaultObjectModelValidator implements ObjectModelValidator {
 
     protected void validateVersion(String version, ObjectModel object, String fieldName, String modelName)
             throws InvalidModelException {
-        if (version == null || version.isEmpty())
-            throw new InvalidModelException("Model for Object (%d) in %s is invalid : %s  MUST NOT be null or empty",
-                    object.id, modelName, fieldName);
-        String[] versionPart = version.split("\\.");
-        if (versionPart.length != 2) {
+
+        String errorMsg = Version.validate(version);
+        if (errorMsg != null)
             throw new InvalidModelException(
-                    "Model for Object %s(%d) in %s is invalid : %s (%s) MUST be composed of 2 parts", object.name,
-                    object.id, modelName, fieldName, version);
-        }
-        for (int i = 0; i < 2; i++) {
-            try {
-                int parsedInt = Integer.parseInt(versionPart[i]);
-                if (parsedInt < 0) {
-                    throw new InvalidModelException(
-                            "Model for Object %s(%d) in %s is invalid : %s (%s) part %d (%s) is not a valid integer",
-                            object.name, object.id, modelName, fieldName, version, i + 1, versionPart[i]);
-                }
-            } catch (Exception e) {
-                throw new InvalidModelException(
-                        "Model for Object %s(%d) in %s is invalid : %s (%s) part %d (%s) is not a valid integer",
-                        object.name, object.id, modelName, fieldName, version, i + 1, versionPart);
-            }
-        }
+                    "Model for Object (%d) in %s is invalid : field %s is invalid : %s  MUST NOT be null or empty",
+                    object.id, modelName, fieldName, errorMsg);
     }
 
     protected void validateResourceFieldNotNull(ResourceModel resource, String modelName, Object fieldValue,

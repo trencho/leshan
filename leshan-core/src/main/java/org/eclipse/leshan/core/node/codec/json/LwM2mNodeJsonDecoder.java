@@ -17,8 +17,9 @@ package org.eclipse.leshan.core.node.codec.json;
 
 import org.eclipse.leshan.core.json.JsonArrayEntry;
 import org.eclipse.leshan.core.json.JsonRootObject;
-import org.eclipse.leshan.core.json.LwM2mJson;
+import org.eclipse.leshan.core.json.LwM2mJsonDecoder;
 import org.eclipse.leshan.core.json.LwM2mJsonException;
+import org.eclipse.leshan.core.json.jackson.LwM2mJsonJacksonEncoderDecoder;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -33,6 +34,7 @@ import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.node.codec.CodecException;
+import org.eclipse.leshan.core.node.codec.TimestampedNodeDecoder;
 import org.eclipse.leshan.core.util.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,15 +52,27 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 public class LwM2mNodeJsonDecoder {
+public class LwM2mNodeJsonDecoder implements TimestampedNodeDecoder {
 
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeJsonDecoder.class);
 
+    private final LwM2mJsonDecoder decoder;
+
+    public LwM2mNodeJsonDecoder() {
+        this.decoder = new LwM2mJsonJacksonEncoderDecoder();
+    }
+
+    public LwM2mNodeJsonDecoder(LwM2mJsonDecoder jsonDecoder) {
+        this.decoder = jsonDecoder;
+    }
+
     @SuppressWarnings("unchecked")
-    public static <T extends LwM2mNode> T decode(byte[] content, LwM2mPath path, LwM2mModel model, Class<T> nodeClass)
+    @Override
+    public <T extends LwM2mNode> T decode(byte[] content, LwM2mPath path, LwM2mModel model, Class<T> nodeClass)
             throws CodecException {
         try {
             String jsonStrValue = content != null ? new String(content) : "";
-            JsonRootObject json = LwM2mJson.fromJsonLwM2m(jsonStrValue);
+            JsonRootObject json = decoder.fromJsonLwM2m(jsonStrValue);
             List<TimestampedLwM2mNode> timestampedNodes = parseJSON(json, path, model, nodeClass);
             if (timestampedNodes.size() == 0) {
                 return null;
@@ -71,19 +85,20 @@ public class LwM2mNodeJsonDecoder {
         }
     }
 
-    public static List<TimestampedLwM2mNode> decodeTimestamped(byte[] content, LwM2mPath path, LwM2mModel model,
+    @Override
+    public List<TimestampedLwM2mNode> decodeTimestampedData(byte[] content, LwM2mPath path, LwM2mModel model,
             Class<? extends LwM2mNode> nodeClass) throws CodecException {
         try {
             String jsonStrValue = new String(content);
-            JsonRootObject json = LwM2mJson.fromJsonLwM2m(jsonStrValue);
+            JsonRootObject json = decoder.fromJsonLwM2m(jsonStrValue);
             return parseJSON(json, path, model, nodeClass);
         } catch (LwM2mJsonException e) {
             throw new CodecException(e, "Unable to deserialize json [path:%s]", path);
         }
     }
 
-    private static List<TimestampedLwM2mNode> parseJSON(JsonRootObject jsonObject, LwM2mPath requestPath,
-            LwM2mModel model, Class<? extends LwM2mNode> nodeClass) throws CodecException {
+    private List<TimestampedLwM2mNode> parseJSON(JsonRootObject jsonObject, LwM2mPath requestPath, LwM2mModel model,
+            Class<? extends LwM2mNode> nodeClass) throws CodecException {
 
         LOG.trace("Parsing JSON content for path {}: {}", requestPath, jsonObject);
 
@@ -182,7 +197,7 @@ public class LwM2mNodeJsonDecoder {
 
     }
 
-    private static Long computeTimestamp(Long baseTime, Long time) {
+    private Long computeTimestamp(Long baseTime, Long time) {
         Long timestamp;
         if (baseTime != null) {
             if (time != null) {
@@ -201,7 +216,7 @@ public class LwM2mNodeJsonDecoder {
      * 
      * @return a map (relativeTimestamp => collection of JsonArrayEntry)
      */
-    private static SortedMap<Long, Collection<JsonArrayEntry>> groupJsonEntryByTimestamp(JsonRootObject jsonObject) {
+    private SortedMap<Long, Collection<JsonArrayEntry>> groupJsonEntryByTimestamp(JsonRootObject jsonObject) {
         SortedMap<Long, Collection<JsonArrayEntry>> result = new TreeMap<>(new Comparator<Long>() {
             @Override
             public int compare(Long o1, Long o2) {
@@ -243,8 +258,8 @@ public class LwM2mNodeJsonDecoder {
      *
      * @return a map (instanceId => collection of JsonArrayEntry)
      */
-    private static Map<Integer, Collection<JsonArrayEntry>> groupJsonEntryByInstanceId(
-            Collection<JsonArrayEntry> jsonEntries, String baseName, LwM2mPath requestPath) throws CodecException {
+    private Map<Integer, Collection<JsonArrayEntry>> groupJsonEntryByInstanceId(Collection<JsonArrayEntry> jsonEntries,
+            String baseName, LwM2mPath requestPath) throws CodecException {
         Map<Integer, Collection<JsonArrayEntry>> result = new HashMap<>();
 
         for (JsonArrayEntry e : jsonEntries) {
@@ -286,7 +301,7 @@ public class LwM2mNodeJsonDecoder {
         return result;
     }
 
-    private static LwM2mPath extractAndValidatePath(String baseName, String name, LwM2mPath requestPath)
+    private LwM2mPath extractAndValidatePath(String baseName, String name, LwM2mPath requestPath)
             throws CodecException {
         LwM2mPath path = new LwM2mPath(baseName + name);
 
@@ -311,7 +326,7 @@ public class LwM2mNodeJsonDecoder {
         return path;
     }
 
-    private static Map<Integer, LwM2mResource> extractLwM2mResources(Collection<JsonArrayEntry> jsonArrayEntries,
+    private Map<Integer, LwM2mResource> extractLwM2mResources(Collection<JsonArrayEntry> jsonArrayEntries,
             String baseName, LwM2mModel model, LwM2mPath requestPath) throws CodecException {
         if (jsonArrayEntries == null)
             return Collections.emptyMap();
@@ -409,7 +424,7 @@ public class LwM2mNodeJsonDecoder {
         return lwM2mResourceMap;
     }
 
-    private static Object parseJsonValue(Object value, Type expectedType, LwM2mPath path) throws CodecException {
+    private Object parseJsonValue(Object value, Type expectedType, LwM2mPath path) throws CodecException {
 
         LOG.trace("JSON value for path {} and expected type {}: {}", path, expectedType, value);
 
@@ -439,7 +454,7 @@ public class LwM2mNodeJsonDecoder {
         }
     }
 
-    public static Type getResourceType(LwM2mPath rscPath, LwM2mModel model, JsonArrayEntry resourceElt) {
+    public Type getResourceType(LwM2mPath rscPath, LwM2mModel model, JsonArrayEntry resourceElt) {
         // Use model type in priority
         ResourceModel rscDesc = model.getResourceModel(rscPath.getObjectId(), rscPath.getResourceId());
         if (rscDesc != null)

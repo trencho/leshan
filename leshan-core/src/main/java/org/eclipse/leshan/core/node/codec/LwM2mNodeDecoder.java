@@ -23,6 +23,9 @@ import org.eclipse.leshan.core.request.ContentFormat;
 
 import java.util.List;
 
+/**
+ * A Decoder of {@link LwM2mNode} which should support several {@link ContentFormat} and time-stamped values.
+ */
 public interface LwM2mNodeDecoder {
 
     /**

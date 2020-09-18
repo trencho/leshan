@@ -20,14 +20,12 @@ import org.w3c.dom.Node;
 /**
  * A DDF File Validator.
  * <p>
- * Validate a DDF File against a LWM2M.xsd schema.
- * 
- * @since 1.1
+ * Validate a DDF File against a LWM2M schema.
  */
 public interface DDFFileValidator {
 
     /**
-     * Validate a DOM node (could be DOM Document) against the LWM2M.xsd Schema.
+     * Validate a DOM node (could be DOM Document) against the LWM2M Schema.
      * 
      * @param xmlToValidate DOM node to validate
      * @throws InvalidDDFFileException if ddf file is invalid.

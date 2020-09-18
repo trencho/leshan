@@ -23,6 +23,9 @@ import org.eclipse.leshan.core.request.ContentFormat;
 
 import java.util.List;
 
+/**
+ * An Encoder of {@link LwM2mNode} which should support several {@link ContentFormat} and time-stamped values.
+ */
 public interface LwM2mNodeEncoder {
 
     /**
@@ -35,8 +38,7 @@ public interface LwM2mNodeEncoder {
      * @return the encoded node as a byte array
      * @throws CodecException if there payload is malformed.
      */
-    byte[] encode(LwM2mNode node, ContentFormat format, LwM2mPath path, LwM2mModel model)
-            throws CodecException;
+    byte[] encode(LwM2mNode node, ContentFormat format, LwM2mPath path, LwM2mModel model) throws CodecException;
 
     /**
      * Serializes a list of time-stamped {@link LwM2mNode} with the given content format.

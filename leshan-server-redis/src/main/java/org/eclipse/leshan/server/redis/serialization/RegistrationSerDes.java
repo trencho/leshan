@@ -15,6 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis.serialization;
 
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.LwM2m.Version;
+import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.server.registration.Registration;
+
 import com.eclipsesource.json.Json;
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -85,7 +94,7 @@ public class RegistrationSerDes {
         b.bindingMode(BindingMode.valueOf(jObj.getString("bnd", null)));
         b.lastUpdate(new Date(jObj.getLong("lastUp", 0)));
         b.lifeTimeInSec(jObj.getLong("lt", 0));
-        b.lwM2mVersion(jObj.getString("ver", "1.0"));
+        b.lwM2mVersion(jObj.getString("ver", Version.getDefault().toString()));
         b.registrationDate(new Date(jObj.getLong("regDate", 0)));
         if (jObj.get("sms") != null) {
             b.smsNumber(jObj.getString("sms", ""));
