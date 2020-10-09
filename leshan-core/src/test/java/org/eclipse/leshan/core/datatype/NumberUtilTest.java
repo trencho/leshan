@@ -15,13 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.datatype;
 
-import static org.eclipse.leshan.core.util.datatype.NumberUtil.*;
-import static org.junit.Assert.assertEquals;
+import org.eclipse.leshan.core.util.datatype.ULong;
+import org.junit.Test;
 
 import java.math.BigInteger;
 
-import org.eclipse.leshan.core.util.datatype.ULong;
-import org.junit.Test;
+import static org.eclipse.leshan.core.util.datatype.NumberUtil.numberToLong;
+import static org.eclipse.leshan.core.util.datatype.NumberUtil.numberToULong;
+import static org.junit.Assert.assertEquals;
 
 public class NumberUtilTest {
 

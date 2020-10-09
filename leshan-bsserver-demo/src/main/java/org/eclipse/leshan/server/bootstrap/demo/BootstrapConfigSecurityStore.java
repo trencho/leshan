@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap.demo;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.security.GeneralSecurityException;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.util.SecurityUtil;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
@@ -37,7 +30,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 
 /**

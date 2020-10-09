@@ -16,14 +16,12 @@
 package org.eclipse.leshan.core.node;
 
 import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.core.util.datatype.ULong;
 
 /**
  * A resource with a single value.

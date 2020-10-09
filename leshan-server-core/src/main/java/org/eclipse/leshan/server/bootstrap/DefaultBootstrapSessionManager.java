@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.Iterator;
-
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.DownlinkRequest;
@@ -28,7 +26,7 @@ import org.eclipse.leshan.server.security.SecurityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
+import java.util.Iterator;
 
 /**
  * Implementation of a session manager.
@@ -41,8 +39,8 @@ public class DefaultBootstrapSessionManager implements BootstrapSessionManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultBootstrapSessionManager.class);
 
-    private BootstrapSecurityStore bsSecurityStore;
-    private SecurityChecker securityChecker;
+    private final BootstrapSecurityStore bsSecurityStore;
+    private final SecurityChecker securityChecker;
 
     /**
      * Create a {@link DefaultBootstrapSessionManager} using a default {@link SecurityChecker} to accept or refuse new

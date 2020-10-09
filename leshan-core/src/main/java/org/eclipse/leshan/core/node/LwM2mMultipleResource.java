@@ -17,6 +17,7 @@ package org.eclipse.leshan.core.node;
 
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Validate;
+import org.eclipse.leshan.core.util.datatype.ULong;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,10 +27,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.core.util.Validate;
-import org.eclipse.leshan.core.util.datatype.ULong;
 
 /**
  * A resource which contains several resource instances.

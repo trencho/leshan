@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import static org.junit.Assert.*;
-
-import java.util.Iterator;
-
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfigStore;
@@ -28,7 +24,7 @@ import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Iterator;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;

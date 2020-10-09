@@ -53,6 +53,7 @@ import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TIME_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.UNSIGNED_INTEGER_RESOURCE_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;

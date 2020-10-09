@@ -16,12 +16,10 @@
 package org.eclipse.leshan.core.node;
 
 import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
 
 import java.util.Date;
 import java.util.Map;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.core.util.datatype.ULong;
 
 /**
  * A resource is an information made available by the LWM2M Client.
