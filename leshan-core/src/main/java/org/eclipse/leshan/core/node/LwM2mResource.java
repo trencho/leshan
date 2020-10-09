@@ -20,6 +20,9 @@ import org.eclipse.leshan.core.model.ResourceModel.Type;
 import java.util.Date;
 import java.util.Map;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
+
 /**
  * A resource is an information made available by the LWM2M Client.
  * <p>
@@ -49,7 +52,8 @@ public interface LwM2mResource extends LwM2mNode {
      * If {@link #getType()} returns {@link Type#TIME}, the value is a {@link Date}.<br>
      * If {@link #getType()} returns {@link Type#INTEGER}, the value is a {@link Long}.<br>
      * If {@link #getType()} returns {@link Type#FLOAT}, the value is a {@link Double}.<br>
-     * 
+     * If {@link #getType()} returns {@link Type#UNSIGNED_INTEGER}, the value is a {@link ULong}.<br>
+     *
      * @return the value of the resource.
      */
     Object getValue();
@@ -65,7 +69,8 @@ public interface LwM2mResource extends LwM2mNode {
      * If {@link #getType()} returns {@link Type#TIME}, the value is a {@link Date}.<br>
      * If {@link #getType()} returns {@link Type#INTEGER}, the value is a {@link Long}.<br>
      * If {@link #getType()} returns {@link Type#FLOAT}, the value is a {@link Double}.<br>
-     * 
+     * If {@link #getType()} returns {@link Type#UNSIGNED_INTEGER}, the value is a {@link ULong}.<br>
+     *
      * @return the value a resource instance with the given identifier.
      */
     Object getValue(int id);

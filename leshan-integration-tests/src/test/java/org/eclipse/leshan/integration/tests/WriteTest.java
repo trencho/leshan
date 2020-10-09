@@ -35,6 +35,7 @@ import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.WriteResponse;
+import org.eclipse.leshan.core.util.datatype.ULong;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -211,34 +212,40 @@ public class WriteTest {
 
     @Test
     public void can_write_string_resource_json_instance() throws InterruptedException {
-        write_string_resource_instance(ContentFormat.JSON);
+        write_string_resource_instance(ContentFormat.JSON, 0);
     }
 
     @Test
     public void can_write_string_resource_old_json_instance() throws InterruptedException {
-        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE));
+        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE), 0);
     }
 
     @Test
     public void can_write_string_resource_text_instance() throws InterruptedException {
-        write_string_resource_instance(ContentFormat.TEXT);
+        write_string_resource_instance(ContentFormat.TEXT, 0);
+    }
+
+    @Test
+    public void can_write_string_multiple_resource_text_instance() throws InterruptedException {
+        write_string_resource_instance(ContentFormat.TEXT, 0);
+        write_string_resource_instance(ContentFormat.TEXT, 1);
     }
 
     @Test
     public void can_write_string_resource_tlv_instance() throws InterruptedException {
-        write_string_resource_instance(ContentFormat.TLV);
+        write_string_resource_instance(ContentFormat.TLV, 0);
     }
 
     @Test
     public void can_write_string_resource_old_tlv_instance() throws InterruptedException {
-        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE));
+        write_string_resource_instance(ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE), 0);
     }
 
-    private void write_string_resource_instance(ContentFormat format) throws InterruptedException {
+    private void write_string_resource_instance(ContentFormat format, int resourceInstance) throws InterruptedException {
         // read device model number
         String valueToWrite = "newValue";
         WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new WriteRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, 0, valueToWrite, Type.STRING));
+            new WriteRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, resourceInstance, valueToWrite, Type.STRING));
 
         // verify result
         assertEquals(CHANGED, response.getCode());
@@ -247,7 +254,7 @@ public class WriteTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, 0));
+            new ReadRequest(format, TEST_OBJECT_ID, 0, STRING_RESOURCE_INSTANCE_ID, resourceInstance));
 
         // verify result
         LwM2mResourceInstance resource = (LwM2mResourceInstance) readResponse.getContent();
@@ -387,6 +394,50 @@ public class WriteTest {
                 new ReadRequest(format, TEST_OBJECT_ID, 0, OPAQUE_RESOURCE_ID));
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertArrayEquals(expectedvalue, (byte[]) resource.getValue());
+    }
+
+    @Test
+    public void can_write_unsigned_integer_resource_in_text() throws InterruptedException {
+        write_unsigned_integer_resource(ContentFormat.TEXT);
+    }
+
+    @Test
+    public void can_write_unsigned_integer_resource_in_tlv() throws InterruptedException {
+        write_unsigned_integer_resource(ContentFormat.TLV);
+    }
+
+    @Test
+    public void can_write_unsigned_integer_resource_in_old_tlv() throws InterruptedException {
+        write_unsigned_integer_resource(ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE));
+    }
+
+    @Test
+    public void can_write_unsigned_integer_resource_in_json() throws InterruptedException {
+        write_unsigned_integer_resource(ContentFormat.JSON);
+    }
+
+    @Test
+    public void can_write_unsigned_integer_resource_in_old_json() throws InterruptedException {
+        write_unsigned_integer_resource(ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE));
+    }
+
+    private void write_unsigned_integer_resource(ContentFormat format) throws InterruptedException {
+        // write resource
+        ULong expectedvalue = ULong.valueOf("18446744073709551615"); // this unsigned integer can not be stored in a
+
+        WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
+                new WriteRequest(format, TEST_OBJECT_ID, 0, UNSIGNED_INTEGER_RESOURCE_ID, expectedvalue));
+
+        // verify result
+        assertEquals(ResponseCode.CHANGED, response.getCode());
+        assertNotNull(response.getCoapResponse());
+        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
+
+        // read resource to check the value changed
+        ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
+                new ReadRequest(TEST_OBJECT_ID, 0, UNSIGNED_INTEGER_RESOURCE_ID));
+        LwM2mResource resource = (LwM2mResource) readResponse.getContent();
+        assertEquals(expectedvalue, resource.getValue());
     }
 
     @Test

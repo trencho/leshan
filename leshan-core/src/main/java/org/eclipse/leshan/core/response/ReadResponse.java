@@ -22,6 +22,7 @@ import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
+import org.eclipse.leshan.core.util.datatype.ULong;
 
 import java.util.Date;
 import java.util.Map;
@@ -98,6 +99,10 @@ public class ReadResponse extends AbstractLwM2mResponse {
 
     public static ReadResponse success(int resourceId, long value) {
         return new ReadResponse(ResponseCode.CONTENT, LwM2mSingleResource.newIntegerResource(resourceId, value), null);
+    }
+
+    public static ReadResponse success(int resourceId, ULong value) {
+        return new ReadResponse(ResponseCode.CONTENT, LwM2mSingleResource.newUnsignedIntegerResource(resourceId, value), null);
     }
 
     public static ReadResponse success(int resourceId, ObjectLink value) {

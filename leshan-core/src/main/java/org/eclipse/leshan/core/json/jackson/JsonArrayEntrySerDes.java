@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.leshan.core.json.JsonArrayEntry;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
 import org.eclipse.leshan.core.util.json.JacksonJsonSerDes;
 import org.eclipse.leshan.core.util.json.JsonException;
 
@@ -49,6 +50,10 @@ public class JsonArrayEntrySerDes extends JacksonJsonSerDes<JsonArrayEntry> {
                     o.put("v", value.longValue());
                 } else if (value instanceof BigInteger) {
                     o.put("v", (BigInteger) value);
+                }
+                // unsigned integer
+                else if (value instanceof ULong) {
+                    o.put("v", ((ULong) value).toBigInteger());
                 }
                 // floating-point
                 else if (value instanceof Float) {

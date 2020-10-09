@@ -16,6 +16,27 @@
 
 package org.eclipse.leshan.integration.tests;
 
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Security;
@@ -259,18 +280,18 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
             }
 
             @Override
-            public List<SecurityInfo> getAllByEndpoint(String endpoint) {
+            public Iterator<SecurityInfo> getAllByEndpoint(String endpoint) {
                 if (getCurrentEndpoint().equals(endpoint)) {
                     SecurityInfo info;
                     if (mode == SecurityMode.PSK) {
                         info = pskSecurityInfo();
-                        return Arrays.asList(info);
+                        return Arrays.asList(info).iterator();
                     } else if (mode == SecurityMode.RPK) {
                         info = rpkSecurityInfo();
-                        return Arrays.asList(info);
+                        return Arrays.asList(info).iterator();
                     }
                 }
-                return Arrays.asList();
+                return null;
             }
         };
     }
@@ -295,7 +316,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
             }
 
             @Override
-            public List<SecurityInfo> getAllByEndpoint(String endpoint) {
+            public Iterator<SecurityInfo> getAllByEndpoint(String endpoint) {
                 return null;
             }
         };
