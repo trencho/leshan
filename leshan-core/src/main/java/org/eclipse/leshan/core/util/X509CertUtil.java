@@ -5,7 +5,10 @@ import java.net.InetAddress;
 import java.security.Principal;
 import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * X.509 Certificate Utilities for accessing certificate details.
@@ -71,7 +74,7 @@ public class X509CertUtil {
          *
          * @param value the integer value of the code
          */
-        private GeneralName(final int value) {
+        GeneralName(final int value) {
             this.value = value;
         }
 

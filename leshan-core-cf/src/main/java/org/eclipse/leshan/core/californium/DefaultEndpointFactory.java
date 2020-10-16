@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.californium;
 
-import java.net.InetSocketAddress;
-import java.security.Principal;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.CoapEndpoint.Builder;
 import org.eclipse.californium.core.network.EndpointContextMatcherFactory;
@@ -31,6 +28,7 @@ import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 
 import java.net.InetSocketAddress;
+import java.security.Principal;
 
 /**
  * A default implementation of {@link EndpointFactory}.
