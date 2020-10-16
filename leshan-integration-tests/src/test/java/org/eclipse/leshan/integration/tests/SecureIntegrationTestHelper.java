@@ -16,6 +16,32 @@
 
 package org.eclipse.leshan.integration.tests;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.KeySpec;
+import java.util.List;
+
+import javax.crypto.SecretKey;
+import javax.security.auth.x500.X500Principal;
+
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.observe.ObservationStore;
@@ -36,6 +62,7 @@ import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.californium.EndpointFactory;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.util.Hex;
+import org.eclipse.leshan.core.util.X509CertUtil;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.security.DefaultAuthorizer;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
@@ -283,6 +310,12 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
         createRPKClient(false);
     }
 
+    public void setEndpointNameFromX509(X509Certificate certificate) {
+        X500Principal subjectDN = certificate.getSubjectX500Principal();
+        String endpointName = X509CertUtil.getPrincipalField(subjectDN, "CN");
+        setCurrentEndpoint(endpointName);
+    }
+
     public void createX509CertClient() throws CertificateEncodingException {
         createX509CertClient(clientX509Cert, clientPrivateKeyFromCert, serverX509Cert);
     }
@@ -365,7 +398,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
             @Override
             protected boolean matchX509Identity(String endpoint, String receivedX509CommonName,
                     String expectedX509CommonName) {
-                return expectedX509CommonName.startsWith(receivedX509CommonName);
+                return expectedX509CommonName.equals(receivedX509CommonName);
             }
         }));
 
