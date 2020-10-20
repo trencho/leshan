@@ -18,21 +18,6 @@
 
 package org.eclipse.leshan.client.demo;
 
-import static org.eclipse.leshan.client.object.Security.*;
-import static org.eclipse.leshan.core.LwM2mId.*;
-
-import java.io.File;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.security.interfaces.ECPublicKey;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -82,6 +67,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.security.interfaces.ECPublicKey;
 import java.util.ArrayList;
@@ -555,7 +541,8 @@ public class LeshanClientDemo {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), additionalAttributes,
                     bsAdditionalAttributes, lifetime, communicationPeriod, serverURI, pskIdentity, pskKey,
                     clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate,
-                    cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"), modelsFolderPath, ciphers);
+                    trustStore, cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"),
+                    modelsFolderPath, ciphers);
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
@@ -566,9 +553,9 @@ public class LeshanClientDemo {
             Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes, int lifetime,
             Integer communicationPeriod, String serverURI, byte[] pskIdentity, byte[] pskKey,
             PrivateKey clientPrivateKey, PublicKey clientPublicKey, PublicKey serverPublicKey,
-            X509Certificate clientCertificate, X509Certificate serverCertificate, boolean supportOldFormat,
-            boolean supportDeprecatedCiphers, boolean reconnectOnUpdate, boolean forceFullhandshake,
-            String modelsFolderPath, List<CipherSuite> ciphers) throws Exception {
+            X509Certificate clientCertificate, X509Certificate serverCertificate, List<Certificate> trustStore,
+            boolean supportOldFormat, boolean supportDeprecatedCiphers, boolean reconnectOnUpdate,
+            boolean forceFullhandshake, String modelsFolderPath, List<CipherSuite> ciphers) throws Exception {
 
         MyLocation locationInstance = new MyLocation();
 

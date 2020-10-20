@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.net.InetSocketAddress;
-import java.security.cert.Certificate;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -52,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetSocketAddress;
+import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -69,7 +64,7 @@ public class LeshanClient implements LwM2mClient {
     private final CaliforniumLwM2mRequestSender requestSender;
     private final CaliforniumEndpointsManager endpointsManager;
 
-    private LwM2mObjectTree objectTree;
+    private final LwM2mObjectTree objectTree;
     private final BootstrapHandler bootstrapHandler;
     private final RegistrationEngine engine;
     private final LwM2mClientObserverDispatcher observers;
