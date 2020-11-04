@@ -10,4 +10,4 @@ For more details, please look at https://www.eclipse.org/security/.
 
 ## Supported Versions
 
-There is no final [release of leshan for now](https://github.com/eclipse/leshan/wiki/Roadmap). So security fixes are applied in master branch and then available in next milestone release.
+Version [1.x](https://github.com/eclipse/leshan/tree/1.x) and [master](https://github.com/eclipse/leshan) are concerned.
