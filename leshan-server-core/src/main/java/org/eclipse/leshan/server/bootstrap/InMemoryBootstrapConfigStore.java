@@ -25,7 +25,12 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Simple bootstrap store implementation storing bootstrap configuration information in memory.
+ * 
+ * * @deprecated use {@link InMemoryBootstrapConfigurationStore} instead or see *
+ * {@link BootstrapConfigurationStoreAdapter} or
+ * {@link BootstrapUtil#toRequests(BootstrapConfig, org.eclipse.leshan.core.request.ContentFormat)}
  */
+@Deprecated
 public class InMemoryBootstrapConfigStore implements EditableBootstrapConfigStore {
 
     protected final ConfigurationChecker configChecker = new ConfigurationChecker();
