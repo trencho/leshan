@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
+import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
+import org.eclipse.leshan.core.response.LwM2mResponse;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
-import org.eclipse.leshan.core.response.LwM2mResponse;
-
 public class BootstrapConfiguration {
 
-    private List<BootstrapDownlinkRequest<? extends LwM2mResponse>> requests;
+    private final List<BootstrapDownlinkRequest<? extends LwM2mResponse>> requests;
 
     public BootstrapConfiguration() {
         this.requests = Collections.emptyList();

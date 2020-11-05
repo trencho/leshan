@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import org.eclipse.leshan.core.node.LwM2mNode;
-import org.eclipse.leshan.core.node.LwM2mPath;
-import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -43,14 +34,11 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.CANCELLED;
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.DELETE_FAILED;
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.FINISH_FAILED;
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.INTERNAL_SERVER_ERROR;
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.NO_BOOTSTRAP_CONFIG;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.REQUEST_FAILED;
 import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.UNAUTHORIZED;
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_ACL_FAILED;
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SECURITY_FAILED;
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.WRITE_SERVER_FAILED;
 
 /**
  * A default implementation for {@link BootstrapHandler}.
@@ -290,7 +278,7 @@ public class DefaultBootstrapHandler implements BootstrapHandler {
 
     protected abstract class SafeResponseCallback<T extends LwM2mResponse> implements ResponseCallback<T> {
 
-        private BootstrapSession session;
+        private final BootstrapSession session;
 
         public SafeResponseCallback(BootstrapSession session) {
             this.session = session;
@@ -311,7 +299,7 @@ public class DefaultBootstrapHandler implements BootstrapHandler {
 
     protected abstract class SafeErrorCallback implements ErrorCallback {
 
-        private BootstrapSession session;
+        private final BootstrapSession session;
 
         public SafeErrorCallback(BootstrapSession session) {
             this.session = session;

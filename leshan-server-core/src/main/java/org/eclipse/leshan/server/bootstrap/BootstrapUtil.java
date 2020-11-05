@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.node.LwM2mMultipleResource;
 import org.eclipse.leshan.core.node.LwM2mNode;
@@ -38,6 +33,8 @@ import org.eclipse.leshan.server.bootstrap.BootstrapConfig.ServerSecurity;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class BootstrapUtil {
     public static LwM2mObjectInstance toSecurityInstance(int instanceId, ServerSecurity securityConfig) {
