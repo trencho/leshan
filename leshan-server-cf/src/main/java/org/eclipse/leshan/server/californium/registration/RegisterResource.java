@@ -15,6 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.registration;
 
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
+
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
@@ -60,6 +67,8 @@ public class RegisterResource extends LwM2mCoapResource {
     private static final String QUERY_PARAM_SMS = "sms=";
 
     private static final String QUERY_PARAM_LIFETIME = "lt=";
+
+    private static final String QUERY_PARAM_QUEUEMMODE = "Q"; // since LWM2M 1.1
 
     private static final Logger LOG = LoggerFactory.getLogger(RegisterResource.class);
 
@@ -128,7 +137,8 @@ public class RegisterResource extends LwM2mCoapResource {
         Long lifetime = null;
         String smsNumber = null;
         String lwVersion = null;
-        BindingMode binding = null;
+        EnumSet<BindingMode> binding = null;
+        Boolean queueMode = null;
 
         // Get object Links
         Link[] objectLinks = Link.parse(request.getPayload());
@@ -146,7 +156,9 @@ public class RegisterResource extends LwM2mCoapResource {
             } else if (param.startsWith(QUERY_PARAM_LWM2M_VERSION)) {
                 lwVersion = param.substring(6);
             } else if (param.startsWith(QUERY_PARAM_BINDING_MODE)) {
-                binding = BindingMode.valueOf(param.substring(2));
+                binding = BindingMode.parse(param.substring(2));
+            } else if (param.equals(QUERY_PARAM_QUEUEMMODE)) {
+                queueMode = true;
             } else {
                 String[] tokens = param.split("\\=");
                 if (tokens != null && tokens.length == 2) {
@@ -156,8 +168,8 @@ public class RegisterResource extends LwM2mCoapResource {
         }
 
         // Create request
-        RegisterRequest registerRequest = new RegisterRequest(endpoint, lifetime, lwVersion, binding, smsNumber,
-                objectLinks, additionalParams);
+        RegisterRequest registerRequest = new RegisterRequest(endpoint, lifetime, lwVersion, binding, queueMode,
+                smsNumber, objectLinks, additionalParams);
 
         // Handle request
         // -------------------------------
@@ -183,7 +195,7 @@ public class RegisterResource extends LwM2mCoapResource {
         // Create LwM2m request from CoAP request
         Long lifetime = null;
         String smsNumber = null;
-        BindingMode binding = null;
+        EnumSet<BindingMode> binding = null;
         Link[] objectLinks = null;
         Map<String, String> additionalParams = new HashMap<>();
 
@@ -193,7 +205,7 @@ public class RegisterResource extends LwM2mCoapResource {
             } else if (param.startsWith(QUERY_PARAM_SMS)) {
                 smsNumber = param.substring(4);
             } else if (param.startsWith(QUERY_PARAM_BINDING_MODE)) {
-                binding = BindingMode.valueOf(param.substring(2));
+                binding = BindingMode.parse(param.substring(2));
             } else {
                 String[] tokens = param.split("\\=");
                 if (tokens != null && tokens.length == 2) {

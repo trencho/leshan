@@ -10,4 +10,7 @@ For more details, please look at https://www.eclipse.org/security/.
 
 ## Supported Versions
 
-Version [1.x](https://github.com/eclipse/leshan/tree/1.x) and [master](https://github.com/eclipse/leshan) are concerned.
+| Version | Supported          |
+| ------- | ------------------ |
+| 2.0.0 (master)   | :white_check_mark: | |
+| 1.x   | :white_check_mark: |

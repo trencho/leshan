@@ -15,10 +15,24 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import static org.junit.Assert.*;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.eclipse.californium.core.network.CoapEndpoint;
+import org.eclipse.californium.elements.Connector;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Security;
+import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.DummyInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
@@ -33,7 +47,6 @@ import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
-import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
@@ -63,7 +76,7 @@ import static org.junit.Assert.fail;
 public class IntegrationTestHelper {
     public static final Random r = new Random();
 
-    static final String MODEL_NUMBER = "IT-TEST-123";
+    public static final String MODEL_NUMBER = "IT-TEST-123";
     public static final long LIFETIME = 2;
 
     public static final int TEST_OBJECT_ID = 2000;
@@ -82,9 +95,9 @@ public class IntegrationTestHelper {
 
     public static final String MULTI_INSTANCE = "multiinstance";
 
-    LeshanServer server;
-    LeshanClient client;
-    AtomicReference<String> currentEndpointIdentifier = new AtomicReference<String>();
+    public LeshanServer server;
+    public LeshanClient client;
+    public AtomicReference<String> currentEndpointIdentifier = new AtomicReference<String>();
 
     private final SynchronousClientObserver clientObserver = new SynchronousClientObserver();
     private final SynchronousRegistrationListener registrationListener = new SynchronousRegistrationListener() {
@@ -94,7 +107,7 @@ public class IntegrationTestHelper {
         }
     };
 
-    protected List<ObjectModel> createObjectModels() {
+    public List<ObjectModel> createObjectModels() {
         // load default object from the spec
         List<ObjectModel> objectModels = ObjectLoader.loadDefault();
         // define custom model for testing purpose
@@ -152,8 +165,8 @@ public class IntegrationTestHelper {
             super();
         }
 
-        public TestDevice(String manufacturer, String modelNumber, String serialNumber, String supportedBinding) {
-            super(manufacturer, modelNumber, serialNumber, supportedBinding);
+        public TestDevice(String manufacturer, String modelNumber, String serialNumber) {
+            super(manufacturer, modelNumber, serialNumber);
         }
 
         @Override
@@ -172,9 +185,8 @@ public class IntegrationTestHelper {
         initializer.setInstancesForObject(LwM2mId.SECURITY, Security.noSec(
                 "coap://" + server.getUnsecuredAddress().getHostString() + ":" + server.getUnsecuredAddress().getPort(),
                 12345));
-        initializer.setInstancesForObject(LwM2mId.SERVER,
-                new org.eclipse.leshan.client.object.Server(12345, LIFETIME, BindingMode.U, false));
-        initializer.setInstancesForObject(LwM2mId.DEVICE, new TestDevice("Eclipse Leshan", MODEL_NUMBER, "12345", "U"));
+        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME));
+        initializer.setInstancesForObject(LwM2mId.DEVICE, new TestDevice("Eclipse Leshan", MODEL_NUMBER, "12345"));
         initializer.setClassForObject(LwM2mId.ACCESS_CONTROL, DummyInstanceEnabler.class);
         initializer.setInstancesForObject(TEST_OBJECT_ID, new DummyInstanceEnabler(0),
                 new SimpleInstanceEnabler(1, OPAQUE_RESOURCE_ID, new byte[0]));
@@ -331,5 +343,10 @@ public class IntegrationTestHelper {
 
     public Registration getLastRegistration() {
         return registrationListener.getLastRegistration();
+    }
+
+    public Connector getClientConnector(ServerIdentity server) {
+        CoapEndpoint endpoint = (CoapEndpoint) client.coap().getServer().getEndpoint(client.getAddress(server));
+        return endpoint.getConnector();
     }
 }

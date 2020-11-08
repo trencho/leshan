@@ -44,6 +44,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.EnumSet;
 import java.util.Map;
 
 import static org.eclipse.leshan.client.servers.ServerIdentity.SYSTEM;
@@ -130,7 +131,7 @@ public class ServersInfoExtractor {
                     for (LwM2mObjectInstance server : servers.getInstances().values()) {
                         if (info.serverId == (Long) server.getResource(SRV_SERVER_ID).getValue()) {
                             info.lifetime = (long) server.getResource(SRV_LIFETIME).getValue();
-                            info.binding = BindingMode.valueOf((String) server.getResource(SRV_BINDING).getValue());
+                            info.binding = BindingMode.parse((String) server.getResource(SRV_BINDING).getValue());
 
                             infos.deviceManagements.put(info.serverId, info);
                             break;
@@ -170,11 +171,21 @@ public class ServersInfoExtractor {
         }
     }
 
-    public static BindingMode getBindingMode(LwM2mObjectEnabler serverEnabler, int instanceId) {
+    public static EnumSet<BindingMode> getServerBindingMode(LwM2mObjectEnabler serverEnabler, int instanceId) {
         ReadResponse response = serverEnabler.read(ServerIdentity.SYSTEM,
                 new ReadRequest(SERVER, instanceId, SRV_BINDING));
         if (response.isSuccess()) {
-            return BindingMode.valueOf((String) ((LwM2mResource) response.getContent()).getValue());
+            return BindingMode.parse((String) ((LwM2mResource) response.getContent()).getValue());
+        } else {
+            return null;
+        }
+    }
+
+    public static EnumSet<BindingMode> getDeviceSupportedBindingMode(LwM2mObjectEnabler serverEnabler, int instanceId) {
+        ReadResponse response = serverEnabler.read(ServerIdentity.SYSTEM,
+                new ReadRequest(DEVICE, instanceId, DVC_SUPPORTED_BINDING));
+        if (response.isSuccess()) {
+            return BindingMode.parse((String) ((LwM2mResource) response.getContent()).getValue());
         } else {
             return null;
         }

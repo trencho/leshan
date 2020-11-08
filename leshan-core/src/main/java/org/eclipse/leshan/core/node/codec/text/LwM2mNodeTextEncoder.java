@@ -132,7 +132,7 @@ public class LwM2mNodeTextEncoder implements NodeEncoder {
                 break;
             case OBJLNK:
                 ObjectLink objlnk = (ObjectLink) val;
-                strValue = objlnk.getObjectId() + ":" + objlnk.getObjectInstanceId();
+                strValue = objlnk.encodeToString();
                 break;
             case OPAQUE:
                 byte[] binaryValue = (byte[]) val;

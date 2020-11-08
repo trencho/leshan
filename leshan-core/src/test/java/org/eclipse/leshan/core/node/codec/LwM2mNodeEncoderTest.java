@@ -319,7 +319,7 @@ public class LwM2mNodeEncoderTest {
         b.append("{\"n\":\"9\",\"v\":100},");
         b.append("{\"n\":\"10\",\"v\":15},");
         b.append("{\"n\":\"11/0\",\"v\":0},");
-        b.append("{\"n\":\"13\",\"v\":1.3674912E9},");
+        b.append("{\"n\":\"13\",\"v\":1367491215},");
         b.append("{\"n\":\"14\",\"vs\":\"+02:00\"},");
         b.append("{\"n\":\"16\",\"vs\":\"U\"}]");
 
@@ -345,6 +345,25 @@ public class LwM2mNodeEncoderTest {
         byte[] encoded = encoder.encode(oResource, ContentFormat.SENML_JSON, new LwM2mPath("/3/0/7"), model);
 
         String expected = "[{\"bn\":\"/3/0/7/\",\"n\":\"0\",\"v\":3800},{\"n\":\"1\",\"v\":5000}]";
+        Assert.assertEquals(expected, new String(encoded));
+    }
+
+    @Test
+    public void senml_encode_timestamped_resources() throws CodecException {
+        List<TimestampedLwM2mNode> data = new ArrayList<>();
+        data.add(new TimestampedLwM2mNode(268_500_000L, LwM2mSingleResource.newFloatResource(1, 22.9)));
+        data.add(new TimestampedLwM2mNode(268_500_010L, LwM2mSingleResource.newFloatResource(1, 22.4)));
+        data.add(new TimestampedLwM2mNode(268_500_020L, LwM2mSingleResource.newFloatResource(1, 24.1)));
+
+        byte[] encoded = encoder.encodeTimestampedData(data, ContentFormat.SENML_JSON, new LwM2mPath(1024, 0, 1),
+                model);
+
+        StringBuilder b = new StringBuilder();
+        b.append("[{\"bn\":\"/1024/0/1\",\"bt\":268500000,\"v\":22.9},");
+        b.append("{\"bn\":\"/1024/0/1\",\"bt\":268500010,\"v\":22.4},");
+        b.append("{\"bn\":\"/1024/0/1\",\"bt\":268500020,\"v\":24.1}]");
+
+        String expected = b.toString();
         Assert.assertEquals(expected, new String(encoded));
     }
 }

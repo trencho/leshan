@@ -16,7 +16,16 @@
  *     Achim Kraus (Bosch Software Innovations GmbH) - replace close() with destroy()
  *******************************************************************************/
 
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.create;
+
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
@@ -30,9 +39,13 @@ import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.CreateResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.integration.tests.IntegrationTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 import static org.eclipse.leshan.core.request.ContentFormat.JSON;
 import static org.eclipse.leshan.core.request.ContentFormat.TLV;
@@ -45,9 +58,23 @@ import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+@RunWith(Parameterized.class)
 public class CreateTest {
+    protected IntegrationTestHelper helper = new IntegrationTestHelper();
 
-    IntegrationTestHelper helper = new IntegrationTestHelper();
+    @Parameters(name = "{0}")
+    public static Collection<?> contentFormats() {
+        return Arrays.asList(new Object[][] { //
+                                { ContentFormat.TLV }, //
+                                { ContentFormat.JSON }, //
+                                { ContentFormat.SENML_JSON } });
+    }
+
+    private ContentFormat contentFormat;
+
+    public CreateTest(ContentFormat contentFormat) {
+        this.contentFormat = contentFormat;
+    }
 
     @Before
     public void start() {
@@ -67,59 +94,46 @@ public class CreateTest {
     }
 
     @Test
-    public void can_create_instance_without_instance_id_tlv() throws InterruptedException {
-        can_create_instance_without_instance_id(TLV);
-    }
+    public void can_create_instance_without_instance_id() throws InterruptedException {
+        try {
+            // create ACL instance
+            CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
+                    new CreateRequest(contentFormat, 2, LwM2mSingleResource.newIntegerResource(3, 33)));
 
-    @Test(expected = InvalidRequestException.class)
-    public void can_create_instance_without_instance_id_json() throws InterruptedException {
-        can_create_instance_without_instance_id(JSON);
-    }
+            // verify result
+            assertEquals(ResponseCode.CREATED, response.getCode());
+            assertEquals("2/0", response.getLocation());
+            assertNotNull(response.getCoapResponse());
+            assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
 
-    public void can_create_instance_without_instance_id(ContentFormat format) throws InterruptedException {
-        // create ACL instance
-        CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(format, 2, LwM2mSingleResource.newIntegerResource(3, 33)));
+            // create a second ACL instance
+            response = helper.server.send(helper.getCurrentRegistration(),
+                    new CreateRequest(contentFormat, 2, LwM2mSingleResource.newIntegerResource(3, 34)));
 
-        // verify result
-        assertEquals(ResponseCode.CREATED, response.getCode());
-        assertEquals("2/0", response.getLocation());
-        assertNotNull(response.getCoapResponse());
-        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
+            // verify result
+            assertEquals(ResponseCode.CREATED, response.getCode());
+            assertEquals("2/1", response.getLocation());
+            assertNotNull(response.getCoapResponse());
+            assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
 
-        // create a second ACL instance
-        response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(format, 2, LwM2mSingleResource.newIntegerResource(3, 34)));
-
-        // verify result
-        assertEquals(ResponseCode.CREATED, response.getCode());
-        assertEquals("2/1", response.getLocation());
-        assertNotNull(response.getCoapResponse());
-        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
-
-        // read object 2
-        ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(), new ReadRequest(2));
-        assertEquals(ResponseCode.CONTENT, readResponse.getCode());
-        LwM2mObject object = (LwM2mObject) readResponse.getContent();
-        assertEquals(33l, object.getInstance(0).getResource(3).getValue());
-        assertEquals(34l, object.getInstance(1).getResource(3).getValue());
+            // read object 2
+            ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(), new ReadRequest(2));
+            assertEquals(ResponseCode.CONTENT, readResponse.getCode());
+            LwM2mObject object = (LwM2mObject) readResponse.getContent();
+            assertEquals(33l, object.getInstance(0).getResource(3).getValue());
+            assertEquals(34l, object.getInstance(1).getResource(3).getValue());
+        } catch (InvalidRequestException e) {
+            // only TLV support create instance without instance id
+            assertNotEquals(ContentFormat.TLV, contentFormat);
+        }
     }
 
     @Test
-    public void can_create_instance_with_id_tlv() throws InterruptedException {
-        can_create_instance_with_id(TLV);
-    }
-
-    @Test
-    public void can_create_instance_with_id_json() throws InterruptedException {
-        can_create_instance_with_id(JSON);
-    }
-
-    public void can_create_instance_with_id(ContentFormat format) throws InterruptedException {
+    public void can_create_instance_with_id() throws InterruptedException {
         // create ACL instance
         LwM2mObjectInstance instance = new LwM2mObjectInstance(12, LwM2mSingleResource.newIntegerResource(3, 123));
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(format, 2, instance));
+                new CreateRequest(contentFormat, 2, instance));
 
         // verify result
         assertEquals(ResponseCode.CREATED, response.getCode());
@@ -135,21 +149,12 @@ public class CreateTest {
     }
 
     @Test
-    public void can_create_2_instances_of_object_tlv() throws InterruptedException {
-        can_create_2_instances_of_object(TLV);
-    }
-
-    @Test
-    public void can_create_2_instances_of_object_json() throws InterruptedException {
-        can_create_2_instances_of_object(JSON);
-    }
-
-    public void can_create_2_instances_of_object(ContentFormat format) throws InterruptedException {
+    public void can_create_2_instances_of_object() throws InterruptedException {
         // create ACL instance
         LwM2mObjectInstance instance1 = new LwM2mObjectInstance(12, LwM2mSingleResource.newIntegerResource(3, 123));
         LwM2mObjectInstance instance2 = new LwM2mObjectInstance(13, LwM2mSingleResource.newIntegerResource(3, 124));
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(format, 2, instance1, instance2));
+                new CreateRequest(contentFormat, 2, instance1, instance2));
 
         // verify result
         assertEquals(ResponseCode.CREATED, response.getCode());
@@ -166,22 +171,10 @@ public class CreateTest {
     }
 
     @Test
-    public void cannot_create_instance_of_absent_object() throws InterruptedException {
-        // try to create an instance of object 50
-        CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(50, new LwM2mResource[0]));
-
-        // verify result
-        assertEquals(ResponseCode.NOT_FOUND, response.getCode());
-        assertNotNull(response.getCoapResponse());
-        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
-    }
-
-    @Test
     public void cannot_create_instance_without_all_required_resources() throws InterruptedException {
         // create ACL instance without any resources
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(TEST_OBJECT_ID, new LwM2mResource[0]));
+                new CreateRequest(contentFormat, TEST_OBJECT_ID, new LwM2mObjectInstance(0, new LwM2mResource[0])));
 
         // verify result
         assertEquals(ResponseCode.BAD_REQUEST, response.getCode());
@@ -189,8 +182,9 @@ public class CreateTest {
         assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
 
         // create ACL instance with only 1 mandatory resources (1 missing)
-        CreateResponse response2 = helper.server.send(helper.getCurrentRegistration(), new CreateRequest(TEST_OBJECT_ID,
-                LwM2mSingleResource.newIntegerResource(INTEGER_MANDATORY_RESOURCE_ID, 12)));
+        CreateResponse response2 = helper.server.send(helper.getCurrentRegistration(), new CreateRequest(contentFormat,
+                TEST_OBJECT_ID,
+                new LwM2mObjectInstance(0, LwM2mSingleResource.newIntegerResource(INTEGER_MANDATORY_RESOURCE_ID, 12))));
 
         // verify result
         assertEquals(ResponseCode.BAD_REQUEST, response2.getCode());
@@ -203,7 +197,7 @@ public class CreateTest {
                 LwM2mSingleResource.newIntegerResource(INTEGER_MANDATORY_RESOURCE_ID, 22));
 
         CreateResponse response3 = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(TEST_OBJECT_ID, instance0, instance1));
+                new CreateRequest(contentFormat, TEST_OBJECT_ID, instance0, instance1));
 
         // verify result
         assertEquals(ResponseCode.BAD_REQUEST, response3.getCode());
@@ -215,28 +209,4 @@ public class CreateTest {
         assertNotNull(response.getCoapResponse());
         assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
     }
-
-    @Test
-    public void cannot_create_mandatory_single_object() throws InterruptedException {
-        // try to create another instance of device object
-        CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(3, LwM2mSingleResource.newStringResource(3, "v123")));
-
-        // verify result
-        assertEquals(ResponseCode.BAD_REQUEST, response.getCode());
-        assertNotNull(response.getCoapResponse());
-        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
-    }
-
-    @Test
-    public void cannot_create_instance_of_security_object() throws InterruptedException {
-        CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(0, LwM2mSingleResource.newStringResource(0, "new.dest")));
-
-        // verify result
-        assertEquals(ResponseCode.NOT_FOUND, response.getCode());
-        assertNotNull(response.getCoapResponse());
-        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
-    }
-
 }

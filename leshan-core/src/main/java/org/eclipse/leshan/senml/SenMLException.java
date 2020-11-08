@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Sierra Wireless and others.
+ * Copyright (c) 2013-2015 Sierra Wireless and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -12,12 +12,31 @@
  * 
  * Contributors:
  *     Sierra Wireless - initial API and implementation
+ *     Gemalto M2M GmbH
  *******************************************************************************/
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.senml;
 
-public class RedisObserveTest extends ObserveTest {
+/**
+ * Exception thrown in case of SenML parsing error
+ */
+public class SenMLException extends Exception {
 
-    public RedisObserveTest() {
-        helper = new RedisIntegrationTestHelper();
+    private static final long serialVersionUID = 1L;
+
+    public SenMLException(String message) {
+        super(message);
     }
+
+    public SenMLException(String message, Object... args) {
+        super(String.format(message, args));
+    }
+
+    public SenMLException(Exception e, String message, Object... args) {
+        super(String.format(message, args), e);
+    }
+
+    public SenMLException(String message, Exception cause) {
+        super(message, cause);
+    }
+
 }

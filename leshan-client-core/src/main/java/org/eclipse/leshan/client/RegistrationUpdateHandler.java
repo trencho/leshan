@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.client;
 
+import java.util.EnumSet;
+
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
 import org.eclipse.leshan.client.engine.RegistrationEngine;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -74,27 +76,35 @@ public class RegistrationUpdateHandler {
             public void resourceChanged(LwM2mObjectEnabler object, int instanceId, int... resourceIds) {
                 if (!bsHandler.isBootstrapping())
                     if (object.getId() == LwM2mId.SERVER) {
-                        Long lifetime = null;
-                        BindingMode bindingMode = null;
+                        // handle lifetime changes
                         for (int i = 0; i < resourceIds.length; i++) {
                             if (resourceIds[i] == LwM2mId.SRV_LIFETIME) {
-                                lifetime = ServersInfoExtractor.getLifeTime(object, instanceId);
-                            } else if (resourceIds[i] == LwM2mId.SRV_BINDING) {
-                                bindingMode = ServersInfoExtractor.getBindingMode(object, instanceId);
+                                Long lifetime = ServersInfoExtractor.getLifeTime(object, instanceId);
+                                Long serverId = ServersInfoExtractor.getServerId(object, instanceId);
+                                if (lifetime != null && serverId != null) {
+                                    ServerIdentity server = engine.getRegisteredServer(serverId);
+                                    if (server != null) {
+                                        engine.triggerRegistrationUpdate(server,
+                                                new RegistrationUpdate(lifetime, null, null, null, null));
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    } else if (object.getId() == LwM2mId.DEVICE) {
+                        // handle supported binding changes
+                        EnumSet<BindingMode> bindingMode = null;
+                        for (int i = 0; i < resourceIds.length; i++) {
+                            if (resourceIds[i] == LwM2mId.DVC_SUPPORTED_BINDING) {
+                                bindingMode = ServersInfoExtractor.getDeviceSupportedBindingMode(object, instanceId);
                             }
                         }
 
-                        if (bindingMode != null || lifetime != null) {
-                            Long serverId = null;
-                            serverId = ServersInfoExtractor.getServerId(object, instanceId);
-                            if (serverId != null) {
-                                ServerIdentity server = engine.getRegisteredServer(serverId);
-                                if (server != null)
-                                    engine.triggerRegistrationUpdate(server,
-                                            new RegistrationUpdate(lifetime, null, bindingMode, null, null));
-                            }
+                        if (bindingMode != null) {
+                            engine.triggerRegistrationUpdate(
+                                    new RegistrationUpdate(null, null, bindingMode, null, null));
+                            return;
                         }
-
                     }
             }
         });

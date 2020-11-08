@@ -1,32 +1,26 @@
 /*******************************************************************************
+ * Copyright (c) 2020 Sierra Wireless and others.
+ * 
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
  * 
  * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
+ *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
  * 
  * Contributors:
- *     Boya Zhang - initial API and implementation
+ *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-
 package org.eclipse.leshan.senml;
 
 /**
- * Exception thrown in case of Cbor encoding error
+ * A decoder for SenML format.
+ * 
+ * @see <a href="https://tools.ietf.org/html/rfc8428">rfc8428 - Sensor Measurement Lists (SenML)</a>
  */
-public class SenMLCborException extends Exception {
+public interface SenMLDecoder {
 
-    private static final long serialVersionUID = 1L;
-
-    public SenMLCborException(String message) {
-        super(message);
-    }
-
-    public SenMLCborException(String message, Exception cause) {
-        super(message, cause);
-    }
-
+    SenMLPack fromSenML(byte[] encodedSenML) throws SenMLException;
 }

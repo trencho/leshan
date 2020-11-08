@@ -12,7 +12,12 @@
  *     Boya Zhang - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.senml;
+package org.eclipse.leshan.senml.json.minimaljson;
+
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.Base64;
+import org.eclipse.leshan.senml.SenMLPack;
+import org.eclipse.leshan.senml.SenMLRecord;
 
 import com.eclipsesource.json.JsonArray;
 import com.eclipsesource.json.JsonObject;
@@ -22,7 +27,7 @@ import org.eclipse.leshan.core.util.Base64;
 
 public class SenMLJsonPackSerDes {
 
-    public String serializeToJson(SenMLPack pack) {
+    public byte[] serializeToJson(SenMLPack pack) {
         JsonArray jsonArray = new JsonArray();
 
         for (SenMLRecord record : pack.getRecords()) {
@@ -48,7 +53,7 @@ public class SenMLJsonPackSerDes {
             if (type != null) {
                 switch (record.getType()) {
                 case FLOAT:
-                    jsonObj.add("v", record.getFloatValue().floatValue());
+                    jsonObj.add("v", record.getFloatValue().doubleValue());
                     break;
                 case BOOLEAN:
                     jsonObj.add("vb", record.getBooleanValue());
@@ -69,7 +74,7 @@ public class SenMLJsonPackSerDes {
             jsonArray.add(jsonObj);
         }
 
-        return jsonArray.toString();
+        return jsonArray.toString().getBytes();
     }
 
     public SenMLPack deserializeFromJson(JsonArray array) {
@@ -102,7 +107,7 @@ public class SenMLJsonPackSerDes {
 
             JsonValue v = o.get("v");
             if (v != null && v.isNumber())
-                record.setFloatValue(v.asFloat());
+                record.setFloatValue(v.asDouble());
 
             JsonValue vb = o.get("vb");
             if (vb != null && vb.isBoolean())

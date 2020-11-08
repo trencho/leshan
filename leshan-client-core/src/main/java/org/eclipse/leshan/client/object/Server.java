@@ -17,6 +17,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.object;
 
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Objects;
+
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
@@ -41,24 +46,31 @@ public class Server extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(Server.class);
 
-    private final static List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 6, 7, 8);
+    private final static List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 6, 7, 8, 22);
 
     private int shortServerId;
     private long lifetime;
     private Long defaultMinPeriod;
     private Long defaultMaxPeriod;
-    private BindingMode binding;
+    private EnumSet<BindingMode> binding;
+    private BindingMode preferredTransport;
     private boolean notifyWhenDisable;
 
     public Server() {
         // should only be used at bootstrap time
     }
 
-    public Server(int shortServerId, long lifetime, BindingMode binding, boolean notifyWhenDisable) {
+    public Server(int shortServerId, long lifetime, EnumSet<BindingMode> binding, boolean notifyWhenDisable,
+            BindingMode preferredTransport) {
         this.shortServerId = shortServerId;
         this.lifetime = lifetime;
         this.binding = binding;
         this.notifyWhenDisable = notifyWhenDisable;
+        this.preferredTransport = preferredTransport;
+    }
+
+    public Server(int shortServerId, long lifetime) {
+        this(shortServerId, lifetime, EnumSet.of(BindingMode.U), false, BindingMode.U);
     }
 
     @Override
@@ -87,7 +99,12 @@ public class Server extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid, notifyWhenDisable);
 
         case 7: // binding
-            return ReadResponse.success(resourceid, binding.toString());
+            return ReadResponse.success(resourceid, BindingMode.toString(binding));
+
+        case 22: // preferred transport
+            if (preferredTransport == null)
+                return ReadResponse.notFound();
+            return ReadResponse.success(resourceid, preferredTransport.toString());
 
         default:
             return super.read(identity, resourceid);
@@ -155,9 +172,22 @@ public class Server extends BaseInstanceEnabler {
                 return WriteResponse.badRequest("invalid type");
             }
             try {
-                BindingMode previousBinding = binding;
-                binding = BindingMode.valueOf((String) value.getValue());
+                EnumSet<BindingMode> previousBinding = binding;
+                binding = BindingMode.parse((String) value.getValue());
                 if (!Objects.equals(previousBinding, binding))
+                    fireResourcesChange(resourceid);
+                return WriteResponse.success();
+            } catch (IllegalArgumentException e) {
+                return WriteResponse.badRequest("invalid value");
+            }
+        case 22: // preferredTransport
+            if (value.getType() != Type.STRING) {
+                return WriteResponse.badRequest("invalid type");
+            }
+            try {
+                BindingMode previousPreferedTransport = preferredTransport;
+                preferredTransport = BindingMode.valueOf((String) value.getValue());
+                if (!Objects.equals(previousPreferedTransport, preferredTransport))
                     fireResourcesChange(resourceid);
                 return WriteResponse.success();
             } catch (IllegalArgumentException e) {

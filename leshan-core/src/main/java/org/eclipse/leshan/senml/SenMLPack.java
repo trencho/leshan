@@ -19,11 +19,20 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The class representing the SenML Pack of LwM2M
+ * The class representing the SenML Pack.
+ * 
+ * @see <a href="https://tools.ietf.org/html/rfc8428#section-4">rfc8428 - Sensor Measurement Lists (SenML)</a>
  */
 public class SenMLPack {
 
     private List<SenMLRecord> records;
+
+    public SenMLPack() {
+    }
+
+    public SenMLPack(List<SenMLRecord> records) {
+        this.records = records;
+    }
 
     public void addRecord(SenMLRecord record) {
         if (records == null) {
@@ -31,6 +40,13 @@ public class SenMLPack {
         }
 
         records.add(record);
+    }
+
+    public void addRecords(List<SenMLRecord> records) {
+        if (this.records == null) {
+            this.records = new ArrayList<>();
+        }
+        this.records.addAll(records);
     }
 
     public void setRecords(List<SenMLRecord> records) {

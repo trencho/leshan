@@ -13,6 +13,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.senml;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
+
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -23,23 +28,28 @@ import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
+import org.eclipse.leshan.core.node.ObjectLink;
+import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.node.codec.LwM2mValueConverter;
-import org.eclipse.leshan.core.node.codec.NodeEncoder;
+import org.eclipse.leshan.core.node.codec.TimestampedNodeEncoder;
 import org.eclipse.leshan.core.util.Base64;
 import org.eclipse.leshan.core.util.Validate;
-import org.eclipse.leshan.senml.SenMLJson;
+import org.eclipse.leshan.senml.SenMLEncoder;
+import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Map.Entry;
-
-public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
+public class LwM2mNodeSenMLJsonEncoder implements TimestampedNodeEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeSenMLJsonEncoder.class);
+
+    private final SenMLEncoder encoder;
+
+    public LwM2mNodeSenMLJsonEncoder(SenMLEncoder encoder) {
+        this.encoder = encoder;
+    }
 
     @Override
     public byte[] encode(LwM2mNode node, LwM2mPath path, LwM2mModel model, LwM2mValueConverter converter) {
@@ -56,7 +66,48 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
 
         SenMLPack pack = new SenMLPack();
         pack.setRecords(internalEncoder.records);
-        return SenMLJson.toSenMLJson(pack).getBytes();
+
+        try {
+            return encoder.toSenML(pack);
+        } catch (SenMLException e) {
+            throw new CodecException(e, "Unable to encode node[path:%s] : %s", path, node);
+        }
+    }
+
+    @Override
+    public byte[] encodeTimestampedData(List<TimestampedLwM2mNode> timestampedNodes, LwM2mPath path, LwM2mModel model,
+            LwM2mValueConverter converter) throws CodecException {
+        Validate.notNull(timestampedNodes);
+        Validate.notNull(path);
+        Validate.notNull(model);
+
+        SenMLPack pack = new SenMLPack();
+        for (TimestampedLwM2mNode timestampedLwM2mNode : timestampedNodes) {
+
+            if (timestampedLwM2mNode.getTimestamp() < 268_435_456) {
+                // The smallest absolute Time value that can be expressed (2**28) is 1978-07-04 21:24:16 UTC.
+                // see https://tools.ietf.org/html/rfc8428#section-4.5.3
+                throw new CodecException(
+                        "Unable to encode timestamped node[path:%s] : invalid timestamp %s, timestamp should be greater or equals to 268,435,456",
+                        path, timestampedLwM2mNode.getTimestamp());
+            }
+
+            InternalEncoder internalEncoder = new InternalEncoder();
+            internalEncoder.objectId = path.getObjectId();
+            internalEncoder.model = model;
+            internalEncoder.requestPath = path;
+            internalEncoder.converter = converter;
+            internalEncoder.records = new ArrayList<>();
+            timestampedLwM2mNode.getNode().accept(internalEncoder);
+            internalEncoder.records.get(0).setBaseTime(timestampedLwM2mNode.getTimestamp());
+            pack.addRecords(internalEncoder.records);
+        }
+
+        try {
+            return encoder.toSenML(pack);
+        } catch (SenMLException e) {
+            throw new CodecException(e, "Unable to encode timestamped node[path:%s] : %s", path, timestampedNodes);
+        }
     }
 
     private static class InternalEncoder implements LwM2mNodeVisitor {
@@ -116,11 +167,25 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
         }
 
         @Override
-        public void visit(LwM2mResourceInstance instance) {
-            throw new UnsupportedOperationException("not yet implemented");
+        public void visit(LwM2mResourceInstance resourceInstance) {
+            LOG.trace("Encoding resource instance {} into SenML JSON", resourceInstance);
+            if (!requestPath.isResourceInstance()) {
+                throw new CodecException("Invalid request path %s for resource  instance encoding", requestPath);
+            }
+
+            // get type for this resource
+            ResourceModel rSpec = model.getResourceModel(objectId, requestPath.getResourceId());
+            Type expectedType = rSpec != null ? rSpec.type : resourceInstance.getType();
+
+            // Using request path as base name, and record doesn't have name
+            addSenMLRecord(null, resourceInstance.getType(), expectedType, resourceInstance.getValue());
         }
 
         private void lwM2mResourceToSenMLRecord(String recordName, LwM2mResource resource) {
+            // get type for this resource
+            ResourceModel rSpec = model.getResourceModel(objectId, resource.getId());
+            Type expectedType = rSpec != null ? rSpec.type : resource.getType();
+
             // create resource element
             if (resource.isMultiInstances()) {
                 for (Entry<Integer, LwM2mResourceInstance> entry : resource.getInstances().entrySet()) {
@@ -132,18 +197,15 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
                         resourceInstanceRecordName = recordName + "/" + entry.getKey();
                     }
 
-                    addSenMLRecord(resourceInstanceRecordName, resource, entry.getValue().getValue());
+                    addSenMLRecord(resourceInstanceRecordName, resource.getType(), expectedType,
+                            entry.getValue().getValue());
                 }
             } else {
-                addSenMLRecord(recordName, resource, resource.getValue());
+                addSenMLRecord(recordName, resource.getType(), expectedType, resource.getValue());
             }
         }
 
-        private void addSenMLRecord(String recordName, LwM2mResource resource, Object value) {
-            // get type for this resource
-            ResourceModel rSpec = model.getResourceModel(objectId, resource.getId());
-            Type expectedType = rSpec != null ? rSpec.type : resource.getType();
-
+        private void addSenMLRecord(String recordName, Type valueType, Type expectedType, Object value) {
             // Create SenML record
             SenMLRecord record = new SenMLRecord();
 
@@ -161,7 +223,7 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
 
             // Convert value using expected type
             LwM2mPath lwM2mResourcePath = new LwM2mPath(bn + n);
-            Object convertedValue = converter.convertValue(value, resource.getType(), expectedType, lwM2mResourcePath);
+            Object convertedValue = converter.convertValue(value, valueType, expectedType, lwM2mResourcePath);
             setResourceValue(convertedValue, expectedType, lwM2mResourcePath, record);
 
             // Add record to the List
@@ -170,11 +232,18 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
 
         private void setResourceValue(Object value, Type type, LwM2mPath resourcePath, SenMLRecord record) {
             LOG.trace("Encoding resource value {} in SenML JSON", value);
+
+            if (type == null || type == Type.NONE) {
+                throw new CodecException(
+                        "Unable to encode value for resource {} without type(probably a executable one)", resourcePath);
+            }
+
             switch (type) {
             case STRING:
                 record.setStringValue((String) value);
                 break;
             case INTEGER:
+            case UNSIGNED_INTEGER:
             case FLOAT:
                 record.setFloatValue((Number) value);
                 break;
@@ -188,7 +257,13 @@ public class LwM2mNodeSenMLJsonEncoder implements NodeEncoder {
                 record.setStringValue(Base64.encodeBase64String((byte[]) value));
                 break;
             case OBJLNK:
-                record.setStringValue(value.toString());
+                try {
+                    record.setStringValue(((ObjectLink) value).encodeToString());
+                } catch (IllegalArgumentException e) {
+                    throw new CodecException(e, "Invalid value [%s] for objectLink resource [%s] ", value,
+                            resourcePath);
+                }
+                break;
             default:
                 throw new CodecException("Invalid value type %s for %s", type, resourcePath);
             }

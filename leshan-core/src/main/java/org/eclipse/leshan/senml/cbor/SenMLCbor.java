@@ -12,7 +12,9 @@
  *     Boya Zhang - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.senml;
+package org.eclipse.leshan.senml.cbor;
+
+import org.eclipse.leshan.senml.SenMLPack;
 
 /**
  * Helper for encoding/decoding SenML CBOR format

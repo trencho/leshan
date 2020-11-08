@@ -27,7 +27,6 @@ import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.junit.Test;
 
@@ -189,7 +188,7 @@ public class LinkFormatHelperTest {
     @Test
     public void encode_bootstrap_server_object() {
         Map<Integer, LwM2mInstanceEnabler> instancesMap = new HashMap<>();
-        instancesMap.put(0, new Server(333, 120, BindingMode.UQ, false));
+        instancesMap.put(0, new Server(333, 120));
         ObjectEnabler objectEnabler = new ObjectEnabler(1, getObjectModel(1), instancesMap, null,
                 ContentFormat.DEFAULT);
 
@@ -202,7 +201,7 @@ public class LinkFormatHelperTest {
     @Test
     public void encode_bootstrap_server_object_with_version() {
         Map<Integer, LwM2mInstanceEnabler> instancesMap = new HashMap<>();
-        instancesMap.put(0, new Server(333, 120, BindingMode.UQ, false));
+        instancesMap.put(0, new Server(333, 120));
         ObjectEnabler objectEnabler = new ObjectEnabler(1, getVersionedObjectModel(1, "2.0"), instancesMap, null,
                 ContentFormat.DEFAULT);
 
@@ -245,7 +244,7 @@ public class LinkFormatHelperTest {
 
         // object 1
         Map<Integer, LwM2mInstanceEnabler> serverInstances = new HashMap<>();
-        serverInstances.put(0, new Server(333, 120, BindingMode.UQ, false));
+        serverInstances.put(0, new Server(333, 120));
         ObjectEnabler serverObjectEnabler = new ObjectEnabler(1, getVersionedObjectModel(1, "2.0"), serverInstances,
                 null, ContentFormat.DEFAULT);
         objectEnablers.add(serverObjectEnabler);

@@ -37,6 +37,7 @@ import org.eclipse.leshan.core.tlv.Tlv;
 import org.eclipse.leshan.core.tlv.Tlv.TlvType;
 import org.eclipse.leshan.core.tlv.TlvEncoder;
 import org.eclipse.leshan.core.util.Hex;
+import org.eclipse.leshan.core.util.datatype.ULong;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -813,5 +814,214 @@ public class LwM2mNodeDecoderTest {
         assertTrue(resource instanceof LwM2mMultipleResource);
         assertEquals(11, resource.getId());
         assertTrue(resource.getInstances().size() == 2);
+    }
+
+    @Test
+    public void senml_json_decode_acl_object() {
+        StringBuilder payload = new StringBuilder();
+        payload.append("[{\"bn\":\"/2/3/\",\"n\":\"0\",\"v\":3},");
+        payload.append("{\"n\":\"1\",\"v\":1},");
+        payload.append("{\"n\":\"3\",\"v\":123},");
+        payload.append("{\"bn\":\"/2/2/\",\"n\":\"0\",\"v\":4},");
+        payload.append("{\"n\":\"1\",\"v\":2},");
+        payload.append("{\"n\":\"3\",\"v\":124}]");
+
+        LwM2mObject object = decoder.decode(payload.toString().getBytes(), ContentFormat.SENML_JSON,
+                new LwM2mPath("/2"), model, LwM2mObject.class);
+
+        assertNotNull(object);
+        assertEquals(2, object.getId());
+        assertEquals(2, object.getInstances().size());
+        assertEquals(3l, object.getInstance(3).getResource(0).getValue());
+        assertEquals(1l, object.getInstance(3).getResource(1).getValue());
+        assertEquals(123l, object.getInstance(3).getResource(3).getValue());
+        assertEquals(4l, object.getInstance(2).getResource(0).getValue());
+        assertEquals(2l, object.getInstance(2).getResource(1).getValue());
+        assertEquals(124l, object.getInstance(2).getResource(3).getValue());
+
+    }
+
+    @Test
+    public void senml_json_decode_device_object_instance() {
+        StringBuilder payload = new StringBuilder();
+        payload.append("[{\"bn\":\"/3/0/\",\"n\":\"0\",\"vs\":\"Open Mobile Alliance\"},");
+        payload.append("{\"n\":\"1\",\"vs\":\"Lightweight M2M Client\"},");
+        payload.append("{\"n\":\"2\",\"vs\":\"345000123\"},");
+        payload.append("{\"n\":\"3\",\"vs\":\"1.0\"},");
+        payload.append("{\"n\":\"6/0\",\"v\":1},");
+        payload.append("{\"n\":\"6/1\",\"v\":5},");
+        payload.append("{\"n\":\"7/0\",\"v\":3800},");
+        payload.append("{\"n\":\"7/1\",\"v\":5000},");
+        payload.append("{\"n\":\"8/0\",\"v\":125},");
+        payload.append("{\"n\":\"8/1\",\"v\":900},");
+        payload.append("{\"n\":\"9\",\"v\":100},");
+        payload.append("{\"n\":\"10\",\"v\":15},");
+        payload.append("{\"n\":\"11/0\",\"v\":0},");
+        payload.append("{\"n\":\"13\",\"v\":1367491215},");
+        payload.append("{\"n\":\"14\",\"vs\":\"+02:00\"},");
+        payload.append("{\"n\":\"16\",\"vs\":\"U\"}]");
+
+        LwM2mObjectInstance instance = decoder.decode(payload.toString().getBytes(), ContentFormat.SENML_JSON,
+                new LwM2mPath("/3/0"), model, LwM2mObjectInstance.class);
+
+        assertNotNull(instance);
+        assertEquals(0, instance.getId());
+        assertEquals("Open Mobile Alliance", instance.getResource(0).getValue());
+        assertEquals("Lightweight M2M Client", instance.getResource(1).getValue());
+        assertEquals("345000123", instance.getResource(2).getValue());
+        assertEquals("1.0", instance.getResource(3).getValue());
+
+        assertEquals(1l, instance.getResource(6).getValue(0));
+        assertEquals(5l, instance.getResource(6).getValue(1));
+        assertEquals(3800l, instance.getResource(7).getValue(0));
+        assertEquals(5000l, instance.getResource(7).getValue(1));
+        assertEquals(125l, instance.getResource(8).getValue(0));
+        assertEquals(900l, instance.getResource(8).getValue(1));
+
+        assertEquals(100l, instance.getResource(9).getValue());
+        assertEquals(15l, instance.getResource(10).getValue());
+
+        assertEquals(0l, instance.getResource(11).getValue(0));
+
+        Date time = (Date) instance.getResource(13).getValue();
+        assertEquals(1367491215000l, time.getTime());
+
+        assertEquals("+02:00", instance.getResource(14).getValue());
+        assertEquals("U", instance.getResource(16).getValue());
+    }
+
+    @Test
+    public void senml_json_decode_single_resource() {
+        String payload = "[{\"bn\":\"/3/0/0\",\"vs\":\"Open Mobile Alliance\"}]";
+        LwM2mResource resource = decoder.decode(payload.getBytes(), ContentFormat.SENML_JSON, new LwM2mPath("/3/0/0"),
+                model, LwM2mResource.class);
+
+        assertNotNull(resource);
+        assertTrue(!resource.isMultiInstances());
+        assertEquals(0, resource.getId());
+        assertEquals("Open Mobile Alliance", resource.getValue());
+
+        payload = "[{\"n\":\"/6/0/3\",\"v\":20.0}]";
+        resource = decoder.decode(payload.getBytes(), ContentFormat.SENML_JSON, new LwM2mPath("/6/0/3"), model,
+                LwM2mResource.class);
+
+        assertNotNull(resource);
+        assertTrue(!resource.isMultiInstances());
+        assertEquals(3, resource.getId());
+        assertEquals(20.0, resource.getValue());
+    }
+
+    @Test
+    public void senml_json_decode_multiple_resource() {
+        StringBuilder payload = new StringBuilder();
+        payload.append("[{\"bn\":\"/3/0/7/\",\"n\":\"0\",\"v\":3800},");
+        payload.append("{\"n\":\"1\",\"v\":5000}]");
+        LwM2mResource multipleResources = decoder.decode(payload.toString().getBytes(), ContentFormat.SENML_JSON,
+                new LwM2mPath("/3/0/7"), model, LwM2mResource.class);
+
+        assertNotNull(multipleResources);
+        assertTrue(multipleResources.isMultiInstances());
+        assertEquals(3800l, multipleResources.getValue(0));
+        assertEquals(5000l, multipleResources.getValue(1));
+    }
+
+    @Test
+    public void senml_json_decode_ulong() {
+        // 18446744073709551615 can not hold in Long
+        String payload = "[{\"n\":\"/0/0/16\",\"v\":18446744073709551615}]";
+        LwM2mResource resource = decoder.decode(payload.getBytes(), ContentFormat.SENML_JSON, new LwM2mPath("/0/0/16"),
+                model, LwM2mResource.class);
+
+        assertNotNull(resource);
+        assertTrue(!resource.isMultiInstances());
+        assertEquals(16, resource.getId());
+        assertEquals(ULong.valueOf("18446744073709551615"), resource.getValue());
+    }
+
+    @Test
+    public void senml_json_decode_long() {
+        // 9223372036854775800 long value can not hold in double (will be approximate to 9223372036854775808)
+        String payload = "[{\"n\":\"/1/0/2\",\"v\":9223372036854775800}]";
+        LwM2mResource resource = decoder.decode(payload.getBytes(), ContentFormat.SENML_JSON, new LwM2mPath("/1/0/2"),
+                model, LwM2mResource.class);
+
+        assertNotNull(resource);
+        assertTrue(!resource.isMultiInstances());
+        assertEquals(2, resource.getId());
+        assertEquals(9223372036854775800l, resource.getValue());
+    }
+
+    @Test
+    public void senml_timestamped_resources() throws CodecException {
+        // json content for instance 0 of device object
+        StringBuilder b = new StringBuilder();
+        b.append("[{\"bn\":\"/1024/0/1\",\"v\":22.9,\"bt\":268500000},");
+        b.append("{\"v\":22.4,\"t\":-5},");
+        b.append("{\"v\":24.1,\"t\":-50}],");
+
+        List<TimestampedLwM2mNode> timestampedResources = decoder.decodeTimestampedData(b.toString().getBytes(),
+                ContentFormat.SENML_JSON, new LwM2mPath(1024, 0, 1), model);
+
+        assertEquals(3, timestampedResources.size());
+        assertEquals(Long.valueOf(268500000), timestampedResources.get(0).getTimestamp());
+        assertEquals(22.9d, ((LwM2mResource) timestampedResources.get(0).getNode()).getValue());
+        assertEquals(Long.valueOf(268500000 - 5), timestampedResources.get(1).getTimestamp());
+        assertEquals(22.4d, ((LwM2mResource) timestampedResources.get(1).getNode()).getValue());
+        assertEquals(Long.valueOf(268500000 - 50), timestampedResources.get(2).getTimestamp());
+        assertEquals(24.1d, ((LwM2mResource) timestampedResources.get(2).getNode()).getValue());
+    }
+
+    @Test
+    public void senml_timestamped_instances() throws CodecException {
+        // json content for instance 0 of device object
+        StringBuilder b = new StringBuilder();
+        b.append("[{\"bn\":\"/1024/0/\",\"bt\":268600000, \"n\":\"1\", \"v\":22.9},");
+        b.append("{\"n\":\"1\",\"v\":24.1,\"t\":-50},");
+        b.append("{\"bt\":268500000, \"n\":\"0\",\"vs\":\"a string\"},");
+        b.append("{\"n\":\"1\",\"v\":22.4}]");
+
+        List<TimestampedLwM2mNode> timestampedResources = decoder.decodeTimestampedData(b.toString().getBytes(),
+                ContentFormat.SENML_JSON, new LwM2mPath(1024, 0), model);
+
+        assertEquals(3, timestampedResources.size());
+        assertEquals(Long.valueOf(268600000), timestampedResources.get(0).getTimestamp());
+        assertEquals(22.9d, ((LwM2mObjectInstance) timestampedResources.get(0).getNode()).getResource(1).getValue());
+
+        assertEquals(Long.valueOf(268600000 - 50), timestampedResources.get(1).getTimestamp());
+        assertEquals(24.1d, ((LwM2mObjectInstance) timestampedResources.get(1).getNode()).getResource(1).getValue());
+
+        assertEquals(Long.valueOf(268500000), timestampedResources.get(2).getTimestamp());
+        assertEquals(22.4d, ((LwM2mObjectInstance) timestampedResources.get(2).getNode()).getResource(1).getValue());
+        assertEquals("a string",
+                ((LwM2mObjectInstance) timestampedResources.get(2).getNode()).getResource(0).getValue());
+
+    }
+
+    @Test
+    public void senml_timestamped_Object() throws CodecException {
+        // json content for instance 0 of device object
+        StringBuilder b = new StringBuilder();
+        b.append("[{\"bn\":\"/1024/\",\"bt\":268600000,\"n\":\"0/1\",\"v\":22.9},");
+        b.append("{\"n\":\"0/0\",\"vs\":\"a string\",\"t\":-50},");
+        b.append("{\"n\":\"1/1\",\"v\":23,\"t\":-50},");
+        b.append("{\"n\":\"0/1\",\"v\":24.1,\"t\":-5}]");
+
+        List<TimestampedLwM2mNode> timestampedResources = decoder.decodeTimestampedData(b.toString().getBytes(),
+                ContentFormat.SENML_JSON, new LwM2mPath(1024), model);
+
+        assertEquals(3, timestampedResources.size());
+        assertEquals(Long.valueOf(268600000), timestampedResources.get(0).getTimestamp());
+        assertEquals(22.9d,
+                ((LwM2mObject) timestampedResources.get(0).getNode()).getInstance(0).getResource(1).getValue());
+
+        assertEquals(Long.valueOf(268600000 - 5), timestampedResources.get(1).getTimestamp());
+        assertEquals(24.1d,
+                ((LwM2mObject) timestampedResources.get(1).getNode()).getInstance(0).getResource(1).getValue());
+
+        assertEquals(Long.valueOf(268600000 - 50), timestampedResources.get(2).getTimestamp());
+        assertEquals(23.0d,
+                ((LwM2mObject) timestampedResources.get(2).getNode()).getInstance(1).getResource(1).getValue());
+        assertEquals("a string",
+                ((LwM2mObject) timestampedResources.get(2).getNode()).getInstance(0).getResource(0).getValue());
     }
 }

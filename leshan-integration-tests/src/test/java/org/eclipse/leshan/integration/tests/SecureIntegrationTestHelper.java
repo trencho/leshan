@@ -26,6 +26,7 @@ import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
 import org.eclipse.californium.scandium.dtls.pskstore.PskStore;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
+import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.object.Server;
@@ -34,7 +35,6 @@ import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.californium.EndpointFactory;
-import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.core.util.X509CertUtil;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
@@ -204,14 +204,14 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
                         "coaps://" + server.getSecuredAddress().getHostString() + ":"
                                 + server.getSecuredAddress().getPort(),
                         12345, GOOD_PSK_ID.getBytes(StandardCharsets.UTF_8), GOOD_PSK_KEY));
-        initializer.setInstancesForObject(LwM2mId.SERVER,
-                new Server(12345, LIFETIME, queueMode ? BindingMode.UQ : BindingMode.U, false));
-        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345", "U"));
+        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME));
+        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345"));
         initializer.setDummyInstancesForObject(LwM2mId.ACCESS_CONTROL);
         List<LwM2mObjectEnabler> objects = initializer.createAll();
 
         InetSocketAddress clientAddress = new InetSocketAddress(InetAddress.getLoopbackAddress(), 0);
         LeshanClientBuilder builder = new LeshanClientBuilder(getCurrentEndpoint());
+        builder.setRegistrationEngineFactory(new DefaultRegistrationEngineFactory().setQueueMode(queueMode));
         builder.setLocalAddress(clientAddress.getHostString(), clientAddress.getPort());
         builder.setObjects(objects);
         builder.setDtlsConfig(
@@ -268,8 +268,8 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
                 "coaps://" + server.getSecuredAddress().getHostString() + ":" + server.getSecuredAddress().getPort(),
                 12345, clientPublicKey.getEncoded(), clientPrivateKey.getEncoded(),
                 useServerCertificate ? serverX509Cert.getPublicKey().getEncoded() : serverPublicKey.getEncoded()));
-        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME, BindingMode.U, false));
-        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345", "U"));
+        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME));
+        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345"));
         initializer.setClassForObject(LwM2mId.ACCESS_CONTROL, DummyInstanceEnabler.class);
         List<LwM2mObjectEnabler> objects = initializer.createAll();
 
@@ -313,8 +313,8 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
                                 + server.getSecuredAddress().getPort(),
                         12345, clientCertificate.getEncoded(), privatekey.getEncoded(),
                         serverCertificate.getEncoded()));
-        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME, BindingMode.U, false));
-        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345", "U"));
+        initializer.setInstancesForObject(LwM2mId.SERVER, new Server(12345, LIFETIME));
+        initializer.setInstancesForObject(LwM2mId.DEVICE, new Device("Eclipse Leshan", MODEL_NUMBER, "12345"));
         initializer.setClassForObject(LwM2mId.ACCESS_CONTROL, DummyInstanceEnabler.class);
         List<LwM2mObjectEnabler> objects = initializer.createAll();
 

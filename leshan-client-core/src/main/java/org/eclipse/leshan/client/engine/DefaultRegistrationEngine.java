@@ -15,6 +15,20 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.RegistrationUpdate;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
@@ -28,7 +42,9 @@ import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
 import org.eclipse.leshan.client.util.LinkFormatHelper;
 import org.eclipse.leshan.core.LwM2m.Version;
+import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.ResponseCode;
+import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.Identity;
@@ -87,7 +103,9 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     // True if client should re-initiate a connection (DTLS) on registration update
     private final boolean reconnectOnUpdate;
     // True if client should try to resume connection if possible.
-    private final boolean resumeOnConnect;
+    private boolean resumeOnConnect;
+    // True if client use queueMode : for now this just add Q parameter on register request.
+    private final boolean queueMode;
 
     private enum Status {
         SUCCESS, FAILURE, TIMEOUT
@@ -124,7 +142,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
             Integer communicationPeriodInMs, boolean reconnectOnUpdate, boolean resumeOnConnect) {
         this(endpoint, objectTree, endpointsManager, requestSender, bootstrapState, observer, additionalAttributes,
                 null, executor, requestTimeoutInMs, deregistrationTimeoutInMs, bootstrapSessionTimeoutInSec,
-                retryWaitingTimeInMs, communicationPeriodInMs, reconnectOnUpdate, resumeOnConnect);
+                retryWaitingTimeInMs, communicationPeriodInMs, reconnectOnUpdate, resumeOnConnect, false);
     }
 
     /** @since 1.1 */
@@ -133,7 +151,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
             Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes,
             ScheduledExecutorService executor, long requestTimeoutInMs, long deregistrationTimeoutInMs,
             int bootstrapSessionTimeoutInSec, int retryWaitingTimeInMs, Integer communicationPeriodInMs,
-            boolean reconnectOnUpdate, boolean resumeOnConnect) {
+            boolean reconnectOnUpdate, boolean resumeOnConnect, boolean useQueueMode) {
         this.endpoint = endpoint;
         this.objectEnablers = objectTree.getObjectEnablers();
         this.bootstrapHandler = bootstrapState;
@@ -151,6 +169,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
         this.communicationPeriodInMs = communicationPeriodInMs;
         this.reconnectOnUpdate = reconnectOnUpdate;
         this.resumeOnConnect = resumeOnConnect;
+        this.queueMode = useQueueMode;
 
         if (executor == null) {
             schedExecutor = createScheduledExecutor();
@@ -298,8 +317,11 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
         LOG.info("Trying to register to {} ...", server.getUri());
         RegisterRequest request = null;
         try {
-            request = new RegisterRequest(endpoint, dmInfo.lifetime, Version.lastSupported().toString(), dmInfo.binding,
-                    null, LinkFormatHelper.getClientDescription(objectEnablers.values(), null), additionalAttributes);
+            EnumSet<BindingMode> supportedBindingMode = ServersInfoExtractor
+                    .getDeviceSupportedBindingMode(objectEnablers.get(LwM2mId.DEVICE), 0);
+            request = new RegisterRequest(endpoint, dmInfo.lifetime, Version.lastSupported().toString(),
+                    supportedBindingMode, queueMode, null,
+                    LinkFormatHelper.getClientDescription(objectEnablers.values(), null), additionalAttributes);
             if (observer != null) {
                 observer.onRegistrationStarted(server, request);
             }
