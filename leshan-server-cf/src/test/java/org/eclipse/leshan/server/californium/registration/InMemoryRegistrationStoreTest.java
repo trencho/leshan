@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.registration;
 
-import java.net.InetAddress;
-import java.nio.charset.StandardCharsets;
-import java.util.EnumSet;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
@@ -32,6 +28,7 @@ import org.junit.Test;
 
 import java.net.InetAddress;
 import java.nio.charset.StandardCharsets;
+import java.util.EnumSet;
 
 public class InMemoryRegistrationStoreTest {
 

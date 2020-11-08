@@ -19,11 +19,13 @@ package org.eclipse.leshan.server.bootstrap.demo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
 import org.eclipse.leshan.server.bootstrap.EditableBootstrapConfigStore;
 import org.eclipse.leshan.server.bootstrap.InMemoryBootstrapConfigStore;
 import org.eclipse.leshan.server.bootstrap.InvalidConfigurationException;
+import org.eclipse.leshan.server.bootstrap.demo.json.BindingModeTypeAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,20 +40,6 @@ import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.util.Validate;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
-import org.eclipse.leshan.server.bootstrap.EditableBootstrapConfigStore;
-import org.eclipse.leshan.server.bootstrap.InMemoryBootstrapConfigStore;
-import org.eclipse.leshan.server.bootstrap.InvalidConfigurationException;
-import org.eclipse.leshan.server.bootstrap.demo.json.BindingModeTypeAdapter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 /**
  * A {@link EditableBootstrapConfigStore} which persist configuration in a file using json format.

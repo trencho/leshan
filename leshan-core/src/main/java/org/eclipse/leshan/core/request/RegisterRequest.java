@@ -16,6 +16,7 @@
 package org.eclipse.leshan.core.request;
 
 import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.RegisterResponse;
 
@@ -24,11 +25,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.request.exception.InvalidRequestException;
-import org.eclipse.leshan.core.response.RegisterResponse;
 
 /**
  * A Lightweight M2M request for sending the LWM2M Client properties required by the LWM2M Server to contact the LWM2M
@@ -90,7 +86,7 @@ public class RegisterRequest implements UplinkRequest<RegisterResponse> {
             else
                 this.queueMode = null;
         } else {
-            this.queueMode = queueMode == null ? false : queueMode;
+            this.queueMode = queueMode != null && queueMode;
         }
 
         this.endpointName = endpointName;

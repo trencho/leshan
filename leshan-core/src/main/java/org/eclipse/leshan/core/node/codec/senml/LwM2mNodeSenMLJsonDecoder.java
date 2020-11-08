@@ -13,18 +13,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.senml;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -49,6 +37,18 @@ import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 public class LwM2mNodeSenMLJsonDecoder implements TimestampedNodeDecoder {
 
@@ -266,7 +266,7 @@ public class LwM2mNodeSenMLJsonDecoder implements TimestampedNodeDecoder {
         // Ensure there is at least one entry for null timestamp
         if (result.isEmpty()) {
             Collection<ResolvedSenMLRecord> emptylist = Collections.emptyList();
-            result.put((Long) null, emptylist);
+            result.put(null, emptylist);
         }
         return result;
     }
@@ -444,9 +444,9 @@ public class LwM2mNodeSenMLJsonDecoder implements TimestampedNodeDecoder {
     }
 
     private static class ResolvedSenMLRecord {
-        private SenMLRecord record;
-        private LwM2mPath fullpath;
-        private Long time;
+        private final SenMLRecord record;
+        private final LwM2mPath fullpath;
+        private final Long time;
 
         public SenMLRecord getRecord() {
             return record;

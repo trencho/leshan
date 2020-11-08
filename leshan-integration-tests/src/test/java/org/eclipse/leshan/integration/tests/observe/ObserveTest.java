@@ -19,15 +19,6 @@
 
 package org.eclipse.leshan.integration.tests.observe;
 
-import org.eclipse.californium.core.coap.CoAP.Type;
-import org.eclipse.californium.core.coap.OptionSet;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.Set;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.StaticModel;
@@ -52,12 +43,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;

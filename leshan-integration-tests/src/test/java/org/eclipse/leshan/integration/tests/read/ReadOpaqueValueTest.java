@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.read;
 
-import static org.eclipse.leshan.core.ResponseCode.CONTENT;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
-import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -35,6 +27,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.eclipse.leshan.core.ResponseCode.CONTENT;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.OPAQUE_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
+import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class ReadOpaqueValueTest {
@@ -50,7 +51,7 @@ public class ReadOpaqueValueTest {
                                 { ContentFormat.SENML_JSON } });
     }
 
-    private ContentFormat contentFormat;
+    private final ContentFormat contentFormat;
 
     public ReadOpaqueValueTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;

@@ -18,20 +18,10 @@
 
 package org.eclipse.leshan.integration.tests.create;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
-import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.CreateRequest;
@@ -47,8 +37,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import static org.eclipse.leshan.core.request.ContentFormat.JSON;
-import static org.eclipse.leshan.core.request.ContentFormat.TLV;
+import java.util.Arrays;
+import java.util.Collection;
+
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.INTEGER_MANDATORY_RESOURCE_ID;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_MANDATORY_RESOURCE_ID;
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
@@ -56,6 +47,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 
 @RunWith(Parameterized.class)
@@ -70,7 +62,7 @@ public class CreateTest {
                                 { ContentFormat.SENML_JSON } });
     }
 
-    private ContentFormat contentFormat;
+    private final ContentFormat contentFormat;
 
     public CreateTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;
@@ -174,7 +166,7 @@ public class CreateTest {
     public void cannot_create_instance_without_all_required_resources() throws InterruptedException {
         // create ACL instance without any resources
         CreateResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new CreateRequest(contentFormat, TEST_OBJECT_ID, new LwM2mObjectInstance(0, new LwM2mResource[0])));
+                new CreateRequest(contentFormat, TEST_OBJECT_ID, new LwM2mObjectInstance(0)));
 
         // verify result
         assertEquals(ResponseCode.BAD_REQUEST, response.getCode());

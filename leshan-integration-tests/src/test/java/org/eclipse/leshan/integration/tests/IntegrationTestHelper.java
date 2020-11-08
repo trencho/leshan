@@ -15,17 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.junit.Assert.*;
-
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.elements.Connector;
 import org.eclipse.leshan.client.californium.LeshanClient;

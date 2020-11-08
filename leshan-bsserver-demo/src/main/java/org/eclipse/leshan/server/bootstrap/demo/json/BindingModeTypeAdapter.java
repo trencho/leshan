@@ -15,14 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap.demo.json;
 
-import java.io.IOException;
-import java.util.EnumSet;
-
-import org.eclipse.leshan.core.request.BindingMode;
-
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.eclipse.leshan.core.request.BindingMode;
+
+import java.io.IOException;
+import java.util.EnumSet;
 
 public class BindingModeTypeAdapter extends TypeAdapter<EnumSet<BindingMode>> {
 

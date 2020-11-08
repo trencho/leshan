@@ -17,13 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.read;
 
-import static org.eclipse.leshan.core.ResponseCode.CONTENT;
-import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -37,6 +30,14 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+
+import static org.eclipse.leshan.core.ResponseCode.CONTENT;
+import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 @RunWith(Parameterized.class)
 public class ReadMultiValueTest {
     protected IntegrationTestHelper helper = new IntegrationTestHelper();
@@ -49,7 +50,7 @@ public class ReadMultiValueTest {
                                 { ContentFormat.SENML_JSON } });
     }
 
-    private ContentFormat contentFormat;
+    private final ContentFormat contentFormat;
 
     public ReadMultiValueTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;

@@ -16,6 +16,7 @@
 package org.eclipse.leshan.core.request;
 
 import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.UpdateResponse;
 
@@ -24,11 +25,6 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.request.exception.InvalidRequestException;
-import org.eclipse.leshan.core.response.UpdateResponse;
 
 /**
  * A Lightweight M2M request for updating the LWM2M Client properties required by the LWM2M Server to contact the LWM2M

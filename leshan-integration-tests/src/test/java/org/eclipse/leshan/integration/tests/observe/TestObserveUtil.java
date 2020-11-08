@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.observe;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.OptionSet;
 import org.eclipse.californium.core.coap.Response;
@@ -26,6 +24,8 @@ import org.eclipse.californium.elements.Connector;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.californium.elements.RawData;
 import org.eclipse.leshan.core.request.ContentFormat;
+
+import java.net.InetSocketAddress;
 
 public class TestObserveUtil {
     public static void sendNotification(Connector connector, InetSocketAddress destination, byte[] payload,

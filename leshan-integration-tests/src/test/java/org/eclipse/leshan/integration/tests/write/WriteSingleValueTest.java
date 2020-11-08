@@ -15,17 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
-import static org.eclipse.leshan.core.ResponseCode.CHANGED;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -50,6 +39,25 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
+import static org.eclipse.leshan.core.ResponseCode.CHANGED;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.BOOLEAN_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.FLOAT_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.INTEGER_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TIME_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.UNSIGNED_INTEGER_RESOURCE_ID;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 @RunWith(Parameterized.class)
 public class WriteSingleValueTest {
     protected IntegrationTestHelper helper = new IntegrationTestHelper();
@@ -65,7 +73,7 @@ public class WriteSingleValueTest {
                                 { ContentFormat.SENML_JSON } });
     }
 
-    private ContentFormat contentFormat;
+    private final ContentFormat contentFormat;
 
     public WriteSingleValueTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;

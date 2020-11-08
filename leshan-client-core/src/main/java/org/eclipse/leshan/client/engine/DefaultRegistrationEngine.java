@@ -15,20 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.RegistrationUpdate;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
@@ -60,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -103,7 +90,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     // True if client should re-initiate a connection (DTLS) on registration update
     private final boolean reconnectOnUpdate;
     // True if client should try to resume connection if possible.
-    private boolean resumeOnConnect;
+    private final boolean resumeOnConnect;
     // True if client use queueMode : for now this just add Q parameter on register request.
     private final boolean queueMode;
 

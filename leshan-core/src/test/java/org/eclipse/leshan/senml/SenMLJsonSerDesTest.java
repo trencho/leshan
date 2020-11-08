@@ -14,15 +14,15 @@
 
 package org.eclipse.leshan.senml;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.senml.json.jackson.SenMLJsonJacksonEncoderDecoder;
 import org.eclipse.leshan.senml.json.minimaljson.SenMLJsonMinimalEncoderDecoder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class SenMLJsonSerDesTest extends AbstractSenMLTest {
@@ -36,8 +36,8 @@ public class SenMLJsonSerDesTest extends AbstractSenMLTest {
                                 { jackson, jackson, "jackson" } });
     }
 
-    private SenMLEncoder encoder;
-    private SenMLDecoder decoder;
+    private final SenMLEncoder encoder;
+    private final SenMLDecoder decoder;
 
     public SenMLJsonSerDesTest(SenMLEncoder encoder, SenMLDecoder decoder, String encoderDecoderName) {
         this.encoder = encoder;

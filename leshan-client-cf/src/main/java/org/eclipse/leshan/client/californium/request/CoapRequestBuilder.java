@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium.request;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map.Entry;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.leshan.core.Link;
@@ -33,6 +29,7 @@ import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.request.UplinkRequestVisitor;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map.Entry;
 

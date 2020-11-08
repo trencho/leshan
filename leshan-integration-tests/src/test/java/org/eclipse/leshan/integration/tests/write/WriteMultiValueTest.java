@@ -15,16 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -47,6 +37,18 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 @RunWith(Parameterized.class)
 public class WriteMultiValueTest {
     protected IntegrationTestHelper helper = new IntegrationTestHelper();
@@ -61,7 +63,7 @@ public class WriteMultiValueTest {
                                 { ContentFormat.SENML_JSON } });
     }
 
-    private ContentFormat contentFormat;
+    private final ContentFormat contentFormat;
 
     public WriteMultiValueTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;

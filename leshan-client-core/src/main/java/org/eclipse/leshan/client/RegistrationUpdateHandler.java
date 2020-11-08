@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client;
 
-import java.util.EnumSet;
-
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
 import org.eclipse.leshan.client.engine.RegistrationEngine;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -28,14 +26,16 @@ import org.eclipse.leshan.client.util.LinkFormatHelper;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.request.BindingMode;
 
+import java.util.EnumSet;
+
 /**
  * A class responsible to handle Registration Update. It should listen LWM2M Object Tree for changing and send
  * registration Update if needed.
  */
 public class RegistrationUpdateHandler {
 
-    private RegistrationEngine engine;
-    private BootstrapHandler bsHandler;
+    private final RegistrationEngine engine;
+    private final BootstrapHandler bsHandler;
 
     public RegistrationUpdateHandler(RegistrationEngine engine, BootstrapHandler bsHandler) {
         this.engine = engine;

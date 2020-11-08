@@ -15,16 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.servlet.json;
 
-import java.lang.reflect.Type;
-
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.server.queue.PresenceService;
-import org.eclipse.leshan.server.registration.Registration;
-
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.server.queue.PresenceService;
 import org.eclipse.leshan.server.registration.Registration;
 

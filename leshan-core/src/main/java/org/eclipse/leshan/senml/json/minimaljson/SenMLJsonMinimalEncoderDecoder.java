@@ -14,14 +14,13 @@
 
 package org.eclipse.leshan.senml.json.minimaljson;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.ParseException;
 import org.eclipse.leshan.core.util.json.JsonException;
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.ParseException;
 
 /**
  * Helper for encoding/decoding SenML JSON using minimal-json

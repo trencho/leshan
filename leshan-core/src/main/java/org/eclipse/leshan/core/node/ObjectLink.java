@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
-import java.util.Arrays;
-
 import org.eclipse.leshan.core.util.Validate;
+
+import java.util.Arrays;
 
 /**
  * The object link is used to refer an Instance of a given Object. An Object link value is composed of two concatenated
@@ -119,9 +119,7 @@ public class ObjectLink {
         ObjectLink other = (ObjectLink) obj;
         if (objectId != other.objectId)
             return false;
-        if (objectInstanceId != other.objectInstanceId)
-            return false;
-        return true;
+        return objectInstanceId == other.objectInstanceId;
     }
 
     @Override

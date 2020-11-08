@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.EnumSet;
-
 import org.eclipse.leshan.core.LwM2m.Version;
+
+import java.util.EnumSet;
 
 /**
  * Transport binding and Queue Mode

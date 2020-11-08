@@ -15,12 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.queue;
 
-import static org.junit.Assert.*;
-
-import java.net.Inet4Address;
-import java.net.UnknownHostException;
-import java.util.EnumSet;
-
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.registration.Registration;
@@ -28,6 +22,7 @@ import org.junit.Test;
 
 import java.net.Inet4Address;
 import java.net.UnknownHostException;
+import java.util.EnumSet;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -38,8 +33,8 @@ import static org.junit.Assert.fail;
  *
  */
 public class PresenceServiceTest {
-    private ClientAwakeTimeProvider awakeTimeProvider = new StaticClientAwakeTimeProvider();
-    private PresenceServiceImpl presenceService = new PresenceServiceImpl(awakeTimeProvider);
+    private final ClientAwakeTimeProvider awakeTimeProvider = new StaticClientAwakeTimeProvider();
+    private final PresenceServiceImpl presenceService = new PresenceServiceImpl(awakeTimeProvider);
 
     @Test
     public void testSetOnlineForNonQueueMode() throws Exception {

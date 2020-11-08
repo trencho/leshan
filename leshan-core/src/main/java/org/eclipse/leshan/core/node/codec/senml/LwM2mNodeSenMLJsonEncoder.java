@@ -13,11 +13,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.senml;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -41,6 +36,11 @@ import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map.Entry;
 
 public class LwM2mNodeSenMLJsonEncoder implements TimestampedNodeEncoder {
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeSenMLJsonEncoder.class);
@@ -118,7 +118,7 @@ public class LwM2mNodeSenMLJsonEncoder implements TimestampedNodeEncoder {
         private LwM2mValueConverter converter;
 
         // visitor output
-        private final ArrayList<SenMLRecord> records = new ArrayList<>();
+        private ArrayList<SenMLRecord> records = new ArrayList<>();
 
         @Override
         public void visit(LwM2mObject object) {

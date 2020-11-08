@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.servers;
 
-import java.util.EnumSet;
-
 import org.eclipse.leshan.core.request.BindingMode;
+
+import java.util.EnumSet;
 
 /**
  * Sensible information about a LWM2M server

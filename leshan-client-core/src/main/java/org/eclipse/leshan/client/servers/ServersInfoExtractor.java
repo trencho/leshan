@@ -48,6 +48,8 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import static org.eclipse.leshan.client.servers.ServerIdentity.SYSTEM;
+import static org.eclipse.leshan.core.LwM2mId.DEVICE;
+import static org.eclipse.leshan.core.LwM2mId.DVC_SUPPORTED_BINDING;
 import static org.eclipse.leshan.core.LwM2mId.SECURITY;
 import static org.eclipse.leshan.core.LwM2mId.SEC_BOOTSTRAP;
 import static org.eclipse.leshan.core.LwM2mId.SEC_PUBKEY_IDENTITY;

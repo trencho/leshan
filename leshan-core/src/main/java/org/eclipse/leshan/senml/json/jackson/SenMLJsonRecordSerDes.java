@@ -14,9 +14,9 @@
 
 package org.eclipse.leshan.senml.json.jackson;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Base64;
 import org.eclipse.leshan.core.util.datatype.ULong;
@@ -24,9 +24,8 @@ import org.eclipse.leshan.core.util.json.JacksonJsonSerDes;
 import org.eclipse.leshan.core.util.json.JsonException;
 import org.eclipse.leshan.senml.SenMLRecord;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class SenMLJsonRecordSerDes extends JacksonJsonSerDes<SenMLRecord> {
 
