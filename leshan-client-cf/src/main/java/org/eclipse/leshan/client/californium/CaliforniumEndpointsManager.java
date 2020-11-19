@@ -24,8 +24,9 @@ import org.eclipse.californium.elements.auth.RawPublicKeyIdentity;
 import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
-import org.eclipse.californium.scandium.dtls.pskstore.StaticPskStore;
-import org.eclipse.californium.scandium.dtls.rpkstore.TrustedRpkStore;
+import org.eclipse.californium.scandium.dtls.pskstore.AdvancedSinglePskStore;
+import org.eclipse.californium.scandium.dtls.x509.NewAdvancedCertificateVerifier;
+import org.eclipse.californium.scandium.dtls.x509.StaticNewAdvancedCertificateVerifier;
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerIdentity.Role;
@@ -102,8 +103,8 @@ public class CaliforniumEndpointsManager implements EndpointsManager {
 
             // Support PSK
             if (serverInfo.secureMode == SecurityMode.PSK) {
-                StaticPskStore staticPskStore = new StaticPskStore(serverInfo.pskId, serverInfo.pskKey);
-                newBuilder.setPskStore(staticPskStore);
+                AdvancedSinglePskStore staticPskStore = new AdvancedSinglePskStore(serverInfo.pskId, serverInfo.pskKey);
+                newBuilder.setAdvancedPskStore(staticPskStore);
                 serverIdentity = Identity.psk(serverInfo.getAddress(), serverInfo.pskId);
                 filterCipherSuites(newBuilder, dtlsConfigbuilder.getIncompleteConfig().getSupportedCipherSuites(), true,
                         false);
@@ -112,23 +113,9 @@ public class CaliforniumEndpointsManager implements EndpointsManager {
                 newBuilder.setIdentity(serverInfo.privateKey, serverInfo.publicKey);
                 // set RPK truststore
                 final PublicKey expectedKey = serverInfo.serverPublicKey;
-                newBuilder.setRpkTrustStore(new TrustedRpkStore() {
-                    @Override
-                    public boolean isTrusted(RawPublicKeyIdentity id) {
-                        PublicKey receivedKey = id.getKey();
-                        if (receivedKey == null) {
-                            LOG.warn("The server public key is null {}", id);
-                            return false;
-                        }
-                        if (!receivedKey.equals(expectedKey)) {
-                            LOG.debug(
-                                    "Server public key received does match with the expected one.\nReceived: {}\nExpected: {}",
-                                    receivedKey, expectedKey);
-                            return false;
-                        }
-                        return true;
-                    }
-                });
+                NewAdvancedCertificateVerifier rpkVerifier = new StaticNewAdvancedCertificateVerifier.Builder()
+                        .setTrustedRPKs(new RawPublicKeyIdentity(expectedKey)).build();
+                newBuilder.setAdvancedCertificateVerifier(rpkVerifier);
                 serverIdentity = Identity.rpk(serverInfo.getAddress(), expectedKey);
                 filterCipherSuites(newBuilder, dtlsConfigbuilder.getIncompleteConfig().getSupportedCipherSuites(),
                         false, true);
@@ -137,7 +124,8 @@ public class CaliforniumEndpointsManager implements EndpointsManager {
                 newBuilder.setIdentity(serverInfo.privateKey, new Certificate[] { serverInfo.clientCertificate });
 
                 // set X509 verifier
-                newBuilder.setCertificateVerifier(new DefaultLeshanCertificateVerifier(serverInfo.serverCertificate));
+                newBuilder.setAdvancedCertificateVerifier(
+                        new DefaultLeshanCertificateVerifier(serverInfo.serverCertificate));
                 serverIdentity = Identity.x509(serverInfo.getAddress(), EndpointContextUtil.extractCN(
                         ((X509Certificate) serverInfo.serverCertificate).getSubjectX500Principal().getName()));
                 filterCipherSuites(newBuilder, dtlsConfigbuilder.getIncompleteConfig().getSupportedCipherSuites(),
