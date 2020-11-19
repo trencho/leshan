@@ -1,11 +1,5 @@
 package org.eclipse.leshan.client.californium;
 
-import java.security.cert.Certificate;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.security.auth.x500.X500Principal;
-
 import org.eclipse.californium.scandium.dtls.AlertMessage;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertDescription;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertLevel;
@@ -18,6 +12,11 @@ import org.eclipse.californium.scandium.dtls.HandshakeException;
 import org.eclipse.californium.scandium.dtls.HandshakeResultHandler;
 import org.eclipse.californium.scandium.dtls.x509.NewAdvancedCertificateVerifier;
 import org.eclipse.californium.scandium.util.ServerNames;
+
+import javax.security.auth.x500.X500Principal;
+import java.security.cert.Certificate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DefaultLeshanCertificateVerifier implements NewAdvancedCertificateVerifier {
 

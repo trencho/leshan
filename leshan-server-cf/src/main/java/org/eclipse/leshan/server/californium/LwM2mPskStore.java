@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
-import java.net.InetSocketAddress;
-
-import javax.crypto.SecretKey;
-
 import org.eclipse.californium.scandium.dtls.ConnectionId;
 import org.eclipse.californium.scandium.dtls.PskPublicInformation;
 import org.eclipse.californium.scandium.dtls.PskSecretResult;
@@ -38,8 +34,8 @@ import java.net.InetSocketAddress;
  */
 public class LwM2mPskStore implements AdvancedPskStore {
 
-    private SecurityStore securityStore;
-    private RegistrationStore registrationStore;
+    private final SecurityStore securityStore;
+    private final RegistrationStore registrationStore;
 
     public LwM2mPskStore(SecurityStore securityStore) {
         this(securityStore, null);
