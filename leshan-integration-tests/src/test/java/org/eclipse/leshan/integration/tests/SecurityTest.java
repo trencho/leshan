@@ -15,16 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Token;
@@ -57,6 +47,7 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
 
 import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
 import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_ENDPOINT;

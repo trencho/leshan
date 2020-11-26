@@ -18,6 +18,7 @@ package org.eclipse.leshan.client.servers;
 
 import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.node.LwM2mObject;
@@ -27,6 +28,7 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.util.SecurityUtil;
+import org.eclipse.leshan.core.util.datatype.ULong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +54,7 @@ import static org.eclipse.leshan.core.LwM2mId.DEVICE;
 import static org.eclipse.leshan.core.LwM2mId.DVC_SUPPORTED_BINDING;
 import static org.eclipse.leshan.core.LwM2mId.SECURITY;
 import static org.eclipse.leshan.core.LwM2mId.SEC_BOOTSTRAP;
+import static org.eclipse.leshan.core.LwM2mId.SEC_CERTIFICATE_USAGE;
 import static org.eclipse.leshan.core.LwM2mId.SEC_PUBKEY_IDENTITY;
 import static org.eclipse.leshan.core.LwM2mId.SEC_SECRET_KEY;
 import static org.eclipse.leshan.core.LwM2mId.SEC_SECURITY_MODE;
@@ -62,21 +65,6 @@ import static org.eclipse.leshan.core.LwM2mId.SERVER;
 import static org.eclipse.leshan.core.LwM2mId.SRV_BINDING;
 import static org.eclipse.leshan.core.LwM2mId.SRV_LIFETIME;
 import static org.eclipse.leshan.core.LwM2mId.SRV_SERVER_ID;
-import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
-import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
-import org.eclipse.leshan.core.CertificateUsage;
-import org.eclipse.leshan.core.LwM2mId;
-import org.eclipse.leshan.core.SecurityMode;
-import org.eclipse.leshan.core.node.LwM2mObject;
-import org.eclipse.leshan.core.node.LwM2mObjectInstance;
-import org.eclipse.leshan.core.node.LwM2mResource;
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.ReadRequest;
-import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.util.SecurityUtil;
-import org.eclipse.leshan.core.util.datatype.ULong;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Extract from LwM2m object tree all the servers information like server uri, security mode, ...

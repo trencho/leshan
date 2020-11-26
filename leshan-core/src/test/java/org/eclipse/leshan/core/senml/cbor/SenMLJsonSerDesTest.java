@@ -14,9 +14,6 @@
 
 package org.eclipse.leshan.core.senml.cbor;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;

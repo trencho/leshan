@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.servers;
 
+import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.SecurityMode;
 import org.slf4j.Logger;
@@ -26,12 +27,6 @@ import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
-
-import org.eclipse.leshan.core.CertificateUsage;
-import org.eclipse.leshan.core.LwM2m;
-import org.eclipse.leshan.core.SecurityMode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Sensible information about a LWM2M server or a LWM2M Bootstrap sever.

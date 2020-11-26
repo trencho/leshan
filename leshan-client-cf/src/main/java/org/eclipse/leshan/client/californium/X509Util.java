@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
+import org.eclipse.californium.elements.util.CertPathUtil;
+
 import java.security.GeneralSecurityException;
 import java.security.cert.CertPath;
 import java.security.cert.CertPathValidator;
@@ -30,8 +32,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.californium.elements.util.CertPathUtil;
 
 public class X509Util {
 

@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.net.InetSocketAddress;
-import java.security.cert.CertPath;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.security.auth.x500.X500Principal;
-
 import org.eclipse.californium.scandium.dtls.AlertMessage;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertDescription;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertLevel;
@@ -37,6 +28,14 @@ import org.eclipse.californium.scandium.dtls.HandshakeResultHandler;
 import org.eclipse.californium.scandium.dtls.x509.NewAdvancedCertificateVerifier;
 import org.eclipse.californium.scandium.util.ServerNames;
 import org.eclipse.leshan.core.util.X509CertUtil;
+
+import javax.security.auth.x500.X500Principal;
+import java.net.InetSocketAddress;
+import java.security.cert.CertPath;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.List;
 
 public abstract class BaseCertificateVerifier implements NewAdvancedCertificateVerifier {
 

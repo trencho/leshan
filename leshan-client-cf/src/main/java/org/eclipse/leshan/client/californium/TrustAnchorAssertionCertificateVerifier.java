@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.security.GeneralSecurityException;
-import java.security.cert.CertPath;
-import java.security.cert.X509Certificate;
-
 import org.eclipse.californium.scandium.dtls.AlertMessage;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertDescription;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertLevel;
@@ -26,6 +22,10 @@ import org.eclipse.californium.scandium.dtls.CertificateMessage;
 import org.eclipse.californium.scandium.dtls.DTLSSession;
 import org.eclipse.californium.scandium.dtls.HandshakeException;
 import org.eclipse.leshan.core.util.Validate;
+
+import java.security.GeneralSecurityException;
+import java.security.cert.CertPath;
+import java.security.cert.X509Certificate;
 
 /**
  * This class implements Certificate Usage (2) - Trust Anchor Assertion
