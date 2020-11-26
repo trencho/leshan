@@ -58,7 +58,8 @@ public class ObserveTimeStampTest {
     public static Collection<?> contentFormats() {
         return Arrays.asList(new Object[][] { //
                                 { ContentFormat.JSON }, //
-                                { ContentFormat.SENML_JSON } });
+                                { ContentFormat.SENML_JSON }, //
+                                { ContentFormat.SENML_CBOR } });
     }
 
     protected IntegrationTestHelper helper = new IntegrationTestHelper();

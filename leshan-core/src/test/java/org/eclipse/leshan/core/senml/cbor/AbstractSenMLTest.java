@@ -1,10 +1,10 @@
 /*******************************************************************************
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
  * 
  * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
+ *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
  * 
@@ -12,7 +12,10 @@
  *     Boya Zhang - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.senml;
+package org.eclipse.leshan.core.senml.cbor;
+
+import org.eclipse.leshan.senml.SenMLPack;
+import org.eclipse.leshan.senml.SenMLRecord;
 
 public abstract class AbstractSenMLTest {
     protected void givenResourceWithFloatValue(SenMLPack pack, String n, Number value) {
@@ -78,7 +81,7 @@ public abstract class AbstractSenMLTest {
         givenResourceWithFloatValue(pack, "9", 100);
         givenResourceWithFloatValue(pack, "10", 15);
         givenResourceWithFloatValue(pack, "11/0", 0);
-        givenResourceWithFloatValue(pack, "13", 1367491215l);
+        givenResourceWithFloatValue(pack, "13", 1367491215);
 
         givenResourceWithStringValue(pack, "14", "+02:00");
         givenResourceWithStringValue(pack, "16", "U");

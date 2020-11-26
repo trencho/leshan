@@ -50,7 +50,8 @@ public class ReadSingleValueTest {
                                 { ContentFormat.TEXT }, //
                                 { ContentFormat.TLV }, //
                                 { ContentFormat.JSON }, //
-                                { ContentFormat.SENML_JSON } });
+                                { ContentFormat.SENML_JSON }, //
+                                { ContentFormat.SENML_CBOR } });
     }
 
     private final ContentFormat contentFormat;

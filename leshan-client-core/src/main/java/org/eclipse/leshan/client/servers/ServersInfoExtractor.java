@@ -62,6 +62,21 @@ import static org.eclipse.leshan.core.LwM2mId.SERVER;
 import static org.eclipse.leshan.core.LwM2mId.SRV_BINDING;
 import static org.eclipse.leshan.core.LwM2mId.SRV_LIFETIME;
 import static org.eclipse.leshan.core.LwM2mId.SRV_SERVER_ID;
+import org.eclipse.leshan.client.resource.LwM2mInstanceEnabler;
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.core.CertificateUsage;
+import org.eclipse.leshan.core.LwM2mId;
+import org.eclipse.leshan.core.SecurityMode;
+import org.eclipse.leshan.core.node.LwM2mObject;
+import org.eclipse.leshan.core.node.LwM2mObjectInstance;
+import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.util.SecurityUtil;
+import org.eclipse.leshan.core.util.datatype.ULong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extract from LwM2m object tree all the servers information like server uri, security mode, ...
@@ -107,6 +122,7 @@ public class ServersInfoExtractor {
                             info.clientCertificate = getClientCertificate(security);
                             info.serverCertificate = getServerCertificate(security);
                             info.privateKey = getPrivateKey(security);
+                            info.certificateUsage = getCertificateUsage(security);
                         }
                         infos.bootstrap = info;
                     }
@@ -128,6 +144,7 @@ public class ServersInfoExtractor {
                         info.clientCertificate = getClientCertificate(security);
                         info.serverCertificate = getServerCertificate(security);
                         info.privateKey = getPrivateKey(security);
+                        info.certificateUsage = getCertificateUsage(security);
                     }
                     // search corresponding device management server
                     for (LwM2mObjectInstance server : servers.getInstances().values()) {
@@ -219,6 +236,10 @@ public class ServersInfoExtractor {
 
     public static SecurityMode getSecurityMode(LwM2mObjectInstance securityInstance) {
         return SecurityMode.fromCode((long) securityInstance.getResource(SEC_SECURITY_MODE).getValue());
+    }
+
+    public static CertificateUsage getCertificateUsage(LwM2mObjectInstance securityInstance) {
+        return CertificateUsage.fromCode((ULong) securityInstance.getResource(SEC_CERTIFICATE_USAGE).getValue());
     }
 
     public static String getPskIdentity(LwM2mObjectInstance securityInstance) {

@@ -70,7 +70,8 @@ public class WriteSingleValueTest {
                                 { ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE) }, //
                                 { ContentFormat.JSON }, //
                                 { ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE) }, //
-                                { ContentFormat.SENML_JSON } });
+                                { ContentFormat.SENML_JSON }, //
+                                { ContentFormat.SENML_CBOR } });
     }
 
     private final ContentFormat contentFormat;
@@ -240,13 +241,6 @@ public class WriteSingleValueTest {
 
     @Test
     public void can_write_single_instance_objlnk_resource() throws InterruptedException {
-
-        // object link not yet implemented for some content format.
-        switch (contentFormat.getCode()) {
-        case ContentFormat.JSON_CODE:
-        case ContentFormat.OLD_JSON_CODE:
-            return;
-        }
 
         ObjectLink data = new ObjectLink(10245, 1);
 

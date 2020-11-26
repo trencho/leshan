@@ -50,13 +50,13 @@ import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-public class LwM2mNodeSenMLJsonDecoder implements TimestampedNodeDecoder {
+public class LwM2mNodeSenMLDecoder implements TimestampedNodeDecoder {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeSenMLJsonDecoder.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeSenMLDecoder.class);
 
     private final SenMLDecoder decoder;
 
-    public LwM2mNodeSenMLJsonDecoder(SenMLDecoder decoder) {
+    public LwM2mNodeSenMLDecoder(SenMLDecoder decoder) {
         this.decoder = decoder;
     }
 
@@ -382,7 +382,7 @@ public class LwM2mNodeSenMLJsonDecoder implements TimestampedNodeDecoder {
     }
 
     private Object parseResourceValue(Object value, Type expectedType, LwM2mPath path) throws CodecException {
-        LOG.trace("Parse SenML JSON value for path {} and expected type {}: {}", path, expectedType, value);
+        LOG.trace("Parse SenML value for path {} and expected type {}: {}", path, expectedType, value);
 
         try {
             switch (expectedType) {
