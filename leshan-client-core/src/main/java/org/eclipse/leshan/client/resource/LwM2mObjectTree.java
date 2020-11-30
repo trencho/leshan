@@ -18,6 +18,9 @@ package org.eclipse.leshan.client.resource;
 import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.resource.listener.ObjectListener;
 import org.eclipse.leshan.client.resource.listener.ObjectsListener;
+import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.core.Startable;
+import org.eclipse.leshan.core.Stoppable;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -25,13 +28,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.eclipse.leshan.client.LwM2mClient;
-import org.eclipse.leshan.client.resource.listener.ObjectListener;
-import org.eclipse.leshan.client.resource.listener.ObjectsListener;
-import org.eclipse.leshan.core.Destroyable;
-import org.eclipse.leshan.core.Startable;
-import org.eclipse.leshan.core.Stoppable;
 
 /**
  * The LWM2M Object Tree.

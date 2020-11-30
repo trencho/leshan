@@ -21,6 +21,7 @@ import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.elements.EndpointContext;
+import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.core.californium.AsyncRequestObserver;
 import org.eclipse.leshan.core.californium.CoapAsyncRequestObserver;
 import org.eclipse.leshan.core.californium.CoapResponseCallback;
@@ -45,7 +46,6 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.eclipse.leshan.core.util.Validate;
-import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.server.request.LowerLayerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -389,7 +389,7 @@ public class RequestSender implements Destroyable {
         ongoingRequests.remove(key, coapRequest);
     }
 
-    private AtomicLong idGenerator = new AtomicLong(0l);
+    private final AtomicLong idGenerator = new AtomicLong(0l);
 
     private class CleanerMessageObserver extends MessageObserverAdapter {
 

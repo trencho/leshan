@@ -21,13 +21,13 @@ import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.server.resources.Resource;
+import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.core.Startable;
+import org.eclipse.leshan.core.Stoppable;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
 import org.eclipse.leshan.core.util.Validate;
-import org.eclipse.leshan.core.Destroyable;
-import org.eclipse.leshan.core.Startable;
-import org.eclipse.leshan.core.Stoppable;
 import org.eclipse.leshan.server.bootstrap.BootstrapConfigurationStore;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandler;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandlerFactory;
@@ -57,7 +57,7 @@ public class LeshanBootstrapServer {
     private final BootstrapConfigurationStore bsStore;
     private final BootstrapSecurityStore bsSecurityStore;
 
-    private LwM2mBootstrapRequestSender requestSender;
+    private final LwM2mBootstrapRequestSender requestSender;
 
     /**
      * /** Initialize a server which will bind to the specified address and port.

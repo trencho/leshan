@@ -28,11 +28,11 @@ import org.eclipse.californium.core.coap.Token;
 import org.eclipse.californium.core.observe.ObservationStoreException;
 import org.eclipse.californium.core.observe.ObservationUtil;
 import org.eclipse.californium.elements.EndpointContext;
-import org.eclipse.leshan.core.observation.Observation;
-import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.core.Startable;
 import org.eclipse.leshan.core.Stoppable;
+import org.eclipse.leshan.core.observation.Observation;
+import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.eclipse.leshan.server.californium.observation.ObserveUtil;
 import org.eclipse.leshan.server.registration.Deregistration;
 import org.eclipse.leshan.server.registration.ExpirationListener;
@@ -70,8 +70,8 @@ public class InMemoryRegistrationStore implements CaliforniumRegistrationStore, 
     private final Map<String /* end-point */, Registration> regsByEp = new HashMap<>();
     private final Map<InetSocketAddress, Registration> regsByAddr = new HashMap<>();
     private final Map<String /* reg-id */, Registration> regsByRegId = new HashMap<>();
-    private Map<Token, org.eclipse.californium.core.observe.Observation> obsByToken = new HashMap<>();
-    private Map<String, Set<Token>> tokensByRegId = new HashMap<>();
+    private final Map<Token, org.eclipse.californium.core.observe.Observation> obsByToken = new HashMap<>();
+    private final Map<String, Set<Token>> tokensByRegId = new HashMap<>();
 
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
