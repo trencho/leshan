@@ -32,6 +32,12 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.eclipse.leshan.core.util.NamedThreadFactory;
+import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.server.registration.Registration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Tracks the status of each LWM2M client registered with Queue mode binding. Also ensures that the
  * {@link PresenceListener} are notified on state changes only for those LWM2M clients registered using Queue mode

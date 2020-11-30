@@ -26,13 +26,20 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.eclipse.leshan.client.LwM2mClient;
+import org.eclipse.leshan.client.resource.listener.ObjectListener;
+import org.eclipse.leshan.client.resource.listener.ObjectsListener;
+import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.core.Startable;
+import org.eclipse.leshan.core.Stoppable;
+
 /**
  * The LWM2M Object Tree.
  * <p>
  * It contains all the {@link LwM2mObjectEnabler} which are the implementation of each LWM2M object supported by the
  * client.
  */
-public class LwM2mObjectTree {
+public class LwM2mObjectTree implements Startable, Stoppable, Destroyable {
 
     protected ObjectListener dispatcher = new ObjectListenerDispatcher();
     protected CopyOnWriteArrayList<ObjectsListener> listeners = new CopyOnWriteArrayList<>();
@@ -90,6 +97,35 @@ public class LwM2mObjectTree {
             removedEnabler.removeListener(dispatcher);
             for (ObjectsListener listener : listeners) {
                 listener.objectRemoved(removedEnabler);
+            }
+        }
+    }
+
+    @Override
+    public void destroy() {
+        for (LwM2mObjectEnabler objectEnabler : objectEnablers.values()) {
+            if (objectEnabler instanceof Destroyable) {
+                ((Destroyable) objectEnabler).destroy();
+            } else if (objectEnabler instanceof Stoppable) {
+                ((Stoppable) objectEnabler).stop();
+            }
+        }
+    }
+
+    @Override
+    public void start() {
+        for (LwM2mObjectEnabler objectEnabler : objectEnablers.values()) {
+            if (objectEnabler instanceof Startable) {
+                ((Startable) objectEnabler).start();
+            }
+        }
+    }
+
+    @Override
+    public void stop() {
+        for (LwM2mObjectEnabler objectEnabler : objectEnablers.values()) {
+            if (objectEnabler instanceof Stoppable) {
+                ((Stoppable) objectEnabler).stop();
             }
         }
     }
