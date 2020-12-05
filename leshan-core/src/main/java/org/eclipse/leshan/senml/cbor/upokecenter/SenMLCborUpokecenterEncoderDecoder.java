@@ -15,18 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.senml.cbor.upokecenter;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
-
+import com.upokecenter.cbor.CBORException;
+import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
 
-import com.upokecenter.cbor.CBORException;
-import com.upokecenter.cbor.CBORObject;
-import com.upokecenter.cbor.CBORType;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.LinkedHashMap;
 
 /**
  * Helper for encoding/decoding SenML CBOR using <a href="https://github.com/peteroupc/CBOR-Java">"upokecenter"

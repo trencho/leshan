@@ -14,9 +14,6 @@
 
 package org.eclipse.leshan.core.senml.cbor;
 
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;
@@ -28,6 +25,9 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 @RunWith(Parameterized.class)
 public class SenMLCborSerializerTest extends AbstractSenMLTest {
@@ -41,8 +41,8 @@ public class SenMLCborSerializerTest extends AbstractSenMLTest {
                                 { jackson, jackson, "jackson" } });
     }
 
-    private SenMLEncoder encoder;
-    private SenMLDecoder decoder;
+    private final SenMLEncoder encoder;
+    private final SenMLDecoder decoder;
 
     public SenMLCborSerializerTest(SenMLEncoder encoder, SenMLDecoder decoder, String encoderDecoderName) {
         this.encoder = encoder;

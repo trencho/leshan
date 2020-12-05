@@ -15,13 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.senml.cbor.upokecenter;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Collection;
-
+import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
+import com.upokecenter.numbers.EInteger;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Base64;
 import org.eclipse.leshan.core.util.datatype.ULong;
@@ -30,9 +26,12 @@ import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 
-import com.upokecenter.cbor.CBORObject;
-import com.upokecenter.cbor.CBORType;
-import com.upokecenter.numbers.EInteger;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Collection;
 
 public class SenMLCborPackSerDes {
 

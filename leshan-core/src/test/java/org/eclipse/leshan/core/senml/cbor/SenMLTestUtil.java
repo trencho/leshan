@@ -15,13 +15,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.senml.cbor;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Objects;
-
 import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
 import org.junit.Assert;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.Objects;
 
 public class SenMLTestUtil {
 

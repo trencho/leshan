@@ -14,11 +14,6 @@
 
 package org.eclipse.leshan.core.senml.cbor;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;
@@ -31,6 +26,8 @@ import org.junit.runners.Parameterized;
 
 import java.util.Arrays;
 import java.util.Collection;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class SenMLJsonSerDesTest extends AbstractSenMLTest {
