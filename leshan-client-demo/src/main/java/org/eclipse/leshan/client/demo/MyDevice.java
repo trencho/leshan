@@ -27,7 +27,19 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class MyDevice extends BaseInstanceEnabler {
+import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
+import org.eclipse.leshan.client.servers.ServerIdentity;
+import org.eclipse.leshan.core.Destroyable;
+import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.node.LwM2mResource;
+import org.eclipse.leshan.core.response.ExecuteResponse;
+import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.core.response.WriteResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class MyDevice extends BaseInstanceEnabler implements Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyDevice.class);
 
@@ -35,11 +47,12 @@ public class MyDevice extends BaseInstanceEnabler {
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 2, 3, 9, 10, 11, 13, 14, 15, 16, 17, 18,
             19, 20, 21);
 
+    private final Timer timer;
+
     public MyDevice() {
         // notify new date each 5 second
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Device-Current Time"));
-        scheduler.scheduleAtFixedRate(new Runnable() {
-
+        this.timer = new Timer("Device-Current Time");
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 fireResourcesChange(13);
@@ -214,5 +227,10 @@ public class MyDevice extends BaseInstanceEnabler {
     @Override
     public List<Integer> getAvailableResourceIds(ObjectModel model) {
         return supportedResources;
+    }
+
+    @Override
+    public void destroy() {
+        timer.cancel();
     }
 }

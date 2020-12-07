@@ -2,6 +2,7 @@ package org.eclipse.leshan.client.demo;
 
 import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
+import org.eclipse.leshan.core.Destroyable;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
@@ -18,7 +19,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-public class RandomTemperatureSensor extends BaseInstanceEnabler {
+public class RandomTemperatureSensor extends BaseInstanceEnabler implements Destroyable {
 
     private static final Logger LOG = LoggerFactory.getLogger(RandomTemperatureSensor.class);
 
@@ -109,5 +110,10 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler {
     @Override
     public List<Integer> getAvailableResourceIds(ObjectModel model) {
         return supportedResources;
+    }
+
+    @Override
+    public void destroy() {
+        scheduler.shutdown();
     }
 }
