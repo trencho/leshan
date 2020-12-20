@@ -15,6 +15,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
+import static org.eclipse.leshan.core.ResponseCode.CHANGED;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -31,7 +42,7 @@ import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.datatype.ULong;
-import org.eclipse.leshan.integration.tests.IntegrationTestHelper;
+import org.eclipse.leshan.integration.tests.util.IntegrationTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,6 +78,7 @@ public class WriteSingleValueTest {
         return Arrays.asList(new Object[][] { //
                                 { ContentFormat.TEXT }, //
                                 { ContentFormat.TLV }, //
+                                { ContentFormat.CBOR }, //
                                 { ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE) }, //
                                 { ContentFormat.JSON }, //
                                 { ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE) }, //
@@ -138,7 +150,7 @@ public class WriteSingleValueTest {
     @Test
     public void write_integer_resource() throws InterruptedException {
         // write resource
-        long expectedvalue = 999l;
+        long expectedvalue = -999l;
         WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
                 new WriteRequest(contentFormat, TEST_OBJECT_ID, 0, INTEGER_RESOURCE_ID, expectedvalue));
 
@@ -205,7 +217,7 @@ public class WriteSingleValueTest {
         // write resource
         Date expectedvalue = new Date(946681000l); // second accuracy
         WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
-                new WriteRequest(contentFormat, TEST_OBJECT_ID, 0, TIME_RESOURCE_ID, expectedvalue));
+                new WriteRequest(contentFormat, TEST_OBJECT_ID, 0, TIME_RESOURCE_ID, expectedvalue), 100000000);
 
         // verify result
         assertEquals(ResponseCode.CHANGED, response.getCode());
@@ -214,7 +226,7 @@ public class WriteSingleValueTest {
 
         // read resource to check the value changed
         ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(),
-                new ReadRequest(contentFormat, TEST_OBJECT_ID, 0, TIME_RESOURCE_ID));
+                new ReadRequest(contentFormat, TEST_OBJECT_ID, 0, TIME_RESOURCE_ID), 100000000);
         LwM2mResource resource = (LwM2mResource) readResponse.getContent();
         assertEquals(expectedvalue, resource.getValue());
     }

@@ -13,7 +13,7 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.lockstep;
 
 import org.eclipse.californium.core.coap.Message;
 import org.eclipse.californium.core.coap.Request;

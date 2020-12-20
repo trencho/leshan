@@ -21,4 +21,13 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
  * A Lightweight M2M request.
  */
 public interface LwM2mRequest<T extends LwM2mResponse> {
+
+    /**
+     * Get the underlying CoAP request. The object type depends of the chosen CoAP implementation. (e.g with Californium
+     * implementation <code>getCoapResponse()</code> will returns
+     * <code>a org.eclipse.californium.core.coap.Request)</code>).
+     * 
+     * @return the CoAP request
+     */
+    Object getCoapRequest();
 }

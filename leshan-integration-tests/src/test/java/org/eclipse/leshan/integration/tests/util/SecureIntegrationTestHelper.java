@@ -14,7 +14,7 @@
  *     Zebra Technologies - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.util;
 
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
@@ -224,7 +224,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
     }
 
     public void createPSKClient(boolean queueMode) {
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.SECURITY,
                 Security.psk(
                         "coaps://" + server.getSecuredAddress().getHostString() + ":"
@@ -289,7 +289,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
     }
 
     public void createRPKClient(boolean useServerCertificate) {
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.SECURITY, Security.rpk(
                 "coaps://" + server.getSecuredAddress().getHostString() + ":" + server.getSecuredAddress().getPort(),
                 12345, clientPublicKey.getEncoded(), clientPrivateKey.getEncoded(),
@@ -332,7 +332,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
 
     public void createX509CertClient(Certificate clientCertificate, PrivateKey privatekey,
             Certificate serverCertificate) throws CertificateEncodingException {
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.SECURITY,
                 Security.x509(
                         "coaps://" + server.getSecuredAddress().getHostString() + ":"
@@ -363,7 +363,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
         /* Make sure there is only 1 certificate in chain before client certificate chains are supported */
         assert (clientCertificate.length == 1);
 
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.SECURITY,
                 Security.x509(
                         "coaps://" + server.getSecuredAddress().getHostString() + ":"
@@ -394,10 +394,14 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
         return createServerBuilder(null);
     }
 
+    @Override
+    protected SecurityStore createSecurityStore() {
+        securityStore = new InMemorySecurityStore();
+        return securityStore;
+    }
+
     protected LeshanServerBuilder createServerBuilder(Boolean serverOnly) {
         LeshanServerBuilder builder = super.createServerBuilder();
-        securityStore = new InMemorySecurityStore();
-        builder.setSecurityStore(securityStore);
         Builder dtlsConfig = new DtlsConnectorConfig.Builder();
         dtlsConfig.setMaxRetransmissions(1);
         dtlsConfig.setRetransmissionTimeout(300);

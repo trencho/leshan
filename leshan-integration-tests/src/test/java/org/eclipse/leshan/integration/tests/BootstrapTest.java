@@ -15,6 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.*;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.*;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.client.resource.SimpleInstanceEnabler;
@@ -26,8 +34,11 @@ import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
+import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.integration.tests.util.BootstrapIntegrationTestHelper;
+import org.eclipse.leshan.integration.tests.util.TestObjectsInitializer;
 import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.After;
@@ -74,6 +85,54 @@ public class BootstrapTest {
 
         // Create Client and check it is not already registered
         helper.createClient();
+        helper.assertClientNotRegisterered();
+
+        // Start it and wait for registration
+        helper.client.start();
+        helper.waitForRegistrationAtServerSide(1);
+
+        // check the client is registered
+        helper.assertClientRegisterered();
+    }
+
+    @Test
+    public void bootstrap_tlv_only() {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null);
+        helper.bootstrapServer.start();
+
+        // Create Client and check it is not already registered
+        ContentFormat noPreferredFormat = null; // if no preferred content format server should use TLV
+        ContentFormat supportedFormat = ContentFormat.TLV;
+        helper.createClient(noPreferredFormat, supportedFormat);
+        helper.assertClientNotRegisterered();
+
+        // Start it and wait for registration
+        helper.client.start();
+        helper.waitForRegistrationAtServerSide(1);
+
+        // check the client is registered
+        helper.assertClientRegisterered();
+    }
+
+    @Test
+    public void bootstrap_senmlcbor_only() {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null);
+        helper.bootstrapServer.start();
+
+        // Create Client and check it is not already registered
+        ContentFormat preferredFormat = ContentFormat.SENML_CBOR;
+        ContentFormat supportedFormat = ContentFormat.SENML_CBOR;
+        helper.createClient(preferredFormat, supportedFormat);
         helper.assertClientNotRegisterered();
 
         // Start it and wait for registration
@@ -176,7 +235,7 @@ public class BootstrapTest {
         helper.bootstrapServer.start();
 
         // Create Client and check it is not already registered
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.ACCESS_CONTROL, new SimpleInstanceEnabler());
         initializer.setInstancesForObject(LwM2mId.CONNECTIVITY_STATISTICS, new SimpleInstanceEnabler());
         helper.createClient(helper.withoutSecurity(), initializer);
@@ -208,7 +267,7 @@ public class BootstrapTest {
         helper.bootstrapServer.start();
 
         // Create Client and check it is not already registered
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.ACCESS_CONTROL, new SimpleInstanceEnabler());
         initializer.setInstancesForObject(LwM2mId.CONNECTIVITY_STATISTICS, new SimpleInstanceEnabler());
         helper.createClient(helper.withoutSecurity(), initializer);
@@ -248,7 +307,7 @@ public class BootstrapTest {
         helper.bootstrapServer.start();
 
         // Create Client and check it is not already registered
-        ObjectsInitializer initializer = new ObjectsInitializer();
+        ObjectsInitializer initializer = new TestObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.ACCESS_CONTROL, new SimpleInstanceEnabler());
         helper.createClient(helper.withoutSecurity(), initializer);
         helper.assertClientNotRegisterered();

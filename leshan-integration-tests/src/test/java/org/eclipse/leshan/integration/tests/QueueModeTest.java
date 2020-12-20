@@ -19,6 +19,7 @@ package org.eclipse.leshan.integration.tests;
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.integration.tests.util.QueueModeIntegrationTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

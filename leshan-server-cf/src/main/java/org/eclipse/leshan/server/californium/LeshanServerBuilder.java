@@ -27,7 +27,6 @@ import org.eclipse.californium.scandium.DTLSConnector;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
 import org.eclipse.californium.scandium.dtls.CertificateType;
-import org.eclipse.californium.scandium.dtls.ProtocolVersion;
 import org.eclipse.californium.scandium.dtls.x509.BridgeCertificateVerifier;
 import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.californium.DefaultEndpointFactory;
@@ -403,7 +402,6 @@ public class LeshanServerBuilder {
      * @return the LWM2M server.
      * @throws IllegalStateException if builder configuration is not consistent.
      */
-    @SuppressWarnings("deprecation")
     public LeshanServer build() {
         if (localAddress == null)
             localAddress = new InetSocketAddress(LwM2m.DEFAULT_COAP_PORT);
@@ -443,11 +441,6 @@ public class LeshanServerBuilder {
             }
             // Set default DTLS setting for Leshan unless user change it.
             DtlsConnectorConfig incompleteConfig = dtlsConfigBuilder.getIncompleteConfig();
-
-            // TODO probably remove this with integration of Cf-2.6.0.
-            // see : https://github.com/eclipse/californium/pull/1459
-            if (incompleteConfig.getProtocolVersionForHelloVerifyRequests() == null)
-                dtlsConfigBuilder.setProtocolVersionForHelloVerifyRequests(ProtocolVersion.VERSION_DTLS_1_2);
 
             // Handle PSK Store
             if (incompleteConfig.getAdvancedPskStore() != null) {

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016 Sierra Wireless and others.
+ * Copyright (c) 2020 Sierra Wireless and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -13,13 +13,20 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.core.request;
 
-import org.eclipse.leshan.integration.tests.util.RedisIntegrationTestHelper;
+import org.eclipse.leshan.core.response.LwM2mResponse;
 
-public class RedisRegistrationTest extends RegistrationTest {
+public abstract class AbstractLwM2mRequest<T extends LwM2mResponse> implements LwM2mRequest<T> {
 
-    public RedisRegistrationTest() {
-        helper = new RedisIntegrationTestHelper();
+    private final Object coapRequest;
+
+    public AbstractLwM2mRequest(Object coapRequest) {
+        this.coapRequest = coapRequest;
+    }
+
+    @Override
+    public Object getCoapRequest() {
+        return coapRequest;
     }
 }

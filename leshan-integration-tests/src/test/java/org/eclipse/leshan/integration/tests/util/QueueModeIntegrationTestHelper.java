@@ -14,7 +14,7 @@
  *     RISE SICS AB - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.util;
 
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
 import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
@@ -26,6 +26,7 @@ import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.core.response.LwM2mResponse;
+import org.eclipse.leshan.integration.tests.PresenceCounter;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.queue.StaticClientAwakeTimeProvider;
 import org.eclipse.leshan.server.registration.Registration;
@@ -55,7 +56,7 @@ public class QueueModeIntegrationTestHelper extends IntegrationTestHelper {
         }
     };
 
-    protected PresenceCounter presenceCounter = new PresenceCounter() {
+    public PresenceCounter presenceCounter = new PresenceCounter() {
         @Override
         public boolean accept(Registration registration) {
             return (registration != null && registration.getEndpoint().equals(currentEndpointIdentifier.get()));
@@ -65,7 +66,7 @@ public class QueueModeIntegrationTestHelper extends IntegrationTestHelper {
     @Override
     public void createClient() {
         // Create objects Enabler
-        ObjectsInitializer initializer = new ObjectsInitializer(new StaticModel(createObjectModels()));
+        ObjectsInitializer initializer = new TestObjectsInitializer(new StaticModel(createObjectModels()));
         initializer.setInstancesForObject(LwM2mId.SECURITY, Security.noSec(
                 "coap://" + server.getUnsecuredAddress().getHostString() + ":" + server.getUnsecuredAddress().getPort(),
                 12345));

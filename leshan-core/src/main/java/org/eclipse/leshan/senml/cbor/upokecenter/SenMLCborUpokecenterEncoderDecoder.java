@@ -46,24 +46,13 @@ public class SenMLCborUpokecenterEncoderDecoder implements SenMLDecoder, SenMLEn
      */
     public SenMLCborUpokecenterEncoderDecoder(boolean keepingInsertionOrder) {
         if (keepingInsertionOrder) {
-            try {
-                final Constructor<CBORObject> constructor = CBORObject.class.getDeclaredConstructor(int.class,
-                        Object.class);
-                constructor.setAccessible(true);
-                serDes = new SenMLCborPackSerDes() {
-                    @Override
-                    CBORObject newMap() {
-                        try {
-                            return constructor.newInstance(5, new LinkedHashMap<CBORObject, CBORObject>());
-                        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                            throw new IllegalStateException(
-                                    "Unable to use Java reflection to create CBORMap keeping insertion order", e);
-                        }
-                    }
-                };
-            } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalStateException("Unable to use Java reflection to keep insertion order", e);
-            }
+            serDes = new SenMLCborPackSerDes() {
+                @Override
+                CBORObject newMap() {
+                    return CBORObject.NewOrderedMap();
+                }
+            };
+
         } else {
             serDes = new SenMLCborPackSerDes();
         }

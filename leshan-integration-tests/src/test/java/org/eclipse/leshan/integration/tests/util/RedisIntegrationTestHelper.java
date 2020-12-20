@@ -13,20 +13,31 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.util;
 
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
+import org.eclipse.leshan.server.model.StaticModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
-import org.eclipse.leshan.server.redis.RedisSecurityStore;
+import org.eclipse.leshan.server.security.InMemorySecurityStore;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.util.Pool;
 
-public class RedisSecureIntegrationTestHelper extends SecureIntegrationTestHelper {
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
+public class RedisIntegrationTestHelper extends IntegrationTestHelper {
     @Override
-    protected LeshanServerBuilder createServerBuilder(Boolean serverOnly)  {
-        LeshanServerBuilder builder = super.createServerBuilder(serverOnly);
+    public void createServer() {
+        LeshanServerBuilder builder = new LeshanServerBuilder();
+        StaticModelProvider modelProvider = new StaticModelProvider(createObjectModels());
+        builder.setObjectModelProvider(modelProvider);
+        DefaultLwM2mNodeDecoder decoder = new DefaultLwM2mNodeDecoder();
+        builder.setDecoder(decoder);
+        builder.setLocalAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
+        builder.setLocalSecureAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
+        builder.setSecurityStore(new InMemorySecurityStore());
 
         // Create redis store
         String redisURI = System.getenv("REDIS_URI");
@@ -34,9 +45,10 @@ public class RedisSecureIntegrationTestHelper extends SecureIntegrationTestHelpe
             redisURI = "";
         Pool<Jedis> jedis = new JedisPool(redisURI);
         builder.setRegistrationStore(new RedisRegistrationStore(jedis));
-        securityStore = new RedisSecurityStore(jedis);
-        builder.setSecurityStore(securityStore);
 
-        return builder;
+        // Build server !
+        server = builder.build();
+        // monitor client registration
+        setupServerMonitoring();
     }
 }

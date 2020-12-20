@@ -13,7 +13,7 @@
  * Contributors:
  *     Zebra Technologies - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.util;
 
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.response.ErrorCallback;

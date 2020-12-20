@@ -14,16 +14,47 @@
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
 
-package org.eclipse.leshan.integration.tests;
+package org.eclipse.leshan.integration.tests.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
+import java.security.AlgorithmParameters;
+import java.security.GeneralSecurityException;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.ECParameterSpec;
+import java.security.spec.ECPoint;
+import java.security.spec.ECPrivateKeySpec;
+import java.security.spec.ECPublicKeySpec;
+import java.security.spec.KeySpec;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.californium.core.coap.Request;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
+import org.eclipse.leshan.client.engine.DefaultRegistrationEngineFactory;
 import org.eclipse.leshan.client.object.Device;
 import org.eclipse.leshan.client.object.Security;
 import org.eclipse.leshan.client.resource.DummyInstanceEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.SecurityMode;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
+import org.eclipse.leshan.core.request.BootstrapRequest;
+import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.response.BootstrapDiscoverResponse;
 import org.eclipse.leshan.core.util.Hex;
@@ -131,6 +162,13 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         builder.setPrivateKey(bootstrapServerPrivateKey);
         builder.setPublicKey(bootstrapServerPublicKey);
         builder.setSessionManager(new DefaultBootstrapSessionManager(securityStore) {
+
+            @Override
+            public BootstrapSession begin(BootstrapRequest request, Identity clientIdentity) {
+                assertThat(request.getCoapRequest(), instanceOf(Request.class));
+                return super.begin(request, clientIdentity);
+            }
+
             @Override
             public void end(BootstrapSession bsSession) {
                 lastBootstrapSession = (DefaultBootstrapSession) bsSession;
@@ -196,6 +234,10 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         createClient(withoutSecurity(), null);
     }
 
+    public void createClient(ContentFormat preferredContentFormat, final ContentFormat... supportedContentFormat) {
+        createClient(withoutSecurity(), null, null, preferredContentFormat, supportedContentFormat);
+    }
+
     public void createPSKClient(String pskIdentity, byte[] pskKey) {
         // Create Security Object (with bootstrap server only)
         String bsUrl = "coaps://" + bootstrapServer.getSecuredAddress().getHostString() + ":"
@@ -217,18 +259,19 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
     }
 
     public void createClient(Security security, ObjectsInitializer initializer) {
-        createClient(security, initializer, null);
+        createClient(security, initializer, null, null);
     }
 
     @Override
     public void createClient(Map<String, String> additionalAttributes) {
-        createClient(withoutSecurity(), null, additionalAttributes);
+        createClient(withoutSecurity(), null, additionalAttributes, null);
     }
 
     public void createClient(Security security, ObjectsInitializer initializer,
-            Map<String, String> additionalAttributes) {
+            Map<String, String> additionalAttributes, ContentFormat preferredContentFormat,
+            final ContentFormat... supportedContentFormat) {
         if (initializer == null) {
-            initializer = new ObjectsInitializer();
+            initializer = new TestObjectsInitializer();
         }
 
         // Initialize LWM2M Object Tree
@@ -236,14 +279,34 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
         initializer.setInstancesForObject(LwM2mId.DEVICE,
                 new Device("Eclipse Leshan", IntegrationTestHelper.MODEL_NUMBER, "12345"));
         initializer.setClassForObject(LwM2mId.SERVER, DummyInstanceEnabler.class);
-        createClient(initializer, additionalAttributes);
+        createClient(initializer, additionalAttributes, preferredContentFormat, supportedContentFormat);
     }
 
-    public void createClient(ObjectsInitializer initializer, Map<String, String> additionalAttributes) {
+    public void createClient(ObjectsInitializer initializer, Map<String, String> additionalAttributes,
+            ContentFormat preferredContentFormat, final ContentFormat... supportedContentFormat) {
         // Create Leshan Client
         LeshanClientBuilder builder = new LeshanClientBuilder(getCurrentEndpoint());
         builder.setObjects(initializer.createAll());
         builder.setBootstrapAdditionalAttributes(additionalAttributes);
+        builder.setRegistrationEngineFactory(
+                new DefaultRegistrationEngineFactory().setPreferredContentFormat(preferredContentFormat));
+
+        // custom encoder/decoder with limited supported content format.
+        if (supportedContentFormat != null && supportedContentFormat.length > 0) {
+            final List<ContentFormat> supportedFormat = Arrays.asList(supportedContentFormat);
+            builder.setDecoder(new DefaultLwM2mNodeDecoder() {
+                @Override
+                public boolean isSupported(ContentFormat format) {
+                    return supportedFormat.contains(format);
+                }
+            });
+            builder.setEncoder(new DefaultLwM2mNodeEncoder() {
+                @Override
+                public boolean isSupported(ContentFormat format) {
+                    return supportedFormat.contains(format);
+                }
+            });
+        }
         client = builder.build();
         setupClientMonitoring();
     }
@@ -334,7 +397,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
                 dmConfig.shortId = 2222;
                 bsConfig.servers.put(0, dmConfig);
 
-                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig));
+                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig, session.getContentFormat()));
             }
         };
     }
@@ -356,7 +419,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
 
                 BootstrapConfig bsConfig = new BootstrapConfig();
                 bsConfig.toDelete = Arrays.asList(pathToDelete);
-                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig));
+                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig, session.getContentFormat()));
             }
         };
     }
@@ -444,7 +507,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
                 dmConfig.shortId = 2222;
                 bsConfig.servers.put(0, dmConfig);
 
-                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig));
+                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig, session.getContentFormat()));
             }
         };
     }
@@ -482,7 +545,7 @@ public class BootstrapIntegrationTestHelper extends SecureIntegrationTestHelper 
                 dmConfig.shortId = 2222;
                 bsConfig.servers.put(0, dmConfig);
 
-                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig));
+                return new BootstrapConfiguration(BootstrapUtil.toRequests(bsConfig, session.getContentFormat()));
             }
         };
     }

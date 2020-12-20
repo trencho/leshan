@@ -15,6 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.LIFETIME;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.*;
+import static org.junit.Assert.*;
+
+import java.io.IOException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.X509Certificate;
+
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Token;
@@ -35,6 +45,8 @@ import org.eclipse.leshan.core.request.exception.SendFailedException;
 import org.eclipse.leshan.core.request.exception.TimeoutException;
 import org.eclipse.leshan.core.request.exception.UnconnectedPeerException;
 import org.eclipse.leshan.core.response.ReadResponse;
+import org.eclipse.leshan.integration.tests.util.Callback;
+import org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
@@ -151,6 +163,7 @@ public class SecurityTest {
         // create a ping message
         Request request = new Request(null, Type.CON);
         request.setToken(Token.EMPTY);
+        request.setMID(0);
         byte[] ping = new UdpDataSerializer().getByteArray(request);
         // sent it
         connector.send(

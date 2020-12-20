@@ -20,6 +20,7 @@ import com.upokecenter.cbor.CBORType;
 import com.upokecenter.numbers.EInteger;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Base64;
+import org.eclipse.leshan.core.util.datatype.NumberUtil;
 import org.eclipse.leshan.core.util.datatype.ULong;
 import org.eclipse.leshan.core.util.json.JsonException;
 import org.eclipse.leshan.senml.SenMLException;
@@ -32,6 +33,9 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import com.upokecenter.cbor.CBORNumber;
+import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
 
 public class SenMLCborPackSerDes {
 
@@ -47,7 +51,7 @@ public class SenMLCborPackSerDes {
 
                 CBORObject bt = o.get(-3);
                 if (bt != null && bt.isNumber())
-                    record.setBaseTime(bt.AsInt64());
+                    record.setBaseTime(bt.AsNumber().ToInt64Checked());
 
                 CBORObject n = o.get(0);
                 if (n != null && n.getType() == CBORType.TextString)
@@ -55,25 +59,34 @@ public class SenMLCborPackSerDes {
 
                 CBORObject t = o.get(6);
                 if (t != null && t.isNumber())
-                    record.setTime(t.AsInt64());
+                    record.setTime(t.AsNumber().ToInt64Checked());
 
                 CBORObject v = o.get(2);
                 boolean hasValue = false;
                 if (v != null && v.isNumber()) {
-                    if (v.isIntegral()) {
-                        if (v.isNegative()) {
-                            record.setFloatValue(v.AsInt64());
-                        } else {
-                            EInteger eInteger = v.AsEInteger();
-                            if (eInteger.CanFitInInt64()) {
-                                record.setFloatValue(eInteger.ToInt64Unchecked());
+                    CBORNumber number = v.AsNumber();
+                    if (number.IsInteger()) {
+                        if (number.IsNegative()) {
+                            if (number.CanFitInInt64()) {
+                                record.setFloatValue(number.ToInt64Unchecked());
                             } else {
-                                // There is maybe a better way to do that.
-                                record.setFloatValue(ULong.valueOf(v.AsEInteger().toString()));
+                                record.setFloatValue((BigInteger) v.ToObject(BigInteger.class));
+                            }
+                        } else {
+                            if (number.CanFitInInt64()) {
+                                record.setFloatValue(number.ToInt64Unchecked());
+                            } else if (number.ToEIntegerIfExact().GetSignedBitLengthAsInt64() == 64) {
+                                record.setFloatValue(ULong.valueOf(number.ToInt64Unchecked()));
+                            } else {
+                                record.setFloatValue((BigInteger) v.ToObject(BigInteger.class));
                             }
                         }
                     } else {
-                        record.setFloatValue(v.AsDoubleValue());
+                        if (v.AsNumber().CanFitInDouble()) {
+                            record.setFloatValue(v.AsDoubleValue());
+                        } else {
+                            record.setFloatValue((BigDecimal) v.ToObject(BigDecimal.class));
+                        }
                     }
                     hasValue = true;
                 }
@@ -149,13 +162,11 @@ public class SenMLCborPackSerDes {
                         } else if (value instanceof Long) {
                             cborRecord.Add(2, value.longValue());
                         } else if (value instanceof BigInteger) {
-                            // probably not supported, not tested
                             cborRecord.Add(2, value);
                         }
                         // unsigned integer
                         else if (value instanceof ULong) {
-                            // There is maybe a better way to do that.
-                            cborRecord.Add(2, EInteger.FromString(value.toString()));
+                            cborRecord.Add(2, NumberUtil.unsignedLongToEInteger(((ULong) value).longValue()));
                         }
                         // floating-point
                         else if (value instanceof Float) {
@@ -163,7 +174,6 @@ public class SenMLCborPackSerDes {
                         } else if (value instanceof Double) {
                             cborRecord.Add(2, value.doubleValue());
                         } else if (value instanceof BigDecimal) {
-                            // probably not supported, not tested
                             cborRecord.Add(2, value);
                         }
                         break;

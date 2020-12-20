@@ -15,6 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mResource;
@@ -23,7 +32,7 @@ import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
-import org.eclipse.leshan.integration.tests.IntegrationTestHelper;
+import org.eclipse.leshan.integration.tests.util.IntegrationTestHelper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,6 +62,7 @@ public class WriteOpaqueValueTest {
                                 { ContentFormat.OPAQUE }, //
                                 { ContentFormat.TEXT }, //
                                 { ContentFormat.TLV }, //
+                                { ContentFormat.CBOR }, //
                                 { ContentFormat.fromCode(ContentFormat.OLD_TLV_CODE) }, //
                                 { ContentFormat.JSON }, //
                                 { ContentFormat.fromCode(ContentFormat.OLD_JSON_CODE) }, //
