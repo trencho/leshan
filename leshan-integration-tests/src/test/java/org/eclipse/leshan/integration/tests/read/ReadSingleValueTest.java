@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.read;
 
-import static org.eclipse.leshan.core.ResponseCode.*;
-import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.*;
-import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -41,11 +33,11 @@ import java.util.Collection;
 
 import static org.eclipse.leshan.core.ResponseCode.BAD_REQUEST;
 import static org.eclipse.leshan.core.ResponseCode.CONTENT;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.INTEGER_RESOURCE_ID;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.MULTI_INSTANCE;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
-import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.INTEGER_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.MULTI_INSTANCE;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.TEST_OBJECT_ID;
+import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)

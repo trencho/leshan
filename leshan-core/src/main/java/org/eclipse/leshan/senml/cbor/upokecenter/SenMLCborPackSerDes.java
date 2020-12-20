@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.senml.cbor.upokecenter;
 
+import com.upokecenter.cbor.CBORNumber;
 import com.upokecenter.cbor.CBORObject;
 import com.upokecenter.cbor.CBORType;
-import com.upokecenter.numbers.EInteger;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Base64;
 import org.eclipse.leshan.core.util.datatype.NumberUtil;
@@ -33,9 +33,6 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
-import com.upokecenter.cbor.CBORNumber;
-import com.upokecenter.cbor.CBORObject;
-import com.upokecenter.cbor.CBORType;
 
 public class SenMLCborPackSerDes {
 
@@ -166,7 +163,7 @@ public class SenMLCborPackSerDes {
                         }
                         // unsigned integer
                         else if (value instanceof ULong) {
-                            cborRecord.Add(2, NumberUtil.unsignedLongToEInteger(((ULong) value).longValue()));
+                            cborRecord.Add(2, NumberUtil.unsignedLongToEInteger(value.longValue()));
                         }
                         // floating-point
                         else if (value instanceof Float) {

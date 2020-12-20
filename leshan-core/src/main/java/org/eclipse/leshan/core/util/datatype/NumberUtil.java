@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.util.datatype;
 
-import java.math.BigInteger;
-
 import com.upokecenter.numbers.EInteger;
+
+import java.math.BigInteger;
 
 public class NumberUtil {
 

@@ -23,10 +23,6 @@ import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.util.LinkedHashMap;
-
 /**
  * Helper for encoding/decoding SenML CBOR using <a href="https://github.com/peteroupc/CBOR-Java">"upokecenter"
  * CBOR-Java</a>

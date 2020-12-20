@@ -15,16 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.LIFETIME;
-import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.X509Certificate;
-
 import org.eclipse.californium.core.coap.CoAP.Type;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Token;
@@ -61,13 +51,13 @@ import java.security.PublicKey;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_ENDPOINT;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_PSK_ID;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.BAD_PSK_KEY;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_ENDPOINT;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_ID;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_KEY;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.LIFETIME;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.BAD_ENDPOINT;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.BAD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.BAD_PSK_KEY;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.GOOD_ENDPOINT;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.GOOD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.GOOD_PSK_KEY;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;

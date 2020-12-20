@@ -15,8 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.cbor;
 
-import java.util.Date;
-
+import com.upokecenter.cbor.CBORException;
+import com.upokecenter.cbor.CBORNumber;
+import com.upokecenter.cbor.CBORObject;
+import com.upokecenter.cbor.CBORType;
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -31,10 +33,7 @@ import org.eclipse.leshan.core.util.datatype.ULong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.upokecenter.cbor.CBORException;
-import com.upokecenter.cbor.CBORNumber;
-import com.upokecenter.cbor.CBORObject;
-import com.upokecenter.cbor.CBORType;
+import java.util.Date;
 
 public class LwM2mNodeCborDecoder implements NodeDecoder {
     private static final Logger LOG = LoggerFactory.getLogger(LwM2mNodeCborDecoder.class);

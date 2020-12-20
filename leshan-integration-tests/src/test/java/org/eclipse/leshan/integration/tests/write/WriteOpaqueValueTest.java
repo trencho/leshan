@@ -15,15 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
-import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.*;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mResource;
@@ -43,8 +34,8 @@ import org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 import java.util.Collection;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.OPAQUE_RESOURCE_ID;
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.TEST_OBJECT_ID;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.OPAQUE_RESOURCE_ID;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.TEST_OBJECT_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;

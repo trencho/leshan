@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.*;
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.*;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.client.resource.SimpleInstanceEnabler;
@@ -48,8 +40,8 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_ID;
-import static org.eclipse.leshan.integration.tests.SecureIntegrationTestHelper.GOOD_PSK_KEY;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.GOOD_PSK_ID;
+import static org.eclipse.leshan.integration.tests.util.SecureIntegrationTestHelper.GOOD_PSK_KEY;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;

@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.util;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-
-import java.util.List;
-
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -52,6 +47,11 @@ import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteAttributesResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
+
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
 
 public class TestObjectsInitializer extends ObjectsInitializer {
 

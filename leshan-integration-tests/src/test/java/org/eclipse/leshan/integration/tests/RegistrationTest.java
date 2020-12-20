@@ -17,20 +17,6 @@
 
 package org.eclipse.leshan.integration.tests;
 
-import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.LIFETIME;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.eclipse.californium.core.coap.CoAP.Code;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -62,7 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.eclipse.leshan.integration.tests.IntegrationTestHelper.LIFETIME;
+import static org.eclipse.leshan.integration.tests.util.IntegrationTestHelper.LIFETIME;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;

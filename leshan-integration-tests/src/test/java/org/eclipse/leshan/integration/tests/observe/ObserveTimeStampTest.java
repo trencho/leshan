@@ -15,18 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.observe;
 
-import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.*;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.StaticModel;
@@ -55,7 +43,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static org.eclipse.leshan.integration.tests.TestUtil.assertContentFormat;
+import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
