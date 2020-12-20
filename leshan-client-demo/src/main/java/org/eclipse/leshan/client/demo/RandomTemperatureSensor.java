@@ -31,13 +31,14 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     private static final int RESET_MIN_MAX_MEASURED_VALUES = 5605;
     private static final List<Integer> supportedResources = Arrays.asList(SENSOR_VALUE, UNITS, MAX_MEASURED_VALUE,
             MIN_MEASURED_VALUE, RESET_MIN_MAX_MEASURED_VALUES);
+    private final ScheduledExecutorService scheduler;
     private final Random rng = new Random();
     private double currentTemp = 20d;
     private double minMeasuredValue = currentTemp;
     private double maxMeasuredValue = currentTemp;
 
     public RandomTemperatureSensor() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
+        this.scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Temperature Sensor"));
         scheduler.scheduleAtFixedRate(new Runnable() {
 
             @Override
@@ -51,27 +52,29 @@ public class RandomTemperatureSensor extends BaseInstanceEnabler implements Dest
     public synchronized ReadResponse read(ServerIdentity identity, int resourceId) {
         LOG.info("Read on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
         switch (resourceId) {
-        case MIN_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
-        case MAX_MEASURED_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
-        case SENSOR_VALUE:
-            return ReadResponse.success(resourceId, getTwoDigitValue(currentTemp));
-        case UNITS:
-            return ReadResponse.success(resourceId, UNIT_CELSIUS);
-        default:
-            return super.read(identity, resourceId);
+            case MIN_MEASURED_VALUE:
+                return ReadResponse.success(resourceId, getTwoDigitValue(minMeasuredValue));
+            case MAX_MEASURED_VALUE:
+                return ReadResponse.success(resourceId, getTwoDigitValue(maxMeasuredValue));
+            case SENSOR_VALUE:
+                return ReadResponse.success(resourceId, getTwoDigitValue(currentTemp));
+            case UNITS:
+                return ReadResponse.success(resourceId, UNIT_CELSIUS);
+            default:
+                return super.read(identity, resourceId);
         }
     }
 
     @Override
     public synchronized ExecuteResponse execute(ServerIdentity identity, int resourceId, String params) {
         LOG.info("Execute on Temperature resource /{}/{}/{}", getModel().id, getId(), resourceId);
-        if (resourceId == RESET_MIN_MAX_MEASURED_VALUES) {
-            resetMinMaxMeasuredValues();
-            return ExecuteResponse.success();
+        switch (resourceId) {
+            case RESET_MIN_MAX_MEASURED_VALUES:
+                resetMinMaxMeasuredValues();
+                return ExecuteResponse.success();
+            default:
+                return super.execute(identity, resourceId, params);
         }
-        return super.execute(identity, resourceId, params);
     }
 
     private double getTwoDigitValue(double value) {
