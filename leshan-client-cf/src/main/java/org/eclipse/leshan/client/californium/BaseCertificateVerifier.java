@@ -15,6 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
+import java.net.InetSocketAddress;
+import java.security.cert.CertPath;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import javax.security.auth.x500.X500Principal;
+
 import org.eclipse.californium.scandium.dtls.AlertMessage;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertDescription;
 import org.eclipse.californium.scandium.dtls.AlertMessage.AlertLevel;
@@ -53,7 +63,7 @@ public abstract class BaseCertificateVerifier implements NewAdvancedCertificateV
 
     @Override
     public List<X500Principal> getAcceptedIssuers() {
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
