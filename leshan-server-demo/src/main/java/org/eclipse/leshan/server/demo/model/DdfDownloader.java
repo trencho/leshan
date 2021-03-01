@@ -15,6 +15,24 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo.model;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.io.IOUtils;
 import org.eclipse.leshan.core.model.DDFFileParser;
 import org.eclipse.leshan.core.model.InvalidDDFFileException;
@@ -54,9 +72,22 @@ public class DdfDownloader {
         }
     }
 
+    private static class DdfRef {
+        public Integer objectId;
+        public String url;
+
+        public DdfRef(Integer objectId, String url) {
+            this.objectId = objectId;
+            this.url = url;
+        }
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(DdfDownloader.class);
 
     public static final String DOWNLOAD_FOLDER_PATH = "ddffiles";
+    public static final String CORE_DOWNLOAD_FOLDER_PATH = "core";
+    public static final List<Integer> CORE_IDS = Arrays.asList(0, 1, 2, 3, 4, 5, 6, 7, 21);
+    public static final String DEMO_DOWNLOAD_FOLDER_PATH = "demo";
     private static final String LWM2M_REGISTRY_FOLDER_URL = "https://raw.githubusercontent.com/OpenMobileAlliance/lwm2m-registry/prod/";
     private static final String LWM2M_REGISTRY_FILENAME = "DDF.xml";
 
@@ -79,7 +110,7 @@ public class DdfDownloader {
 
         LOG.info("Processing LWM2M registry at {} ...", registryUrl);
 
-        List<String> ddfUrls = new ArrayList<>();
+        List<DdfRef> ddfUrls = new ArrayList<>();
         try {
             DocumentBuilder builder = factory.newDocumentBuilder();
             Document document;
@@ -92,8 +123,15 @@ public class DdfDownloader {
             for (int i = 0; i < items.getLength(); i++) {
                 Node item = items.item(i);
                 Node id = ((Element) item).getElementsByTagName("ObjectID").item(0);
+                Integer objectId;
                 if (id == null) {
                     LOG.warn("Item without ObjectID : {}" + item.getTextContent());
+                    continue;
+                }
+                try {
+                    objectId = Integer.parseInt(id.getTextContent());
+                } catch (NumberFormatException e) {
+                    LOG.warn("Item with Invalid ObjectID : {}" + item.getTextContent());
                     continue;
                 }
 
@@ -109,28 +147,44 @@ public class DdfDownloader {
                     continue;
                 }
 
-                ddfUrls.add(registryFolderUrl + ddf.getTextContent());
+                ddfUrls.add(new DdfRef(objectId, registryFolderUrl + ddf.getTextContent()));
             }
         } catch (SAXException | ParserConfigurationException e) {
             throw new IOException(e);
         }
 
         LOG.info("Downloading DDF files in [{}] folder ...", downloadFolderPath);
+        if (!Files.isDirectory(Paths.get(downloadFolderPath))) {
+            String absoluteDownloadPath = Paths.get(downloadFolderPath).normalize().toAbsolutePath().toString();
+            LOG.warn("Files will be downloaded in [{}] but this is not exist or is not a directory : \n=>  {}",
+                    downloadFolderPath, absoluteDownloadPath);
+            System.exit(-1);
+        }
+        Path coreOutPath = Paths.get(downloadFolderPath, CORE_DOWNLOAD_FOLDER_PATH);
+        Files.createDirectories(coreOutPath);
+        Path demoOutPath = Paths.get(downloadFolderPath, DEMO_DOWNLOAD_FOLDER_PATH);
+        Files.createDirectories(demoOutPath);
+
         DDFFileParser ddfFileParser = new DDFFileParser();
         int nbDownloaded = 0;
-        for (String ddfUrl : ddfUrls) {
+        for (DdfRef ddfRef : ddfUrls) {
 
             URL parsedUrl;
             try {
-                parsedUrl = new URL(ddfUrl);
+                parsedUrl = new URL(ddfRef.url);
             } catch (MalformedURLException e) {
-                LOG.error("Skipping malformed URL {}", ddfUrl);
+                LOG.error("Skipping malformed URL {}", ddfRef.url);
                 continue;
             }
 
             String filename = parsedUrl.getPath();
             filename = filename.substring(filename.lastIndexOf("/"));
-            Path outPath = Paths.get(downloadFolderPath, filename);
+            Path outPath;
+            if (CORE_IDS.contains(ddfRef.objectId)) {
+                outPath = Paths.get(downloadFolderPath, CORE_DOWNLOAD_FOLDER_PATH, filename);
+            } else {
+                outPath = Paths.get(downloadFolderPath, DEMO_DOWNLOAD_FOLDER_PATH, filename);
+            }
 
             LOG.debug("Downloading DDF file {} to {} (from {})", filename, outPath, parsedUrl);
             // store in memory
@@ -140,12 +194,13 @@ public class DdfDownloader {
             }
             // parse to skip not lwm2m 1.1 or 1.0 models
             boolean skip = false;
+            String version = "";
             try (InputStream in = new ByteArrayInputStream(ddfBytes)) {
                 List<ObjectModel> models = ddfFileParser.parse(in, filename);
                 for (ObjectModel model : models) {
                     if (!model.lwm2mVersion.equals("1.0") && !model.lwm2mVersion.equals("1.1")) {
-                        System.out.println(model.lwm2mVersion);
                         skip = true;
+                        version = model.lwm2mVersion;
                         break;
                     }
                 }
@@ -157,7 +212,7 @@ public class DdfDownloader {
                     nbDownloaded++;
                 }
             } else {
-                LOG.info("Skip models with version > 1.1 : {}", ddfUrl);
+                LOG.info("Skip models with version {} > 1.1 : {}", version, ddfRef.url);
             }
         }
         LOG.info("Downloaded {} models in {}", nbDownloaded, downloadFolderPath);

@@ -15,6 +15,19 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.model;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -155,7 +168,7 @@ public class DDFFileParser {
         String version = ObjectModel.DEFAULT_VERSION;
         Boolean multiple = null;
         Boolean mandatory = null;
-        List<ResourceModel> resources = new ArrayList<>();
+        Map<Integer, ResourceModel> resources = new HashMap<>();
         String urn = null;
         String description2 = null;
         String lwm2mVersion = ObjectModel.DEFAULT_VERSION;
@@ -201,7 +214,14 @@ public class DDFFileParser {
                         continue;
 
                     if (item.getNodeName().equals("Item")) {
-                        resources.add(this.parseResource(item, streamName));
+                        ResourceModel resource = this.parseResource(item, streamName);
+                        if (validate && resources.containsKey(resource.id)) {
+                            throw new InvalidDDFFileException(
+                                    "Object %s in %s contains at least 2 resources with same id %s.",
+                                    id != null ? id : "", streamName, resource.id);
+                        } else {
+                            resources.put(resource.id, resource);
+                        }
                     }
                 }
                 break;
@@ -226,8 +246,8 @@ public class DDFFileParser {
             }
         }
 
-        return new ObjectModel(id, name, description, version, multiple, mandatory, resources, urn, lwm2mVersion,
-                description2);
+        return new ObjectModel(id, name, description, version, multiple, mandatory, resources.values(), urn,
+                lwm2mVersion, description2);
 
     }
 
