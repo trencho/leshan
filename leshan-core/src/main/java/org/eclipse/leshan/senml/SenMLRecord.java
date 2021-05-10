@@ -14,11 +14,11 @@
 
 package org.eclipse.leshan.senml;
 
-import java.util.Arrays;
-
 import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.util.Hex;
+
+import java.util.Arrays;
 
 /**
  * The class representing the SenML Record.

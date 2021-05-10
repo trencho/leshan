@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.send;
 
-import java.util.Map;
-
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.request.SendRequest;
 import org.eclipse.leshan.server.registration.Registration;
+
+import java.util.Map;
 
 /**
  * Listener used to be aware of new data sent by LWM2M client with "Send" Request.

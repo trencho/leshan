@@ -16,12 +16,10 @@
 package org.eclipse.leshan.core.node;
 
 import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
 
 import java.util.Arrays;
 import java.util.Date;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
-import org.eclipse.leshan.core.util.datatype.ULong;
 
 /**
  * An instance of {@link LwM2mMultipleResource}.

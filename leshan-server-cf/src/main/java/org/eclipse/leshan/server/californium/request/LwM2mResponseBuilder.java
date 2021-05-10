@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.request;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
-
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -70,6 +65,9 @@ import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.californium.observation.ObserveUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.Map;
 
 import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
 

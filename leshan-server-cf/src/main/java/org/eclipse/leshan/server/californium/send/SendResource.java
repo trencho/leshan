@@ -15,11 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.send;
 
-import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
-
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.server.resources.CoapExchange;
@@ -37,6 +32,11 @@ import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationStore;
 import org.eclipse.leshan.server.send.SendHandler;
+
+import java.util.List;
+import java.util.Map;
+
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapResponseCode;
 
 /**
  * A CoAP Resource used to handle "Send" request sent by LWM2M devices.

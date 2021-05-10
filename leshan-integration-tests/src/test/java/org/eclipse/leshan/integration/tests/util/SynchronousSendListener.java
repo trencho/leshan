@@ -15,15 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.util;
 
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.request.SendRequest;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.send.SendListener;
+
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class SynchronousSendListener implements SendListener {
     private CountDownLatch dataLatch = new CountDownLatch(1);

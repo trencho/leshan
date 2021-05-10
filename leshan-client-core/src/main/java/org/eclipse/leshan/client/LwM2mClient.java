@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client;
 
-import java.util.List;
-
 import org.eclipse.leshan.client.resource.LwM2mObjectTree;
 import org.eclipse.leshan.client.send.NoDataException;
 import org.eclipse.leshan.client.servers.ServerIdentity;
@@ -32,6 +30,8 @@ import org.eclipse.leshan.core.request.exception.UnconnectedPeerException;
 import org.eclipse.leshan.core.response.ErrorCallback;
 import org.eclipse.leshan.core.response.ResponseCallback;
 import org.eclipse.leshan.core.response.SendResponse;
+
+import java.util.List;
 
 /**
  * A Lightweight M2M client.

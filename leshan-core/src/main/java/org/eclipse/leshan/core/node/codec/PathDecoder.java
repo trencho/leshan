@@ -15,9 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.node.LwM2mPath;
+
+import java.util.List;
 
 /**
  * a {@link LwM2mPath} decoder.

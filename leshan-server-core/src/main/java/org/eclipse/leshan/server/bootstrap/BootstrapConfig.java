@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
+import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.SecurityMode;
 import org.eclipse.leshan.core.request.BindingMode;
 
@@ -25,10 +26,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.leshan.core.CertificateUsage;
-import org.eclipse.leshan.core.SecurityMode;
-import org.eclipse.leshan.core.request.BindingMode;
 
 /**
  * A client configuration to apply to a device during a bootstrap session.

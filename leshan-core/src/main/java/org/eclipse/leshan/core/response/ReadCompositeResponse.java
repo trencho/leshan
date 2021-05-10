@@ -15,11 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.response;
 
-import java.util.Map;
-
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
+
+import java.util.Map;
 
 public class ReadCompositeResponse extends AbstractLwM2mResponse {
 

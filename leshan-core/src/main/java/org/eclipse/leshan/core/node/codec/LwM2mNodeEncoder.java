@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -25,6 +22,7 @@ import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ContentFormat;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * A LWM2M Encoder which supports several {@link ContentFormat} and is able to encode :

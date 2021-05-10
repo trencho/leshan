@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec.senml;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.codec.CodecException;
 import org.eclipse.leshan.core.node.codec.PathEncoder;
@@ -24,6 +22,8 @@ import org.eclipse.leshan.senml.SenMLEncoder;
 import org.eclipse.leshan.senml.SenMLException;
 import org.eclipse.leshan.senml.SenMLPack;
 import org.eclipse.leshan.senml.SenMLRecord;
+
+import java.util.List;
 
 /**
  * A {@link PathEncoder} for SenML format

@@ -14,11 +14,6 @@
 
 package org.eclipse.leshan.core.senml.cbor;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.Arrays;
-import java.util.Collection;
-
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.senml.SenMLDecoder;
 import org.eclipse.leshan.senml.SenMLEncoder;

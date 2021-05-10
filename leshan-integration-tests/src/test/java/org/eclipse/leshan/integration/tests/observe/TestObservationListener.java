@@ -1,10 +1,5 @@
 package org.eclipse.leshan.integration.tests.observe;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.response.ObserveResponse;
 import org.eclipse.leshan.server.observation.ObservationListener;
@@ -13,6 +8,7 @@ import org.eclipse.leshan.server.registration.Registration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TestObservationListener implements ObservationListener {
 

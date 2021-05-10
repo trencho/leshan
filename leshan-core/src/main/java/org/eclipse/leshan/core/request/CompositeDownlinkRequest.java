@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Collection;
-
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.response.LwM2mResponse;
+
+import java.util.Collection;
 
 /**
  * A Composite {@link DownlinkRequest} which targets several nodes.

@@ -15,9 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import java.util.Map;
-import java.util.Map.Entry;
-
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
@@ -27,6 +24,9 @@ import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.request.exception.InvalidRequestException;
 import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.core.util.Validate;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * The "Send" operation is used by the LwM2M Client to send data to the LwM2M Server without explicit request by that

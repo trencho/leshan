@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.lockstep;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Random;
-
 import org.eclipse.californium.core.coap.Message;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Token;
@@ -37,6 +33,7 @@ import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Random;
 
 public class LockStepLwM2mClient extends LockstepEndpoint {

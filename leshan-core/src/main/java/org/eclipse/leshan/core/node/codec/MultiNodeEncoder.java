@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.Map;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.ContentFormat;
+
+import java.util.Map;
 
 /**
  * An encoder for a list of {@link LwM2mNode} which support only one {@link ContentFormat}.
