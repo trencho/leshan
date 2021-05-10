@@ -17,6 +17,28 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.demo;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.BindException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.URI;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+
+import javax.jmdns.JmDNS;
+import javax.jmdns.ServiceInfo;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -26,9 +48,11 @@ import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.network.config.NetworkConfig.Keys;
 import org.eclipse.californium.elements.util.SslContextUtil;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig;
+import org.eclipse.californium.scandium.dtls.SingleNodeConnectionIdGenerator;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.servlet.DefaultServlet;
+import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.webapp.WebAppContext;
 import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
@@ -149,6 +173,12 @@ public class LeshanServerDemo {
         options.addOption("wp", "webport", true, "Set the HTTP port for web server.\nDefault: 8080.");
         options.addOption("m", "modelsfolder", true, "A folder which contains object models in OMA DDF(.xml) format.");
         options.addOption("oc", "activate support of old/deprecated cipher suites.");
+        options.addOption("cid", true, "Control usage of DTLS connection ID." //
+                + "\n - 'on' to activate Connection ID support (same as -cid 6)" //
+                + "\n - 'off' to deactivate it" //
+                + "\n - Positive value define the size in byte of CID generated."
+                + "\n - 0 value means we accept to use CID but will not generated one for foreign peer."
+                + "\n (Default: on)");
         options.addOption("r", "redis", true,
                 "Use redis to store registration and securityInfo. \nThe URL of the redis server should be given using this format : 'redis://:password@hostname:port/db_number'\nExample without DB and password: 'redis://localhost:6379'\nDefault: redis is not used.");
         options.addOption("mdns", "publishDNSSdServices", false,
@@ -159,25 +189,27 @@ public class LeshanServerDemo {
                 "The path to your server private key file.\nThe private key should be in PKCS#8 format (DER encoding)."
                         + X509Chapter);
         options.addOption("cert", true,
-                "The path to your server certificate file.\n"
+                "The path to your server certificate or certificate chain file.\n"
                         + "The certificate Common Name (CN) should generally be equal to the server hostname.\n"
-                        + "The certificate should be in X509v3 format (DER encoding).");
+                        + "The certificate should be in X509v3 format (DER or PEM encoding).\n"
+                        + "The certificate chain should be in X509v3 format (PEM encoding).");
 
         final StringBuilder trustStoreChapter = new StringBuilder();
         trustStoreChapter.append("\n .");
-        trustStoreChapter.append("\n URI format: file://<path-to-trust-store-file>#<hex-strore-password>#<alias-pattern>");
+        trustStoreChapter
+                .append("\n URI format: file://<path-to-trust-store-file>#<hex-strore-password>#<alias-pattern>");
         trustStoreChapter.append("\n .");
         trustStoreChapter.append("\n Where:");
         trustStoreChapter.append("\n - path-to-trust-store-file is path to pkcs12 trust store file");
         trustStoreChapter.append("\n - hex-store-password is HEX formatted password for store");
-        trustStoreChapter.append("\n - alias-pattern can be used to filter trusted certificates and can also be empty to get all");
+        trustStoreChapter.append(
+                "\n - alias-pattern can be used to filter trusted certificates and can also be empty to get all");
         trustStoreChapter.append("\n .");
         trustStoreChapter.append("\n Default: All certificates are trusted which is only OK for a demo.");
 
         options.addOption("truststore", true,
                 "The path to a root certificate file to trust or a folder containing all the trusted certificates in X509v3 format (DER encoding) or trust store URI."
-                        + trustStoreChapter
-                        + X509ChapterDeprecated);
+                        + trustStoreChapter + X509ChapterDeprecated);
         options.addOption("ks", "keystore", true,
                 "Set the key store file.\nIf set, X.509 mode is enabled, otherwise built-in RPK credentials are used.");
         options.addOption("ksp", "storepass", true, "Set the key store password.");
@@ -275,6 +307,20 @@ public class LeshanServerDemo {
         // Get models folder
         String modelsFolderPath = cl.getOptionValue("m");
 
+        // Get CID config
+        String cidOption = cl.getOptionValue("cid");
+        Integer cid = 6;
+        if (cidOption != null) {
+            if ("off".equals(cidOption)) {
+                cid = null;
+            } else if ("on".equals(cidOption)) {
+                // we keep default value
+            } else {
+                cid = Integer.parseInt(cidOption);
+                cid = cid < 0 ? null : cid;
+            }
+        }
+
         // get the Redis hostname:port
         String redisUrl = cl.getOptionValue("r");
 
@@ -294,11 +340,11 @@ public class LeshanServerDemo {
         }
 
         // get X509 info
-        X509Certificate certificate = null;
+        X509Certificate[] certificate = null;
         if (cl.hasOption("cert")) {
             try {
                 privateKey = SecurityUtil.privateKey.readFromFile(cl.getOptionValue("prik"));
-                certificate = SecurityUtil.certificate.readFromFile(cl.getOptionValue("cert"));
+                certificate = SecurityUtil.certificateChain.readFromFile(cl.getOptionValue("cert"));
             } catch (Exception e) {
                 System.err.println("Unable to load X509 files : " + e.getMessage());
                 e.printStackTrace();
@@ -331,7 +377,8 @@ public class LeshanServerDemo {
 
                 // check input exists
                 if (!input.exists()) {
-                    System.err.println("Failed to load trust store - file or directory does not exist : " + input.toString());
+                    System.err.println(
+                            "Failed to load trust store - file or directory does not exist : " + input.toString());
                     formatter.printHelp(USAGE, options);
                     return;
                 }
@@ -357,7 +404,7 @@ public class LeshanServerDemo {
         String keyStorePath = cl.getOptionValue("ks");
         String keyStoreType = cl.getOptionValue("kst", KeyStore.getDefaultType());
         String keyStorePass = cl.getOptionValue("ksp");
-        String keyStoreAlias = cl.getOptionValue("ksa");
+        String keyStoreAlias = cl.getOptionValue("ksa", "leshan");
         String keyStoreAliasPass = cl.getOptionValue("ksap");
 
         // Get mDNS publish switch
@@ -367,7 +414,7 @@ public class LeshanServerDemo {
             createAndStartServer(webAddress, webPort, localAddress, localPort, secureLocalAddress, secureLocalPort,
                     modelsFolderPath, redisUrl, publicKey, privateKey, certificate, trustStore, keyStorePath,
                     keyStoreType, keyStorePass, keyStoreAlias, keyStoreAliasPass, publishDNSSdServices,
-                    cl.hasOption("oc"));
+                    cl.hasOption("oc"), cid);
         } catch (BindException e) {
             System.err.println(
                     String.format("Web port %s is already used, you could change it using 'webport' option.", webPort));
@@ -379,9 +426,10 @@ public class LeshanServerDemo {
 
     public static void createAndStartServer(String webAddress, int webPort, String localAddress, Integer localPort,
             String secureLocalAddress, Integer secureLocalPort, String modelsFolderPath, String redisUrl,
-            PublicKey publicKey, PrivateKey privateKey, X509Certificate certificate, List<Certificate> trustStore,
+            PublicKey publicKey, PrivateKey privateKey, X509Certificate[] certificate, List<Certificate> trustStore,
             String keyStorePath, String keyStoreType, String keyStorePass, String keyStoreAlias,
-            String keyStoreAliasPass, Boolean publishDNSSdServices, boolean supportDeprecatedCiphers) throws Exception {
+            String keyStoreAliasPass, Boolean publishDNSSdServices, boolean supportDeprecatedCiphers, Integer cid)
+            throws Exception {
         // Prepare LWM2M server
         LeshanServerBuilder builder = new LeshanServerBuilder();
         builder.setEncoder(new DefaultLwM2mNodeEncoder());
@@ -417,13 +465,16 @@ public class LeshanServerDemo {
         // Create DTLS Config
         DtlsConnectorConfig.Builder dtlsConfig = new DtlsConnectorConfig.Builder();
         dtlsConfig.setRecommendedCipherSuitesOnly(!supportDeprecatedCiphers);
+        if (cid != null) {
+            dtlsConfig.setConnectionIdGenerator(new SingleNodeConnectionIdGenerator(cid));
+        }
 
-        X509Certificate serverCertificate = null;
+        X509Certificate[] serverCertificateChain = null;
         if (certificate != null) {
             // use X.509 mode (+ RPK)
-            serverCertificate = certificate;
+            serverCertificateChain = certificate;
             builder.setPrivateKey(privateKey);
-            builder.setCertificateChain(new X509Certificate[] { serverCertificate });
+            builder.setCertificateChain(serverCertificateChain);
         } else if (publicKey != null) {
             // use RPK only
             builder.setPublicKey(publicKey);
@@ -466,9 +517,9 @@ public class LeshanServerDemo {
                                 System.exit(-1);
                             }
                             builder.setPrivateKey((PrivateKey) key);
-                            serverCertificate = (X509Certificate) keyStore.getCertificate(alias);
-                            builder.setCertificateChain(
-                                    x509CertificateChain.toArray(new X509Certificate[x509CertificateChain.size()]));
+                            serverCertificateChain = x509CertificateChain
+                                    .toArray(new X509Certificate[x509CertificateChain.size()]);
+                            builder.setCertificateChain(serverCertificateChain);
                         }
                     }
                     builder.setTrustedCertificates(
@@ -480,15 +531,15 @@ public class LeshanServerDemo {
             }
         }
 
-        if (publicKey == null && serverCertificate == null) {
+        if (publicKey == null && serverCertificateChain == null) {
             // public key or server certificated is not defined
             // use default embedded credentials (X.509 + RPK mode)
             try {
                 PrivateKey embeddedPrivateKey = SecurityUtil.privateKey
                         .readFromResource("credentials/server_privkey.der");
-                serverCertificate = SecurityUtil.certificate.readFromResource("credentials/server_cert.der");
+                serverCertificateChain = SecurityUtil.certificateChain.readFromResource("credentials/server_cert.der");
                 builder.setPrivateKey(embeddedPrivateKey);
-                builder.setCertificateChain(new X509Certificate[] { serverCertificate });
+                builder.setCertificateChain(serverCertificateChain);
             } catch (Exception e) {
                 LOG.error("Unable to load embedded X.509 certificate.", e);
                 System.exit(-1);
@@ -496,7 +547,7 @@ public class LeshanServerDemo {
         }
 
         // Define trust store
-        if (serverCertificate != null && keyStorePath == null) {
+        if (serverCertificateChain != null && keyStorePath == null) {
             if (trustStore != null && !trustStore.isEmpty()) {
                 builder.setTrustedCertificates(trustStore.toArray(new Certificate[trustStore.size()]));
             } else {
@@ -543,31 +594,59 @@ public class LeshanServerDemo {
             jettyAddr = new InetSocketAddress(webAddress, webPort);
         }
         Server server = new Server(jettyAddr);
-        WebAppContext root = new WebAppContext();
-        root.setContextPath("/");
-        root.setResourceBase(LeshanServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
-        root.setParentLoaderPriority(true);
+        /*
+         * TODO this should be added again when old demo will be removed.
+         *
+         * WebAppContext root = new WebAppContext(); root.setContextPath("/");
+         * root.setResourceBase(LeshanServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
+         * root.setParentLoaderPriority(true); server.setHandler(root);
+         */
+
+        /* ******** Temporary code to be able to serve both UI ********** */
+        ServletContextHandler root = new ServletContextHandler(null, "/", true, false);
+        // Configuration for new demo
+        DefaultServlet aServlet = new DefaultServlet();
+        ServletHolder aHolder = new ServletHolder(aServlet);
+        aHolder.setInitParameter("resourceBase",
+                LeshanServerDemo.class.getClassLoader().getResource("webapp2").toExternalForm());
+        aHolder.setInitParameter("pathInfoOnly", "true");
+        root.addServlet(aHolder, "/v2/*");
+
+        // Configuration for old demo
+        DefaultServlet bServlet = new DefaultServlet();
+        ServletHolder bHolder = new ServletHolder(bServlet);
+        bHolder.setInitParameter("resourceBase",
+                LeshanServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
+        bHolder.setInitParameter("pathInfoOnly", "true");
+        root.addServlet(bHolder, "/*");
+
         server.setHandler(root);
+        /* **************************************************************** */
 
         // Create Servlet
         EventServlet eventServlet = new EventServlet(lwServer, lwServer.getSecuredAddress().getPort());
         ServletHolder eventServletHolder = new ServletHolder(eventServlet);
-        root.addServlet(eventServletHolder, "/event/*");
+        root.addServlet(eventServletHolder, "/event/*"); // Temporary code to be able to serve both UI
+        root.addServlet(eventServletHolder, "/api/event/*");
+        root.addServlet(eventServletHolder, "/v2/api/event/*"); // Temporary code to be able to serve both UI
 
         ServletHolder clientServletHolder = new ServletHolder(new ClientServlet(lwServer));
         root.addServlet(clientServletHolder, "/api/clients/*");
+        root.addServlet(clientServletHolder, "/v2/api/clients/*");// Temporary code to be able to serve both UI
 
         ServletHolder securityServletHolder;
         if (publicKey != null) {
             securityServletHolder = new ServletHolder(new SecurityServlet(securityStore, publicKey));
         } else {
-            securityServletHolder = new ServletHolder(new SecurityServlet(securityStore, serverCertificate));
+            securityServletHolder = new ServletHolder(new SecurityServlet(securityStore, serverCertificateChain[0]));
         }
         root.addServlet(securityServletHolder, "/api/security/*");
+        root.addServlet(securityServletHolder, "/v2/api/security/*");// Temporary code to be able to serve both UI
 
         ServletHolder objectSpecServletHolder = new ServletHolder(
                 new ObjectSpecServlet(lwServer.getModelProvider(), lwServer.getRegistrationService()));
         root.addServlet(objectSpecServletHolder, "/api/objectspecs/*");
+        root.addServlet(objectSpecServletHolder, "/v2/api/objectspecs/*");// Temporary code to be able to serve both UI
 
         // Register a service to DNS-SD
         if (publishDNSSdServices) {

@@ -20,6 +20,9 @@ import org.eclipse.leshan.core.model.ResourceModel.Type;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+import org.eclipse.leshan.core.util.datatype.ULong;
+
 /**
  * An instance of {@link LwM2mMultipleResource}.
  */
@@ -36,6 +39,37 @@ public class LwM2mResourceInstance implements LwM2mNode {
         this.id = id;
         this.value = value;
         this.type = type;
+    }
+
+    public static LwM2mResourceInstance newInstance(int id, Object value) {
+        LwM2mNodeUtil.validateNotNull(value, "value MUST NOT be null");
+
+        if (value instanceof Byte || value instanceof Short || value instanceof Integer || value instanceof Long) {
+            return new LwM2mResourceInstance(id, ((Number) value).longValue(), Type.INTEGER);
+        }
+        if (value instanceof Float || value instanceof Double) {
+            return new LwM2mResourceInstance(id, ((Number) value).doubleValue(), Type.FLOAT);
+        }
+        if (value instanceof Boolean) {
+            return new LwM2mResourceInstance(id, value, Type.BOOLEAN);
+        }
+        if (value instanceof byte[]) {
+            return new LwM2mResourceInstance(id, value, Type.OPAQUE);
+        }
+        if (value instanceof String) {
+            return new LwM2mResourceInstance(id, value, Type.STRING);
+        }
+        if (value instanceof Date) {
+            return new LwM2mResourceInstance(id, value, Type.TIME);
+        }
+        if (value instanceof ObjectLink) {
+            return new LwM2mResourceInstance(id, value, Type.OBJLNK);
+        }
+        if (value instanceof ULong) {
+            return new LwM2mResourceInstance(id, value, Type.UNSIGNED_INTEGER);
+        }
+        throw new LwM2mNodeException(
+                String.format("Unsupported type %s for resource", value.getClass().getCanonicalName()));
     }
 
     public static LwM2mResourceInstance newInstance(int id, Object value, Type type) {
@@ -101,6 +135,17 @@ public class LwM2mResourceInstance implements LwM2mNode {
 
     public static LwM2mResourceInstance newBinaryInstance(int id, byte[] value) {
         return new LwM2mResourceInstance(id, value, Type.OPAQUE);
+    }
+
+    public static LwM2mResourceInstance newUnsignedIntegerInstance(int id, ULong value) {
+        return new LwM2mResourceInstance(id, value, Type.UNSIGNED_INTEGER);
+    }
+
+    public static LwM2mResourceInstance newUnsignedIntegerInstance(int id, Long value) {
+        if (value >= 0)
+            return new LwM2mResourceInstance(id, ULong.valueOf(value), Type.UNSIGNED_INTEGER);
+        else
+            throw new LwM2mNodeException("Invalid value : positive value expected for UNSIGNED_INTEGER");
     }
 
     @Override

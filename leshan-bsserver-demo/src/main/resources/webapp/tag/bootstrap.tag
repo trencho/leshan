@@ -1,4 +1,11 @@
 <bootstrap>
+    <span >
+        <div class="alert alert-info alert-dismissible"> 
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <p>A new version of <strong>Leshan Bootstrap Server Demo</strong> based on <a href="https://vuejs.org/">Vue.js</a> is in development.
+          <br/>This new version is missing a lot of features but is already <strong>testable <a href="./v2">here</a></strong>.</p>
+        <p> (If you want to contribute to it or understand this move : see <a href="https://github.com/eclipse/leshan/issues/906">#906</a>)</p></div>
+    </span>
    <div class="well well-sm col-md-12"  if={certificate}>
         <h4>The Leshan Bootstrap Certificate  <small>(x509v3 der encoded)</small>
         <button type="button" title ="Download bootstrap server certificate(.der)" class="btn btn-default btn-xs" onclick={()=>saveFile('bsServerCertificate.der',certificate.bytesDer)}>
@@ -58,6 +65,9 @@
                         <p>
                             <strong>{ security.uri }</strong><br/>
                             security mode : {security.securityMode}<br/>
+                            <span if={security.certificateUsage}>
+                            certificate usage : {security.certificateUsage}<br/>
+                            </span>
                             <span if={security.securityMode === 'PSK'}>
                                 Identity : <code code style=display:block;white-space:pre-wrap>{wrap(toAscii(security.publicKeyOrId))}</code>
                                 Key : <code code style=display:block;white-space:pre-wrap>{wrap(toHex(security.secretKey))}</code>
@@ -70,6 +80,9 @@
                         <p>
                             <strong>{security.uri}</strong><br/>
                             security mode : {security.securityMode}<br/>
+                            <span if={security.certificateUsage}>
+                            certificate usage : {security.certificateUsage}<br/>
+                            </span>
                             <span if={security.securityMode === 'PSK'}>
                                 Identity : <code code style=display:block;white-space:pre-wrap>{wrap(toAscii(security.publicKeyOrId))}</code>
                                 key : <code code style=display:block;white-space:pre-wrap>{wrap(toHex(security.secretKey))}</code>

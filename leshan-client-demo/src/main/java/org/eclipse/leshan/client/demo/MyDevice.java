@@ -114,22 +114,22 @@ public class MyDevice extends BaseInstanceEnabler implements Destroyable {
     }
 
     @Override
-    public WriteResponse write(ServerIdentity identity, int resourceid, LwM2mResource value) {
+    public WriteResponse write(ServerIdentity identity, boolean replace, int resourceid, LwM2mResource value) {
         LOG.info("Write on Device resource /{}/{}/{}", getModel().id, getId(), resourceid);
 
         switch (resourceid) {
-            case 13:
-                return WriteResponse.notFound();
-            case 14:
-                setUtcOffset((String) value.getValue());
-                fireResourcesChange(resourceid);
-                return WriteResponse.success();
-            case 15:
-                setTimezone((String) value.getValue());
-                fireResourcesChange(resourceid);
-                return WriteResponse.success();
-            default:
-                return super.write(identity, resourceid, value);
+        case 13:
+            return WriteResponse.notFound();
+        case 14:
+            setUtcOffset((String) value.getValue());
+            fireResourcesChange(resourceid);
+            return WriteResponse.success();
+        case 15:
+            setTimezone((String) value.getValue());
+            fireResourcesChange(resourceid);
+            return WriteResponse.success();
+        default:
+            return super.write(identity, replace, resourceid, value);
         }
     }
 

@@ -22,6 +22,12 @@ import org.eclipse.leshan.core.util.Validate;
  */
 public class LwM2mPath {
 
+    public static final byte ROOT_DEPTH = 1;
+    public static final byte OBJECT_DEPTH = 2;
+    public static final byte OBJECT_INSTANCE_DEPTH = 3;
+    public static final byte RESOURCE_DEPTH = 4;
+    public static final byte RESOURCE_INSTANCE_DEPTH = 5;
+
     private final Integer objectId;
     private final Integer objectInstanceId;
     private final Integer resourceId;
@@ -257,6 +263,33 @@ public class LwM2mPath {
      */
     public boolean isResourceInstance() {
         return objectId != null && objectInstanceId != null && resourceId != null && resourceInstanceId != null;
+    }
+
+    /**
+     * @return a new {@link LwM2mPath} targeting an object from current path.
+     */
+    public LwM2mPath toObjectPath() {
+        if (getObjectId() != null)
+            return new LwM2mPath(getObjectId());
+        throw new IllegalStateException(String.format("an object path can not be created from %s", this));
+    }
+
+    /**
+     * @return a new {@link LwM2mPath} targeting an object instance from current path.
+     */
+    public LwM2mPath toObjectInstancePath() {
+        if (getObjectInstanceId() != null)
+            return new LwM2mPath(getObjectId(), getObjectInstanceId());
+        throw new IllegalStateException(String.format("an object instance path can not be created from %s", this));
+    }
+
+    /**
+     * @return a new {@link LwM2mPath} targeting an resource from current path.
+     */
+    public LwM2mPath toResourcePath() {
+        if (getResourceId() != null)
+            return new LwM2mPath(getObjectId(), getObjectInstanceId(), getResourceId());
+        throw new IllegalStateException(String.format("an resource path can not be created from %s", this));
     }
 
     /**

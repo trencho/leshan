@@ -86,7 +86,7 @@ public class Security extends BaseInstanceEnabler {
      * Returns a new security instance (NoSec) for a bootstrap server.
      */
     public static Security noSecBootstap(String serverUri) {
-        return new Security(serverUri, true, SecurityMode.NO_SEC.code, new byte[0], new byte[0], new byte[0], 0,
+        return new Security(serverUri, true, SecurityMode.NO_SEC.code, new byte[0], new byte[0], new byte[0], null,
                 CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
     }
 
@@ -95,7 +95,7 @@ public class Security extends BaseInstanceEnabler {
      */
     public static Security pskBootstrap(String serverUri, byte[] pskIdentity, byte[] privateKey) {
         return new Security(serverUri, true, SecurityMode.PSK.code, pskIdentity.clone(), new byte[0],
-                privateKey.clone(), 0, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
+                privateKey.clone(), null, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
     }
 
     /**
@@ -104,7 +104,7 @@ public class Security extends BaseInstanceEnabler {
     public static Security rpkBootstrap(String serverUri, byte[] clientPublicKey, byte[] clientPrivateKey,
             byte[] serverPublicKey) {
         return new Security(serverUri, true, SecurityMode.RPK.code, clientPublicKey.clone(), serverPublicKey.clone(),
-                clientPrivateKey.clone(), 0, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
+                clientPrivateKey.clone(), null, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
     }
 
     /**
@@ -113,7 +113,16 @@ public class Security extends BaseInstanceEnabler {
     public static Security x509Bootstrap(String serverUri, byte[] clientCertificate, byte[] clientPrivateKey,
             byte[] serverPublicKey) {
         return new Security(serverUri, true, SecurityMode.X509.code, clientCertificate.clone(), serverPublicKey.clone(),
-                clientPrivateKey.clone(), 0, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
+                clientPrivateKey.clone(), null, CertificateUsage.DOMAIN_ISSUER_CERTIFICATE.code);
+    }
+
+    /**
+     * Returns a new security instance (X509) for a bootstrap server.
+     */
+    public static Security x509Bootstrap(String serverUri, byte[] clientCertificate, byte[] clientPrivateKey,
+            byte[] serverPublicKey, ULong certificateUsage) {
+        return new Security(serverUri, true, SecurityMode.X509.code, clientCertificate.clone(), serverPublicKey.clone(),
+                clientPrivateKey.clone(), null, certificateUsage);
     }
 
     /**
@@ -161,7 +170,7 @@ public class Security extends BaseInstanceEnabler {
     }
 
     @Override
-    public WriteResponse write(ServerIdentity identity, int resourceId, LwM2mResource value) {
+    public WriteResponse write(ServerIdentity identity, boolean replace, int resourceId, LwM2mResource value) {
         if (!identity.isSystem())
             LOG.debug("Write on Security resource /{}/{}/{}", getModel().id, getId(), resourceId);
 
@@ -219,7 +228,7 @@ public class Security extends BaseInstanceEnabler {
             return WriteResponse.success();
 
         default:
-            return super.write(identity, resourceId, value);
+            return super.write(identity, replace, resourceId, value);
         }
 
     }
@@ -248,8 +257,10 @@ public class Security extends BaseInstanceEnabler {
             return ReadResponse.success(resourceid, secretKey);
 
         case SEC_SERVER_ID: // short server id
-            return ReadResponse.success(resourceid, shortServerId);
-
+            if (shortServerId != null)
+                return ReadResponse.success(resourceid, shortServerId);
+            else
+                return ReadResponse.notFound();
         case SEC_CERTIFICATE_USAGE: // certificate usage
             return ReadResponse.success(resourceid, certificateUsage);
 

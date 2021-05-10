@@ -15,6 +15,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.request;
 
+import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toLwM2mResponseCode;
+
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.californium.core.coap.MediaTypeRegistry;
 import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.coap.Response;
@@ -39,8 +44,10 @@ import org.eclipse.leshan.core.request.DownlinkRequestVisitor;
 import org.eclipse.leshan.core.request.ExecuteRequest;
 import org.eclipse.leshan.core.request.LwM2mRequest;
 import org.eclipse.leshan.core.request.ObserveRequest;
+import org.eclipse.leshan.core.request.ReadCompositeRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
 import org.eclipse.leshan.core.request.WriteAttributesRequest;
+import org.eclipse.leshan.core.request.WriteCompositeRequest;
 import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
 import org.eclipse.leshan.core.response.BootstrapDeleteResponse;
@@ -54,8 +61,10 @@ import org.eclipse.leshan.core.response.DiscoverResponse;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.response.ObserveResponse;
+import org.eclipse.leshan.core.response.ReadCompositeResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.core.response.WriteAttributesResponse;
+import org.eclipse.leshan.core.response.WriteCompositeResponse;
 import org.eclipse.leshan.core.response.WriteResponse;
 import org.eclipse.leshan.core.util.Hex;
 import org.eclipse.leshan.server.californium.observation.ObserveUtil;
@@ -254,6 +263,38 @@ public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRe
     }
 
     @Override
+    public void visit(ReadCompositeRequest request) {
+        if (coapResponse.isError()) {
+            // handle error response:
+            lwM2mresponse = new ReadCompositeResponse(toLwM2mResponseCode(coapResponse.getCode()), null,
+                    coapResponse.getPayloadString(), coapResponse);
+        } else if (coapResponse.getCode() == org.eclipse.californium.core.coap.CoAP.ResponseCode.CONTENT) {
+            // handle success response:
+            Map<LwM2mPath, LwM2mNode> content = decodeCompositeCoapResponse(request.getPaths(), coapResponse, request,
+                    clientEndpoint);
+            lwM2mresponse = new ReadCompositeResponse(ResponseCode.CONTENT, content, null, coapResponse);
+        } else {
+            // handle unexpected response:
+            handleUnexpectedResponseCode(clientEndpoint, request, coapResponse);
+        }
+    }
+
+    @Override
+    public void visit(WriteCompositeRequest request) {
+        if (coapResponse.isError()) {
+            // handle error response:
+            lwM2mresponse = new WriteCompositeResponse(toLwM2mResponseCode(coapResponse.getCode()),
+                    coapResponse.getPayloadString(), coapResponse);
+        } else if (coapResponse.getCode() == org.eclipse.californium.core.coap.CoAP.ResponseCode.CHANGED) {
+            // handle success response:
+            lwM2mresponse = new WriteCompositeResponse(ResponseCode.CHANGED, null, coapResponse);
+        } else {
+            // handle unexpected response:
+            handleUnexpectedResponseCode(clientEndpoint, request, coapResponse);
+        }
+    }
+
+    @Override
     public void visit(BootstrapDiscoverRequest request) {
         if (coapResponse.isError()) {
             // handle error response:
@@ -332,6 +373,30 @@ public class LwM2mResponseBuilder<T extends LwM2mResponse> implements DownlinkRe
         // Decode payload
         try {
             return decoder.decode(coapResponse.getPayload(), contentFormat, path, model);
+        } catch (CodecException e) {
+            if (LOG.isDebugEnabled()) {
+                byte[] payload = coapResponse.getPayload() == null ? new byte[0] : coapResponse.getPayload();
+                LOG.debug(
+                        String.format("Unable to decode response payload of request [%s] from client [%s] [payload:%s]",
+                                request, endpoint, Hex.encodeHexString(payload)));
+            }
+            throw new InvalidResponseException(e, "Unable to decode response payload of request [%s] from client [%s]",
+                    request, endpoint);
+        }
+    }
+
+    private Map<LwM2mPath, LwM2mNode> decodeCompositeCoapResponse(List<LwM2mPath> paths, Response coapResponse,
+            LwM2mRequest<?> request, String endpoint) {
+
+        // Get content format
+        ContentFormat contentFormat = null;
+        if (coapResponse.getOptions().hasContentFormat()) {
+            contentFormat = ContentFormat.fromCode(coapResponse.getOptions().getContentFormat());
+        }
+
+        // Decode payload
+        try {
+            return decoder.decodeNodes(coapResponse.getPayload(), contentFormat, paths, model);
         } catch (CodecException e) {
             if (LOG.isDebugEnabled()) {
                 byte[] payload = coapResponse.getPayload() == null ? new byte[0] : coapResponse.getPayload();

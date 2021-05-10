@@ -18,6 +18,28 @@
 
 package org.eclipse.leshan.client.demo;
 
+import static org.eclipse.leshan.client.object.Security.*;
+import static org.eclipse.leshan.core.LwM2mId.*;
+
+import java.io.File;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.security.interfaces.ECPublicKey;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
@@ -39,6 +61,7 @@ import org.eclipse.californium.scandium.dtls.ResumingServerHandshaker;
 import org.eclipse.californium.scandium.dtls.ServerHandshaker;
 import org.eclipse.californium.scandium.dtls.SessionAdapter;
 import org.eclipse.californium.scandium.dtls.SessionId;
+import org.eclipse.californium.scandium.dtls.SingleNodeConnectionIdGenerator;
 import org.eclipse.californium.scandium.dtls.cipher.CipherSuite;
 import org.eclipse.leshan.client.californium.LeshanClient;
 import org.eclipse.leshan.client.californium.LeshanClientBuilder;
@@ -48,6 +71,7 @@ import org.eclipse.leshan.client.object.Server;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.ObjectsInitializer;
 import org.eclipse.leshan.client.resource.listener.ObjectsListenerAdapter;
+import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.californium.DefaultEndpointFactory;
 import org.eclipse.leshan.core.model.LwM2mModel;
@@ -173,6 +197,13 @@ public class LeshanClientDemo {
         c.hasArgs();
         options.addOption(c.build());
         options.addOption("oc", "activate support of old/deprecated cipher suites.");
+        options.addOption("cid", true, "Control usage of DTLS connection ID." //
+                + "\n - 'on' to activate Connection ID support (same as -cid 0)" //
+                + "\n - 'off' to deactivate it" //
+                + "\n - Positive value define the size in byte of CID generated."
+                + "\n - 0 value means we accept to use CID but will not generated one for foreign peer."
+                + "\n (Default: off)");
+
         Builder aa = Option.builder("aa");
         aa.desc("Use additional attributes at registration time, syntax is \n -aa attrName1=attrValue1 attrName2=\\\"attrValue2\\\" ...");
         aa.hasArgs();
@@ -220,25 +251,37 @@ public class LeshanClientDemo {
         options.addOption("ccert", true,
                 "The path to your client certificate file.\n The certificate Common Name (CN) should generaly be equal to the client endpoint name (see -n option).\nThe certificate should be in X509v3 format (DER encoding).");
         options.addOption("scert", true,
-                "The path to your server certificate file.\n The certificate should be in X509v3 format (DER encoding).");
+                "The path to your server certificate file (see -certificate-usage option).\n The certificate should be in X509v3 format (DER encoding).");
 
         final StringBuilder trustStoreChapter = new StringBuilder();
         trustStoreChapter.append("\n .");
-        trustStoreChapter.append("\n URI format: file://<path-to-trust-store-file>#<hex-strore-password>#<alias-pattern>");
+        trustStoreChapter
+                .append("\n URI format: file://<path-to-trust-store-file>#<hex-strore-password>#<alias-pattern>");
         trustStoreChapter.append("\n .");
         trustStoreChapter.append("\n Where:");
         trustStoreChapter.append("\n - path-to-trust-store-file is path to pkcs12 trust store file");
         trustStoreChapter.append("\n - hex-store-password is HEX formatted password for store");
-        trustStoreChapter.append("\n - alias-pattern can be used to filter trusted certificates and can also be empty to get all");
+        trustStoreChapter.append(
+                "\n - alias-pattern can be used to filter trusted certificates and can also be empty to get all");
         trustStoreChapter.append("\n .");
-        trustStoreChapter.append("\n Default: All certificates are trusted which is only OK for a demo.");
+        trustStoreChapter.append("\n Default: empty store.");
 
         options.addOption("truststore", true,
                 "The path to a root certificate file to trust or a folder containing all the trusted certificates in X509v3 format (DER encoding) or trust store URI."
                         + trustStoreChapter);
 
+        final StringBuilder certUsageChapter = new StringBuilder();
+        certUsageChapter.append("\n - 0 : CA constraint");
+        certUsageChapter.append("\n - 1 : service certificate constraint");
+        certUsageChapter.append("\n - 2 : trust anchor assertion");
+        certUsageChapter.append("\n - 3 : domain issued certificate (Default value)");
+        certUsageChapter.append("\n (Usage are described at https://tools.ietf.org/html/rfc6698#section-2.1.1)");
+
+        options.addOption("cu", "certificate-usage", true,
+                "Certificate Usage (as integer) defining how to use server certificate." + certUsageChapter);
+
         HelpFormatter formatter = new HelpFormatter();
-        formatter.setWidth(90);
+        formatter.setWidth(120);
         formatter.setOptionComparator(null);
 
         // Parse arguments
@@ -301,6 +344,15 @@ public class LeshanClientDemo {
             if (!x509config && !rpkConfig) {
                 System.err.println(
                         "cprik should be used with ccert and scert for X509 config OR cpubk and spubk for RPK config");
+                formatter.printHelp(USAGE, options);
+                return;
+            }
+        }
+
+        // Abort if cu is used without complete X509 config
+        if (cl.hasOption("cu")) {
+            if (!x509config) {
+                System.err.println("cu should be used with ccert and scert for X509 config.");
                 formatter.printHelp(USAGE, options);
                 return;
             }
@@ -400,6 +452,20 @@ public class LeshanClientDemo {
                 serverURI = "coap://localhost:" + LwM2m.DEFAULT_COAP_PORT;
         }
 
+        // Get CID config
+        String cidOption = cl.getOptionValue("cid");
+        Integer cid = null;
+        if (cidOption != null) {
+            if ("off".equals(cidOption)) {
+                cid = null;
+            } else if ("on".equals(cidOption)) {
+                cid = 0;
+            } else {
+                cid = Integer.parseInt(cidOption);
+                cid = cid < 0 ? null : cid;
+            }
+        }
+
         // get PSK info
         byte[] pskIdentity = null;
         byte[] pskKey = null;
@@ -470,7 +536,7 @@ public class LeshanClientDemo {
         }
 
         // configure trust store if given
-        List<Certificate> trustStore = null;
+        List<Certificate> trustStore = Collections.emptyList();
         if (cl.hasOption("truststore")) {
             trustStore = new ArrayList<>();
 
@@ -493,7 +559,8 @@ public class LeshanClientDemo {
 
                 // check input exists
                 if (!input.exists()) {
-                    System.err.println("Failed to load trust store - file or directory does not exist : " + input.toString());
+                    System.err.println(
+                            "Failed to load trust store - file or directory does not exist : " + input.toString());
                     formatter.printHelp(USAGE, options);
                     return;
                 }
@@ -515,6 +582,19 @@ public class LeshanClientDemo {
             }
         }
 
+        CertificateUsage certificateUsage = CertificateUsage.DOMAIN_ISSUER_CERTIFICATE;
+        if (cl.hasOption("cu")) {
+            certificateUsage = CertificateUsage.fromCode(Integer.parseInt(cl.getOptionValue("cu")));
+            if (trustStore.isEmpty()) {
+                if (certificateUsage == CertificateUsage.SERVICE_CERTIFICATE_CONSTRAINT) {
+                    System.err.println(
+                            "You need to set a truststore when you are using \"service certificate constraint\" usage");
+                    formatter.printHelp(USAGE, options);
+                    return;
+                }
+            }
+        }
+
         // get local address
         String localAddress = null;
         int localPort = 0;
@@ -532,8 +612,8 @@ public class LeshanClientDemo {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), additionalAttributes,
                     bsAdditionalAttributes, lifetime, communicationPeriod, serverURI, pskIdentity, pskKey,
                     clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate,
-                    trustStore, cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"),
-                    modelsFolderPath, ciphers);
+                    trustStore, certificateUsage, latitude, longitude, scaleFactor, cl.hasOption("ocf"),
+                    cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"), modelsFolderPath, ciphers, cid);
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
@@ -545,8 +625,10 @@ public class LeshanClientDemo {
             Integer communicationPeriod, String serverURI, byte[] pskIdentity, byte[] pskKey,
             PrivateKey clientPrivateKey, PublicKey clientPublicKey, PublicKey serverPublicKey,
             X509Certificate clientCertificate, X509Certificate serverCertificate, List<Certificate> trustStore,
+            CertificateUsage certificateUsage, Float latitude, Float longitude, float scaleFactor,
             boolean supportOldFormat, boolean supportDeprecatedCiphers, boolean reconnectOnUpdate,
-            boolean forceFullhandshake, String modelsFolderPath, List<CipherSuite> ciphers) throws Exception {
+            boolean forceFullhandshake, String modelsFolderPath, List<CipherSuite> ciphers, Integer cid)
+            throws Exception {
 
         MyLocation locationInstance = new MyLocation();
 
@@ -570,7 +652,7 @@ public class LeshanClientDemo {
                 initializer.setClassForObject(SERVER, Server.class);
             } else if (clientCertificate != null) {
                 initializer.setInstancesForObject(SECURITY, x509Bootstrap(serverURI, clientCertificate.getEncoded(),
-                        clientPrivateKey.getEncoded(), serverCertificate.getEncoded()));
+                        clientPrivateKey.getEncoded(), serverCertificate.getEncoded(), certificateUsage.code));
                 initializer.setClassForObject(SERVER, Server.class);
             } else {
                 initializer.setInstancesForObject(SECURITY, noSecBootstap(serverURI));
@@ -586,7 +668,7 @@ public class LeshanClientDemo {
                 initializer.setInstancesForObject(SERVER, new Server(123, lifetime));
             } else if (clientCertificate != null) {
                 initializer.setInstancesForObject(SECURITY, x509(serverURI, 123, clientCertificate.getEncoded(),
-                        clientPrivateKey.getEncoded(), serverCertificate.getEncoded()));
+                        clientPrivateKey.getEncoded(), serverCertificate.getEncoded(), certificateUsage.code));
                 initializer.setInstancesForObject(SERVER, new Server(123, lifetime));
             } else {
                 initializer.setInstancesForObject(SECURITY, noSec(serverURI, 123));
@@ -617,6 +699,9 @@ public class LeshanClientDemo {
         dtlsConfig.setRecommendedCipherSuitesOnly(!supportDeprecatedCiphers);
         if (ciphers != null) {
             dtlsConfig.setSupportedCipherSuites(ciphers);
+        }
+        if (cid != null) {
+            dtlsConfig.setConnectionIdGenerator(new SingleNodeConnectionIdGenerator(cid));
         }
 
         // Configure Registration Engine

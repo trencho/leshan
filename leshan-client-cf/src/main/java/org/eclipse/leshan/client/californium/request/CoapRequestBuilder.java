@@ -19,12 +19,15 @@ import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.californium.EndpointContextUtil;
+import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
 import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.request.RegisterRequest;
+import org.eclipse.leshan.core.request.SendRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.request.UplinkRequestVisitor;
@@ -42,9 +45,13 @@ public class CoapRequestBuilder implements UplinkRequestVisitor {
 
     protected Request coapRequest;
     protected final Identity server;
+    protected final LwM2mNodeEncoder encoder;
+    protected final LwM2mModel model;
 
-    public CoapRequestBuilder(Identity server) {
+    public CoapRequestBuilder(Identity server, LwM2mNodeEncoder encoder, LwM2mModel model) {
         this.server = server;
+        this.encoder = encoder;
+        this.model = model;
     }
 
     @Override
@@ -141,6 +148,17 @@ public class CoapRequestBuilder implements UplinkRequestVisitor {
         coapRequest = Request.newDelete();
         buildRequestSettings();
         coapRequest.getOptions().setUriPath(request.getRegistrationId());
+    }
+
+    @Override
+    public void visit(SendRequest request) {
+        coapRequest = Request.newPost();
+        buildRequestSettings();
+        coapRequest.getOptions().setUriPath("/dp");
+
+        ContentFormat format = request.getFormat();
+        coapRequest.getOptions().setContentFormat(format.getCode());
+        coapRequest.setPayload(encoder.encodeNodes(request.getNodes(), format, model));
     }
 
     public Request getRequest() {

@@ -34,6 +34,7 @@ import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
 import org.eclipse.leshan.core.observation.Observation;
 import org.eclipse.leshan.core.request.DownlinkRequest;
+import org.eclipse.leshan.core.request.SendRequest;
 import org.eclipse.leshan.core.request.exception.ClientSleepingException;
 import org.eclipse.leshan.core.request.exception.InvalidResponseException;
 import org.eclipse.leshan.core.request.exception.RequestCanceledException;
@@ -50,6 +51,7 @@ import org.eclipse.leshan.server.californium.registration.RegisterResource;
 import org.eclipse.leshan.server.californium.request.CaliforniumLwM2mRequestSender;
 import org.eclipse.leshan.server.californium.request.CaliforniumQueueModeRequestSender;
 import org.eclipse.leshan.server.californium.request.CoapRequestSender;
+import org.eclipse.leshan.server.californium.send.SendResource;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.observation.ObservationService;
 import org.eclipse.leshan.server.queue.ClientAwakeTimeProvider;
@@ -72,6 +74,8 @@ import org.eclipse.leshan.server.security.EditableSecurityStore;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.eclipse.leshan.server.security.SecurityStore;
 import org.eclipse.leshan.server.security.SecurityStoreListener;
+import org.eclipse.leshan.server.send.SendHandler;
+import org.eclipse.leshan.server.send.SendService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +109,8 @@ public class LeshanServer {
     // LWM2M attributes
     private final RegistrationServiceImpl registrationService;
     private final CaliforniumRegistrationStore registrationStore;
+    private final SendHandler sendService;
+
     /** @since 1.1 */
     protected final ObservationServiceImpl observationService;
     private final SecurityStore securityStore;
@@ -212,6 +218,10 @@ public class LeshanServer {
         // define /rd resource
         coapServer.add(createRegisterResource(registrationService, authorizer, registrationIdProvider));
 
+        // define /dp resource
+        this.sendService = createSendHandler();
+        coapServer.add(createSendResource(sendService, modelProvider, decoder, registrationStore));
+
         // create request sender
         requestSender = createRequestSender(securedEndpoint, unsecuredEndpoint, registrationService, observationService,
                 this.modelProvider, encoder, decoder, presenceService);
@@ -268,6 +278,15 @@ public class LeshanServer {
     protected CoapResource createRegisterResource(RegistrationServiceImpl registrationService, Authorizer authorizer,
             RegistrationIdProvider registrationIdProvider) {
         return new RegisterResource(new RegistrationHandler(registrationService, authorizer, registrationIdProvider));
+    }
+
+    protected SendHandler createSendHandler() {
+        return new SendHandler();
+    }
+
+    protected CoapResource createSendResource(SendHandler sendHandler, LwM2mModelProvider modelProvider,
+            LwM2mNodeDecoder decoder, CaliforniumRegistrationStore registrationStore) {
+        return new SendResource(sendHandler, modelProvider, decoder, registrationStore);
     }
 
     protected LwM2mRequestSender createRequestSender(Endpoint securedEndpoint, Endpoint unsecuredEndpoint,
@@ -424,6 +443,14 @@ public class LeshanServer {
      */
     public ObservationService getObservationService() {
         return this.observationService;
+    }
+
+    /**
+     * Get the {@link SendService} which can be used to listen data received from LWM2M client which are using
+     * {@link SendRequest}.
+     */
+    public SendService getSendService() {
+        return sendService;
     }
 
     /**

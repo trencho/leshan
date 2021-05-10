@@ -16,6 +16,11 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -24,6 +29,7 @@ import org.eclipse.leshan.core.node.codec.cbor.LwM2mNodeCborEncoder;
 import org.eclipse.leshan.core.node.codec.json.LwM2mNodeJsonEncoder;
 import org.eclipse.leshan.core.node.codec.opaque.LwM2mNodeOpaqueEncoder;
 import org.eclipse.leshan.core.node.codec.senml.LwM2mNodeSenMLEncoder;
+import org.eclipse.leshan.core.node.codec.senml.LwM2mPathSenMLEncoder;
 import org.eclipse.leshan.core.node.codec.text.LwM2mNodeTextEncoder;
 import org.eclipse.leshan.core.node.codec.tlv.LwM2mNodeTlvEncoder;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -38,7 +44,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A default {@link LwM2mNodeEncoder} which support LWM2M {@link ContentFormat} :
+ * A default {@link LwM2mNodeEncoder}.
+ * <p>
+ * For {@link LwM2mNode} encoding, those formats are supported :
  * <ul>
  * <li>{@link ContentFormat#TEXT}</li>
  * <li>{@link ContentFormat#OPAQUE}</li>
@@ -48,12 +56,18 @@ import java.util.Map;
  * <li>{@link ContentFormat#TLV}</li>
  * <li>{@link ContentFormat#JSON} (old one from LwM2m v1.0)</li>
  * </ul>
+ * <p>
+ * For {@link LwM2mPath} encoding, those formats are supported :
+ * <ul>
+ * <li>{@link ContentFormat#SENML_JSON}</li>
+ * <li>{@link ContentFormat#SENML_CBOR}</li>
+ * </ul>
  */
 public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultLwM2mNodeEncoder.class);
 
-    public static Map<ContentFormat, NodeEncoder> getDefaultEncoders(boolean supportDeprecatedContentFormat) {
+    public static Map<ContentFormat, NodeEncoder> getDefaultNodeEncoders(boolean supportDeprecatedContentFormat) {
         Map<ContentFormat, NodeEncoder> encoders = new HashMap<>();
         encoders.put(ContentFormat.TEXT, new LwM2mNodeTextEncoder());
         encoders.put(ContentFormat.OPAQUE, new LwM2mNodeOpaqueEncoder());
@@ -75,8 +89,18 @@ public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
         return encoders;
     }
 
+    public static Map<ContentFormat, PathEncoder> getDefaultPathEncoder() {
+        Map<ContentFormat, PathEncoder> encoders = new HashMap<>();
+        encoders.put(ContentFormat.SENML_JSON, new LwM2mPathSenMLEncoder(new SenMLJsonJacksonEncoderDecoder(true)));
+        encoders.put(ContentFormat.SENML_CBOR,
+                new LwM2mPathSenMLEncoder(new SenMLCborUpokecenterEncoderDecoder(false, true)));
+
+        return encoders;
+    }
+
     protected final LwM2mValueConverter converter;
-    protected final Map<ContentFormat, NodeEncoder> encoders;
+    protected final Map<ContentFormat, NodeEncoder> nodeEncoders;
+    protected final Map<ContentFormat, PathEncoder> pathEncoders;
 
     /**
      * Create {@link DefaultLwM2mNodeEncoder} without support of old TLV and JSON code.
@@ -102,11 +126,13 @@ public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
     }
 
     public DefaultLwM2mNodeEncoder(LwM2mValueConverter converter, boolean supportDeprecatedContentFormat) {
-        this(getDefaultEncoders(supportDeprecatedContentFormat), converter);
+        this(getDefaultNodeEncoders(supportDeprecatedContentFormat), getDefaultPathEncoder(), converter);
     }
 
-    public DefaultLwM2mNodeEncoder(Map<ContentFormat, NodeEncoder> encoders, LwM2mValueConverter converter) {
-        this.encoders = encoders;
+    public DefaultLwM2mNodeEncoder(Map<ContentFormat, NodeEncoder> nodeEncoders,
+            Map<ContentFormat, PathEncoder> pathEncoders, LwM2mValueConverter converter) {
+        this.nodeEncoders = nodeEncoders;
+        this.pathEncoders = pathEncoders;
         this.converter = converter;
     }
 
@@ -118,13 +144,39 @@ public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
             throw new CodecException("Content format is mandatory. [%s]", path);
         }
 
-        NodeEncoder encoder = encoders.get(format);
+        NodeEncoder encoder = nodeEncoders.get(format);
         if (encoder == null) {
             throw new CodecException("Content format %s is not supported [%s]", format, path);
         }
         LOG.trace("Encoding node {} for path {} and format {}", node, path, format);
         byte[] encoded = encoder.encode(node, path, model, converter);
         LOG.trace("Encoded node {}: {}", node, encoded);
+        return encoded;
+    }
+
+    @Override
+    public byte[] encodeNodes(Map<LwM2mPath, LwM2mNode> nodes, ContentFormat format, LwM2mModel model)
+            throws CodecException {
+        // Validate arguments
+        Validate.notEmpty(nodes);
+        Set<LwM2mPath> paths = nodes.keySet();
+
+        // Search encoder
+        if (format == null) {
+            throw new CodecException("Content format is mandatory. [%s]", paths);
+        }
+        NodeEncoder encoder = nodeEncoders.get(format);
+        if (encoder == null) {
+            throw new CodecException("Content format %s is not supported [%s]", format, paths);
+        }
+        if (!(encoder instanceof MultiNodeEncoder)) {
+            throw new CodecException("Cannot encode several nodes with format %s. [%s]", format, paths);
+        }
+
+        // Encode nodes
+        LOG.trace("Encoding nodes {} for path {} and format {}", nodes, paths, format);
+        byte[] encoded = ((MultiNodeEncoder) encoder).encodeNodes(nodes, model, converter);
+        LOG.trace("Encoded nodes {}: {}", nodes, encoded);
         return encoded;
     }
 
@@ -136,7 +188,7 @@ public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
             throw new CodecException("Content format is mandatory. [%s]", path);
         }
 
-        NodeEncoder encoder = encoders.get(format);
+        NodeEncoder encoder = nodeEncoders.get(format);
         if (encoder == null) {
             throw new CodecException("Content format %s is not supported [%s]", format, path);
         }
@@ -152,7 +204,25 @@ public class DefaultLwM2mNodeEncoder implements LwM2mNodeEncoder {
     }
 
     @Override
+    public byte[] encodePaths(List<LwM2mPath> paths, ContentFormat format) throws CodecException {
+        Validate.notEmpty(paths);
+
+        if (format == null) {
+            throw new CodecException("Content format is mandatory. [%s]", paths);
+        }
+
+        PathEncoder encoder = pathEncoders.get(format);
+        if (encoder == null) {
+            throw new CodecException("Content format %s is not supported for paths encoding[%s]", format, paths);
+        }
+        LOG.trace("Encoding paths {} with format {}", paths, format);
+        byte[] encoded = encoder.encode(paths);
+        LOG.trace("Encoded path {}: {}", paths, encoded);
+        return encoded;
+    }
+
+    @Override
     public boolean isSupported(ContentFormat format) {
-        return encoders.get(format) != null;
+        return nodeEncoders.get(format) != null;
     }
 }

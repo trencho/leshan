@@ -42,7 +42,7 @@ import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.server.californium.LeshanServer;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
-import org.eclipse.leshan.server.model.StaticModelProvider;
+import org.eclipse.leshan.server.model.VersionedModelProvider;
 import org.eclipse.leshan.server.registration.Registration;
 import org.eclipse.leshan.server.registration.RegistrationServiceImpl;
 import org.eclipse.leshan.server.security.DefaultAuthorizer;
@@ -175,9 +175,13 @@ public class IntegrationTestHelper {
         }
     }
 
+    protected ObjectsInitializer createObjectsInitializer() {
+        return new TestObjectsInitializer(new StaticModel(createObjectModels()));
+    }
+
     public void createClient(Map<String, String> additionalAttributes) {
         // Create objects Enabler
-        ObjectsInitializer initializer = new TestObjectsInitializer(new StaticModel(createObjectModels()));
+        ObjectsInitializer initializer = createObjectsInitializer();
         initializer.setInstancesForObject(LwM2mId.SECURITY, Security.noSec(
                 "coap://" + server.getUnsecuredAddress().getHostString() + ":" + server.getUnsecuredAddress().getPort(),
                 12345));
@@ -208,7 +212,7 @@ public class IntegrationTestHelper {
         LeshanServerBuilder builder = new LeshanServerBuilder();
         builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
         builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
-        builder.setObjectModelProvider(new StaticModelProvider(createObjectModels()));
+        builder.setObjectModelProvider(new VersionedModelProvider(createObjectModels()));
         builder.setLocalAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
         builder.setLocalSecureAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
         SecurityStore securityStore = createSecurityStore();

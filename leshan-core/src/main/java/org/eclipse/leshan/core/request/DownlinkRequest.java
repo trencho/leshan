@@ -15,7 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 
 /**
@@ -23,13 +22,6 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
  * This is a request sent from server to client to interact with the client resource tree.
  */
 public interface DownlinkRequest<T extends LwM2mResponse> extends LwM2mRequest<T> {
-
-    /**
-     * Gets the requested resource path.
-     *
-     * @return the request path
-     */
-    LwM2mPath getPath();
 
     /**
      * Accept a visitor for this request.

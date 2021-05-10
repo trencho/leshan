@@ -36,7 +36,7 @@ import java.util.Map;
  * The request to change the value of a Resource, an array of Resources Instances or multiple Resources from an Object
  * Instance.
  */
-public class WriteRequest extends AbstractDownlinkRequest<WriteResponse> {
+public class WriteRequest extends AbstractSimpleDownlinkRequest<WriteResponse> {
 
     /**
      * Define the behavior of a write request.
@@ -364,7 +364,20 @@ public class WriteRequest extends AbstractDownlinkRequest<WriteResponse> {
         this(mode, contentFormat, newPath(path), node, coapRequest);
     }
 
-    private WriteRequest(Mode mode, ContentFormat format, LwM2mPath target, LwM2mNode node, Object coapRequest) {
+    /**
+     * A generic constructor to write request.
+     * <p>
+     * Mainly for internal purpore.
+     * 
+     * @param mode the mode of the request : replace or update.
+     * @param format Format of the payload (TLV,JSON,TEXT,OPAQUE ..).
+     * @param target the path of the LWM2M node to write (object instance or resource).
+     * @param node the {@link LwM2mNode} to write.
+     * @param coapRequest the underlying request
+     * 
+     * @exception InvalidRequestException if parameters are invalid.
+     */
+    public WriteRequest(Mode mode, ContentFormat format, LwM2mPath target, LwM2mNode node, Object coapRequest) {
         super(target, coapRequest);
         if (target.isRoot())
             throw new InvalidRequestException("Write request cannot target root path");

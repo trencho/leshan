@@ -17,6 +17,7 @@ package org.eclipse.leshan.server.bootstrap;
 
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
+import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
@@ -259,13 +260,14 @@ public class BootstrapHandlerTest {
         }
 
         @Override
-        public void onResponseSuccess(BootstrapSession bsSession, DownlinkRequest<? extends LwM2mResponse> request) {
+        public void onResponseSuccess(BootstrapSession bsSession,
+                BootstrapDownlinkRequest<? extends LwM2mResponse> request) {
 
         }
 
         @Override
         public BootstrapPolicy onResponseError(BootstrapSession bsSession,
-                DownlinkRequest<? extends LwM2mResponse> request, LwM2mResponse response) {
+                BootstrapDownlinkRequest<? extends LwM2mResponse> request, LwM2mResponse response) {
             if (request instanceof BootstrapFinishRequest) {
                 return BootstrapPolicy.STOP;
             }
@@ -274,7 +276,7 @@ public class BootstrapHandlerTest {
 
         @Override
         public BootstrapPolicy onRequestFailure(BootstrapSession bsSession,
-                DownlinkRequest<? extends LwM2mResponse> request, Throwable cause) {
+                BootstrapDownlinkRequest<? extends LwM2mResponse> request, Throwable cause) {
             return BootstrapPolicy.STOP;
         }
 

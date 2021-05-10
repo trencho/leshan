@@ -36,12 +36,25 @@ import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverDispatcher;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.resource.LwM2mObjectTree;
+import org.eclipse.leshan.client.resource.LwM2mRootEnabler;
+import org.eclipse.leshan.client.resource.RootEnabler;
 import org.eclipse.leshan.client.resource.listener.ObjectListener;
 import org.eclipse.leshan.client.resource.listener.ObjectsListenerAdapter;
+import org.eclipse.leshan.client.send.NoDataException;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.californium.EndpointFactory;
+import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.node.LwM2mNode;
+import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
 import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.request.ReadCompositeRequest;
+import org.eclipse.leshan.core.request.SendRequest;
+import org.eclipse.leshan.core.response.ErrorCallback;
+import org.eclipse.leshan.core.response.ReadCompositeResponse;
+import org.eclipse.leshan.core.response.ResponseCallback;
+import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.core.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,6 +80,9 @@ public class LeshanClient implements LwM2mClient {
 
     private final LwM2mObjectTree objectTree;
     private final BootstrapHandler bootstrapHandler;
+    private final LwM2mRootEnabler rootEnabler;
+    private final LwM2mNodeEncoder encoder;
+    private final LwM2mNodeDecoder decoder;
     private final RegistrationEngine engine;
     private final LwM2mClientObserverDispatcher observers;
 
@@ -101,21 +117,28 @@ public class LeshanClient implements LwM2mClient {
         Validate.notNull(coapConfig);
 
         objectTree = createObjectTree(objectEnablers);
+        rootEnabler = createRootEnabler(objectTree);
+        this.decoder = decoder;
+        this.encoder = encoder;
         observers = createClientObserverDispatcher();
         bootstrapHandler = createBoostrapHandler(objectTree);
         endpointsManager = createEndpointsManager(localAddress, coapConfig, dtlsConfigBuilder, trustStore,
                 endpointFactory);
-        requestSender = createRequestSender(endpointsManager, sharedExecutor);
+        requestSender = createRequestSender(endpointsManager, sharedExecutor, encoder, objectTree.getModel());
         engine = engineFactory.createRegistratioEngine(endpoint, objectTree, endpointsManager, requestSender,
                 bootstrapHandler, observers, additionalAttributes, bsAdditionalAttributes, sharedExecutor);
 
         coapServer = createCoapServer(coapConfig, sharedExecutor);
-        coapServer.add(createBootstrapResource(engine, bootstrapHandler));
+        coapServer.add(createBootstrapResource(engine, endpointsManager, bootstrapHandler));
         endpointsManager.setCoapServer(coapServer);
-        linkObjectTreeToCoapServer(coapServer, engine, objectTree, encoder, decoder);
+        linkObjectTreeToCoapServer(coapServer, engine, endpointsManager, objectTree, encoder, decoder);
         createRegistrationUpdateHandler(engine, endpointsManager, bootstrapHandler, objectTree);
 
         coapApi = new CoapAPI();
+    }
+
+    protected LwM2mRootEnabler createRootEnabler(LwM2mObjectTree tree) {
+        return new RootEnabler(tree);
     }
 
     protected LwM2mObjectTree createObjectTree(List<? extends LwM2mObjectEnabler> objectEnablers) {
@@ -143,7 +166,8 @@ public class LeshanClient implements LwM2mClient {
             @Override
             protected Resource createRoot() {
                 // Use to handle Delete on "/"
-                return new org.eclipse.leshan.client.californium.RootResource(engine, bootstrapHandler, this);
+                return new org.eclipse.leshan.client.californium.RootResource(engine, endpointsManager,
+                        bootstrapHandler, this, rootEnabler, encoder, decoder);
             }
         };
 
@@ -161,11 +185,13 @@ public class LeshanClient implements LwM2mClient {
     }
 
     protected void linkObjectTreeToCoapServer(final CoapServer coapServer, final RegistrationEngine registrationEngine,
-            LwM2mObjectTree objectTree, final LwM2mNodeEncoder encoder, final LwM2mNodeDecoder decoder) {
+            final CaliforniumEndpointsManager endpointsManager, LwM2mObjectTree objectTree,
+            final LwM2mNodeEncoder encoder, final LwM2mNodeDecoder decoder) {
 
         // Create CoAP resources for each lwm2m Objects.
         for (LwM2mObjectEnabler enabler : objectTree.getObjectEnablers().values()) {
-            CoapResource clientObject = createObjectResource(enabler, registrationEngine, encoder, decoder);
+            CoapResource clientObject = createObjectResource(enabler, registrationEngine, endpointsManager, encoder,
+                    decoder);
             coapServer.add(clientObject);
         }
 
@@ -173,7 +199,8 @@ public class LeshanClient implements LwM2mClient {
         objectTree.addListener(new ObjectsListenerAdapter() {
             @Override
             public void objectAdded(LwM2mObjectEnabler object) {
-                CoapResource clientObject = createObjectResource(object, registrationEngine, encoder, decoder);
+                CoapResource clientObject = createObjectResource(object, registrationEngine, endpointsManager, encoder,
+                        decoder);
                 coapServer.add(clientObject);
             }
 
@@ -189,12 +216,13 @@ public class LeshanClient implements LwM2mClient {
     }
 
     protected CoapResource createObjectResource(LwM2mObjectEnabler enabler, RegistrationEngine registrationEngine,
-            LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder) {
-        return new ObjectResource(enabler, registrationEngine, encoder, decoder);
+            CaliforniumEndpointsManager endpointsManager, LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder) {
+        return new ObjectResource(enabler, registrationEngine, endpointsManager, encoder, decoder);
     }
 
-    protected CoapResource createBootstrapResource(RegistrationEngine engine, BootstrapHandler bootstrapHandler) {
-        return new BootstrapResource(engine, bootstrapHandler);
+    protected CoapResource createBootstrapResource(RegistrationEngine registrationEngine,
+            CaliforniumEndpointsManager endpointsManager, BootstrapHandler bootstrapHandler) {
+        return new BootstrapResource(registrationEngine, endpointsManager, bootstrapHandler);
     }
 
     protected CaliforniumEndpointsManager createEndpointsManager(InetSocketAddress localAddress,
@@ -205,8 +233,8 @@ public class LeshanClient implements LwM2mClient {
     }
 
     protected CaliforniumLwM2mRequestSender createRequestSender(CaliforniumEndpointsManager endpointsManager,
-            ScheduledExecutorService executor) {
-        return new CaliforniumLwM2mRequestSender(endpointsManager, executor);
+            ScheduledExecutorService executor, LwM2mNodeEncoder encoder, LwM2mModel model) {
+        return new CaliforniumLwM2mRequestSender(endpointsManager, executor, encoder, model);
     }
 
     protected RegistrationUpdateHandler createRegistrationUpdateHandler(RegistrationEngine engine,
@@ -263,6 +291,39 @@ public class LeshanClient implements LwM2mClient {
     @Override
     public void triggerRegistrationUpdate(ServerIdentity server) {
         engine.triggerRegistrationUpdate(server);
+    }
+
+    @Override
+    public SendResponse sendData(ServerIdentity server, ContentFormat format, List<String> paths, long timeoutInMs)
+            throws InterruptedException {
+        Validate.notNull(server);
+        Validate.notEmpty(paths);
+
+        Map<LwM2mPath, LwM2mNode> collectedData = collectData(server, paths);
+        return requestSender.send(server, new SendRequest(format, collectedData, null), 2000);
+    }
+
+    @Override
+    public void sendData(ServerIdentity server, ContentFormat format, List<String> paths, long timeoutInMs,
+            ResponseCallback<SendResponse> onResponse, ErrorCallback onError) {
+        Validate.notNull(server);
+        Validate.notEmpty(paths);
+        Validate.notNull(onResponse);
+        Validate.notNull(onError);
+
+        Map<LwM2mPath, LwM2mNode> collectedData = collectData(server, paths);
+        requestSender.send(server, new SendRequest(format, collectedData, null), 2000, onResponse, onError);
+    }
+
+    private Map<LwM2mPath, LwM2mNode> collectData(ServerIdentity server, List<String> paths) {
+        // format is not really used as this is an internal call, kind of HACK :/ ...
+        ContentFormat format = ContentFormat.SENML_CBOR;
+        ReadCompositeResponse response = rootEnabler.read(server, new ReadCompositeRequest(format, format, paths));
+        if (response.isSuccess()) {
+            return response.getContent();
+        }
+        throw new NoDataException("Unable to collect data for %s : %s / %s", paths, response.getCode(),
+                response.getErrorMessage());
     }
 
     /**
