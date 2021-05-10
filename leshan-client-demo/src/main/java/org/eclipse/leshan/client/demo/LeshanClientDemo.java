@@ -591,8 +591,8 @@ public class LeshanClientDemo {
             createAndStartClient(endpoint, localAddress, localPort, cl.hasOption("b"), additionalAttributes,
                     bsAdditionalAttributes, lifetime, communicationPeriod, serverURI, pskIdentity, pskKey,
                     clientPrivateKey, clientPublicKey, serverPublicKey, clientCertificate, serverCertificate,
-                    trustStore, certificateUsage, latitude, longitude, scaleFactor, cl.hasOption("ocf"),
-                    cl.hasOption("oc"), cl.hasOption("r"), cl.hasOption("f"), modelsFolderPath, ciphers, cid);
+                    trustStore, certificateUsage, cl.hasOption("ocf"), cl.hasOption("oc"), cl.hasOption("r"),
+                    cl.hasOption("f"), modelsFolderPath, ciphers, cid);
         } catch (Exception e) {
             System.err.println("Unable to create and start client ...");
             e.printStackTrace();
@@ -604,10 +604,9 @@ public class LeshanClientDemo {
             Integer communicationPeriod, String serverURI, byte[] pskIdentity, byte[] pskKey,
             PrivateKey clientPrivateKey, PublicKey clientPublicKey, PublicKey serverPublicKey,
             X509Certificate clientCertificate, X509Certificate serverCertificate, List<Certificate> trustStore,
-            CertificateUsage certificateUsage, Float latitude, Float longitude, float scaleFactor,
-            boolean supportOldFormat, boolean supportDeprecatedCiphers, boolean reconnectOnUpdate,
-            boolean forceFullhandshake, String modelsFolderPath, List<CipherSuite> ciphers, Integer cid)
-            throws Exception {
+            CertificateUsage certificateUsage, boolean supportOldFormat, boolean supportDeprecatedCiphers,
+            boolean reconnectOnUpdate, boolean forceFullhandshake, String modelsFolderPath, List<CipherSuite> ciphers,
+            Integer cid) throws Exception {
 
         MyLocation locationInstance = new MyLocation();
 
