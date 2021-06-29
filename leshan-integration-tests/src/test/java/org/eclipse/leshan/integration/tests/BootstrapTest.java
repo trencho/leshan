@@ -27,10 +27,16 @@ import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.request.ExecuteRequest;
 import org.eclipse.leshan.core.request.ReadRequest;
+import org.eclipse.leshan.core.request.exception.InvalidRequestException;
+import org.eclipse.leshan.core.request.exception.RequestCanceledException;
+import org.eclipse.leshan.core.response.ExecuteResponse;
 import org.eclipse.leshan.core.response.ReadResponse;
 import org.eclipse.leshan.integration.tests.util.BootstrapIntegrationTestHelper;
+import org.eclipse.leshan.integration.tests.util.BootstrapRequestChecker;
 import org.eclipse.leshan.integration.tests.util.TestObjectsInitializer;
+import org.eclipse.leshan.server.bootstrap.BootstrapFailureCause;
 import org.eclipse.leshan.server.security.NonUniqueSecurityInfoException;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.junit.After;
@@ -96,6 +102,8 @@ public class BootstrapTest {
         // Create and start bootstrap server
         helper.createBootstrapServer(null);
         helper.bootstrapServer.start();
+        BootstrapRequestChecker contentFormatChecker = BootstrapRequestChecker.contentFormatChecker(ContentFormat.TLV);
+        helper.bootstrapServer.addListener(contentFormatChecker);
 
         // Create Client and check it is not already registered
         ContentFormat noPreferredFormat = null; // if no preferred content format server should use TLV
@@ -106,6 +114,7 @@ public class BootstrapTest {
         // Start it and wait for registration
         helper.client.start();
         helper.waitForRegistrationAtServerSide(1);
+        assertTrue("not expected content format used", contentFormatChecker.isValid());
 
         // check the client is registered
         helper.assertClientRegisterered();
@@ -120,6 +129,9 @@ public class BootstrapTest {
         // Create and start bootstrap server
         helper.createBootstrapServer(null);
         helper.bootstrapServer.start();
+        BootstrapRequestChecker contentFormatChecker = BootstrapRequestChecker
+                .contentFormatChecker(ContentFormat.SENML_CBOR);
+        helper.bootstrapServer.addListener(contentFormatChecker);
 
         // Create Client and check it is not already registered
         ContentFormat preferredFormat = ContentFormat.SENML_CBOR;
@@ -130,6 +142,34 @@ public class BootstrapTest {
         // Start it and wait for registration
         helper.client.start();
         helper.waitForRegistrationAtServerSide(1);
+        assertTrue("not expected content format used", contentFormatChecker.isValid());
+
+        // check the client is registered
+        helper.assertClientRegisterered();
+    }
+
+    @Test
+    public void bootstrap_contentformat_from_config() {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null, helper.unsecuredBootstrap(ContentFormat.SENML_JSON));
+        helper.bootstrapServer.start();
+        BootstrapRequestChecker contentFormatChecker = BootstrapRequestChecker
+                .contentFormatChecker(ContentFormat.SENML_JSON);
+        helper.bootstrapServer.addListener(contentFormatChecker);
+
+        // Create Client and check it is not already registered
+        ContentFormat preferredFormat = ContentFormat.SENML_CBOR;
+        helper.createClient(preferredFormat);
+        helper.assertClientNotRegisterered();
+
+        // Start it and wait for registration
+        helper.client.start();
+        helper.waitForRegistrationAtServerSide(1);
+        assertTrue("not expected content format used", contentFormatChecker.isValid());
 
         // check the client is registered
         helper.assertClientRegisterered();
@@ -161,7 +201,8 @@ public class BootstrapTest {
         helper.assertClientRegisterered();
 
         // assert session contains additional attributes
-        assertEquals(additionalAttributes, helper.lastBootstrapSession.getBootstrapRequest().getAdditionalAttributes());
+        assertEquals(additionalAttributes,
+                helper.getLastBootstrapSession().getBootstrapRequest().getAdditionalAttributes());
     }
 
     @Test
@@ -186,8 +227,65 @@ public class BootstrapTest {
         helper.assertClientRegisterered();
         assertNotNull(helper.lastDiscoverAnswer);
         assertEquals(ResponseCode.CONTENT, helper.lastDiscoverAnswer.getCode());
-        assertEquals("</>;lwm2m=1.0,</0>;ver=1.1,</0/0>,</1>;ver=1.1,</3>;ver=1.1,</3/0>",
+        assertEquals(
+                String.format("</>;lwm2m=1.0,</0>;ver=1.1,</0/0>;uri=\"coap://%s:%d\",</1>;ver=1.1,</3>;ver=1.1,</3/0>",
+                        helper.bootstrapServer.getUnsecuredAddress().getHostString(),
+                        helper.bootstrapServer.getUnsecuredAddress().getPort()),
                 Link.serialize(helper.lastDiscoverAnswer.getObjectLinks()));
+    }
+
+    @Test
+    public void bootstrapWithDiscoverOnRootThenRebootstrap() throws InvalidRequestException, InterruptedException {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null, null, new BootstrapDiscoverRequest());
+        helper.bootstrapServer.start();
+
+        // Create Client and check it is not already registered
+        helper.createClient();
+        helper.assertClientNotRegisterered();
+
+        // Start it and wait for registration
+        helper.client.start();
+        helper.waitForBootstrapFinishedAtClientSide(1);
+        helper.waitForRegistrationAtServerSide(1);
+
+        // check the client is registered
+        helper.assertClientRegisterered();
+        assertNotNull(helper.lastDiscoverAnswer);
+        assertEquals(ResponseCode.CONTENT, helper.lastDiscoverAnswer.getCode());
+        assertEquals(
+                String.format("</>;lwm2m=1.0,</0>;ver=1.1,</0/0>;uri=\"coap://%s:%d\",</1>;ver=1.1,</3>;ver=1.1,</3/0>",
+                        helper.bootstrapServer.getUnsecuredAddress().getHostString(),
+                        helper.bootstrapServer.getUnsecuredAddress().getPort()),
+                Link.serialize(helper.lastDiscoverAnswer.getObjectLinks()));
+
+        // re-bootstrap
+        try {
+            ExecuteResponse response = helper.server.send(helper.getCurrentRegistration(),
+                    new ExecuteRequest("/1/0/9"));
+            assertTrue(response.isSuccess());
+        } catch (RequestCanceledException e) {
+            // request can be cancelled if server does not received the execute response before the de-registration
+            // so we just ignore this error.
+        }
+
+        // wait bootstrap finished
+        helper.waitForBootstrapFinishedAtClientSide(1);
+
+        // check last discover response
+        assertNotNull(helper.lastDiscoverAnswer);
+        assertEquals(ResponseCode.CONTENT, helper.lastDiscoverAnswer.getCode());
+        assertEquals(String.format(
+                "</>;lwm2m=1.0,</0>;ver=1.1,</0/0>;uri=\"coap://%s:%d\",</0/1>;ssid=2222;uri=\"coap://%s:%d\",</1>;ver=1.1,</1/0>;ssid=2222,</3>;ver=1.1,</3/0>",
+                helper.bootstrapServer.getUnsecuredAddress().getHostString(),
+                helper.bootstrapServer.getUnsecuredAddress().getPort(),
+                helper.server.getUnsecuredAddress().getHostString(), helper.server.getUnsecuredAddress().getPort()),
+                Link.serialize(helper.lastDiscoverAnswer.getObjectLinks()));
+
     }
 
     @Test
@@ -213,6 +311,63 @@ public class BootstrapTest {
         assertNotNull(helper.lastDiscoverAnswer);
         assertEquals(ResponseCode.CONTENT, helper.lastDiscoverAnswer.getCode());
         assertEquals("</>;lwm2m=1.0,</3>;ver=1.1,</3/0>", Link.serialize(helper.lastDiscoverAnswer.getObjectLinks()));
+    }
+
+    @Test
+    public void bootstrap_create_2_bsserver() {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null, helper.unsecuredBootstrapStoreWithBsSecurityInstanceIdAt(0));
+        helper.bootstrapServer.start();
+
+        // Create Client with bootstrap server config at /0/10
+        helper.createClient(helper.withoutSecurityAndInstanceId(10), null);
+        helper.assertClientNotRegisterered();
+
+        // Start BS.
+        // Server will delete /0 but Client will not delete /0/10 instance (because bs server is not deletable)
+        // Then a new BS server will be written at /0/0
+        //
+        // So bootstrap should failed because 2 bs server in Security Object is not a valid state.
+        // see https://github.com/OpenMobileAlliance/OMA_LwM2M_for_Developers/issues/523
+        helper.client.start();
+
+        // ensure bootstrap session failed because of invalid state
+        helper.waitForInconsistentStateAtClientSide(1);
+        helper.waitForBootstrapFailureAtServerSide(1);
+        assertEquals(BootstrapFailureCause.FINISH_FAILED, helper.getLastCauseOfBootstrapFailure());
+    }
+
+    @Test
+    public void bootstrap_with_auto_id_for_security_object() {
+        // Create DM Server without security & start it
+        helper.createServer();
+        helper.server.start();
+
+        // Create and start bootstrap server
+        helper.createBootstrapServer(null, helper.unsecuredBootstrapWithAutoID());
+        helper.bootstrapServer.start();
+
+        // Create Client with bootstrap server config at /0/10
+        helper.createClient(helper.withoutSecurityAndInstanceId(10), null);
+        helper.assertClientNotRegisterered();
+
+        // Start BS.
+        // Server will delete /0 but Client will not delete /0/10 instance (because bs server is not deletable)
+        // Then a new BS server will be written at /0/0
+        //
+        // So bootstrap should failed because 2 bs server in Security Object is not a valid state.
+        // see https://github.com/OpenMobileAlliance/OMA_LwM2M_for_Developers/issues/523
+        helper.client.start();
+
+        // ensure bootstrap session succeed
+        helper.waitForBootstrapFinishedAtClientSide(1);
+        helper.waitForBootstrapSuccessAtServerSide(1);
+        helper.waitForRegistrationAtServerSide(1);
+        helper.assertClientRegisterered();
     }
 
     @Test

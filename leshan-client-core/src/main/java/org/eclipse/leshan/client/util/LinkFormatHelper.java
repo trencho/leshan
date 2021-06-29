@@ -15,22 +15,24 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.util;
 
-import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
-import org.eclipse.leshan.client.servers.ServersInfoExtractor;
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.LwM2mId;
-import org.eclipse.leshan.core.model.LwM2mModel;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+import org.eclipse.leshan.client.servers.ServersInfoExtractor;
+import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.LwM2mId;
+import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.util.StringUtils;
 
 /**
  * An Utility class which help to generate @{link Link} from {@link LwM2mObjectEnabler} and {@link LwM2mModel}.<br>
@@ -41,7 +43,8 @@ public final class LinkFormatHelper {
     private LinkFormatHelper() {
     }
 
-    public static Link[] getClientDescription(Collection<LwM2mObjectEnabler> objectEnablers, String rootPath) {
+    public static Link[] getClientDescription(Collection<LwM2mObjectEnabler> objectEnablers, String rootPath,
+            List<ContentFormat> supportedContentFormats) {
         List<Link> links = new ArrayList<>();
 
         // clean root path
@@ -51,6 +54,24 @@ public final class LinkFormatHelper {
         String rootURL = getPath("/", root);
         Map<String, String> attributes = new HashMap<>();
         attributes.put("rt", "\"oma.lwm2m\"");
+        // serialize contentFormat;
+        if (supportedContentFormats != null && !supportedContentFormats.isEmpty()) {
+            if (supportedContentFormats.size() == 1) {
+                attributes.put("ct", Integer.toString(supportedContentFormats.get(0).getCode()));
+            } else {
+                StringBuilder b = new StringBuilder();
+                b.append("\"");
+                Iterator<ContentFormat> iterator = supportedContentFormats.iterator();
+                b.append(iterator.next().getCode());
+                while (iterator.hasNext()) {
+                    b.append(" ");
+                    b.append(iterator.next().getCode());
+                }
+                b.append("\"");
+                attributes.put("ct", b.toString());
+            }
+        }
+
         links.add(new Link(rootURL, attributes));
 
         // sort resources
@@ -149,21 +170,29 @@ public final class LinkFormatHelper {
         // add instance link
         for (Integer instanceId : objectEnabler.getAvailableInstanceIds()) {
             String instanceURL = getPath("/", Integer.toString(objectEnabler.getId()), Integer.toString(instanceId));
+            Map<String, String> objectAttributes = new HashMap<>();
 
             // get short id
-            Long shortServerId = null;
             if (objectEnabler.getId() == LwM2mId.SECURITY || objectEnabler.getId() == LwM2mId.SERVER) {
                 Boolean isBootstrapServer = objectEnabler.getId() == LwM2mId.SECURITY
                         && ServersInfoExtractor.isBootstrapServer(objectEnabler, instanceId);
                 if (isBootstrapServer != null && !isBootstrapServer) {
-                    shortServerId = ServersInfoExtractor.getServerId(objectEnabler, instanceId);
+                    Long shortServerId = ServersInfoExtractor.getServerId(objectEnabler, instanceId);
+                    if (shortServerId != null)
+                        objectAttributes.put("ssid", shortServerId.toString());
                 }
+
+            }
+
+            // get uri
+            if (objectEnabler.getId() == LwM2mId.SECURITY) {
+                String uri = ServersInfoExtractor.getServerURI(objectEnabler, instanceId);
+                if (uri != null)
+                    objectAttributes.put("uri", "\"" + uri + "\"");
             }
 
             // create link
-            if (shortServerId != null) {
-                Map<String, String> objectAttributes = new HashMap<>();
-                objectAttributes.put("ssid", shortServerId.toString());
+            if (!objectAttributes.isEmpty()) {
                 links.add(new Link(instanceURL, objectAttributes));
             } else {
                 links.add(new Link(instanceURL));
@@ -250,7 +279,7 @@ public final class LinkFormatHelper {
             return "/";
         StringBuilder sb = new StringBuilder(input.length());
         if (off > 0)
-            sb.append(input, 0, off);
+            sb.append(input.substring(0, off));
         char prevChar = 0;
         for (int i = off; i < n; i++) {
             char c = input.charAt(i);

@@ -1,7 +1,7 @@
 <template>
   <v-app-bar :dark="true" flat dense max-height="48">
-    <v-toolbar-title
-      ><v-img src="@/assets/image/logo.png" max-height="48" contain></v-img>
+    <v-toolbar-title 
+      ><v-img src="@/assets/image/logo.png" max-height="32" contain></v-img>
     </v-toolbar-title>
 
     <v-spacer></v-spacer>
@@ -13,7 +13,7 @@
         router
         :to="page.route"
       >
-        <v-icon class="pr-2">{{ page.icon }}</v-icon> {{ page.title }}</v-tab
+        <v-icon class="pr-2">{{ page.icon }}</v-icon> <span v-if="$vuetify.breakpoint.smAndUp"> {{ page.title }} </span></v-tab
       >
     </v-tabs>
   </v-app-bar>
@@ -25,6 +25,7 @@ export default {
     return {
       pages: [
         { title: "Bootstrap", route: "/bootstrap", icon: "mdi-devices" },
+        { title: "Server", route: "/server", icon: "mdi-server-security" },
         { title: "About", route: "/about", icon: "mdi-information-outline" },
       ],
     };

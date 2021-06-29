@@ -16,20 +16,17 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import org.eclipse.leshan.core.util.Validate;
-
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.security.PublicKey;
+
+import org.eclipse.leshan.core.util.Validate;
 
 /**
  * Contains all data which could identify a peer like peer address, PSK identity, Raw Public Key or Certificate Common
  * Name.
  */
-public class Identity implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Identity {
 
     private final InetSocketAddress peerAddress;
     private final String pskIdentity;
@@ -163,7 +160,10 @@ public class Identity implements Serializable {
         } else if (!rawPublicKey.equals(other.rawPublicKey))
             return false;
         if (x509CommonName == null) {
-            return other.x509CommonName == null;
-        } else return x509CommonName.equals(other.x509CommonName);
+            if (other.x509CommonName != null)
+                return false;
+        } else if (!x509CommonName.equals(other.x509CommonName))
+            return false;
+        return true;
     }
 }

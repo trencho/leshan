@@ -15,6 +15,12 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.util;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import org.eclipse.leshan.client.bootstrap.InvalidStateException;
 import org.eclipse.leshan.client.observer.LwM2mClientObserverAdapter;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.ResponseCode;
@@ -23,28 +29,24 @@ import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.RegisterRequest;
 import org.eclipse.leshan.core.request.UpdateRequest;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
 
     private CountDownLatch registerLatch = new CountDownLatch(1);
-    private final AtomicBoolean registerSucceed = new AtomicBoolean(false);
-    private final AtomicBoolean registerFailed = new AtomicBoolean(false);
+    private AtomicBoolean registerSucceed = new AtomicBoolean(false);
+    private AtomicBoolean registerFailed = new AtomicBoolean(false);;
 
     private CountDownLatch updateLatch = new CountDownLatch(1);
-    private final AtomicBoolean updateSucceed = new AtomicBoolean(false);
-    private final AtomicBoolean updateFailed = new AtomicBoolean(false);
+    private AtomicBoolean updateSucceed = new AtomicBoolean(false);
+    private AtomicBoolean updateFailed = new AtomicBoolean(false);
 
     private CountDownLatch deregisterLatch = new CountDownLatch(1);
-    private final AtomicBoolean deregisterSucceed = new AtomicBoolean(false);
-    private final AtomicBoolean deregisterFailed = new AtomicBoolean(false);
+    private AtomicBoolean deregisterSucceed = new AtomicBoolean(false);
+    private AtomicBoolean deregisterFailed = new AtomicBoolean(false);
 
     private CountDownLatch bootstrapLatch = new CountDownLatch(1);
-    private final AtomicBoolean bootstrapSucceed = new AtomicBoolean(false);
-    private final AtomicBoolean bootstrapFailed = new AtomicBoolean(false);
+    private AtomicBoolean bootstrapSucceed = new AtomicBoolean(false);
+    private AtomicBoolean bootstrapInvalidState = new AtomicBoolean(false);
+    private AtomicBoolean bootstrapFailed = new AtomicBoolean(false);
 
     @Override
     public void onBootstrapSuccess(ServerIdentity bsserver, BootstrapRequest request) {
@@ -55,6 +57,9 @@ public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
     @Override
     public void onBootstrapFailure(ServerIdentity bsserver, BootstrapRequest request, ResponseCode responseCode,
             String errorMessage, Exception cause) {
+        if (cause instanceof InvalidStateException) {
+            bootstrapInvalidState.set(true);
+        }
         bootstrapFailed.set(true);
         bootstrapLatch.countDown();
     }
@@ -89,8 +94,8 @@ public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
     }
 
     @Override
-    public void onUpdateFailure(ServerIdentity server, UpdateRequest request, ResponseCode responseCode, String errorMessage,
-            Exception cause) {
+    public void onUpdateFailure(ServerIdentity server, UpdateRequest request, ResponseCode responseCode,
+            String errorMessage, Exception cause) {
         updateFailed.set(true);
         updateLatch.countDown();
     }
@@ -194,6 +199,28 @@ public class SynchronousClientObserver extends LwM2mClientObserverAdapter {
                 if (bootstrapSucceed.get())
                     return true;
                 if (bootstrapFailed.get())
+                    return false;
+                throw new TimeoutException("client bootstrap timeout");
+            }
+            throw new TimeoutException("client bootstrap latch timeout");
+        } finally {
+            bootstrapLatch = new CountDownLatch(1);
+        }
+    }
+
+    /**
+     * Wait for Invalid consistency check.
+     * 
+     * @return true if the client state is inconsistent
+     * @throws TimeoutException if bootstrap timeout
+     */
+    public boolean waitForInconsistenState(long timeout, TimeUnit timeUnit)
+            throws InterruptedException, TimeoutException {
+        try {
+            if (bootstrapLatch.await(timeout, timeUnit)) {
+                if (bootstrapInvalidState.get())
+                    return true;
+                if (bootstrapFailed.get() || bootstrapSucceed.get())
                     return false;
                 throw new TimeoutException("client bootstrap timeout");
             }

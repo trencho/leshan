@@ -20,7 +20,7 @@ import org.eclipse.leshan.core.util.Validate;
 /**
  * A path pointing to a LwM2M node (root, object, object instance, resource or resource instance).
  */
-public class LwM2mPath {
+public class LwM2mPath implements Comparable<LwM2mPath> {
 
     public static final byte ROOT_DEPTH = 1;
     public static final byte OBJECT_DEPTH = 2;
@@ -368,4 +368,58 @@ public class LwM2mPath {
         return true;
     }
 
+    @Override
+    public int compareTo(LwM2mPath o) {
+        int res = compareInteger(this.objectId, o.objectId);
+        if (res != 0 || this.objectId == null)
+            return res;
+
+        res = compareInteger(this.objectInstanceId, o.objectInstanceId);
+        if (res != 0 || this.objectInstanceId == null)
+            return res;
+
+        res = compareInteger(this.resourceId, o.resourceId);
+        if (res != 0 || this.resourceId == null)
+            return res;
+
+        return compareInteger(this.resourceInstanceId, o.resourceInstanceId);
+    }
+
+    private int compareInteger(Integer i1, Integer i2) {
+        if (i1 == i2) {
+            return 0;
+        } else if (i1 == null) {
+            return -1;
+        } else if (i2 == null) {
+            return 1;
+        } else {
+            return i1.compareTo(i2);
+        }
+    }
+
+    /**
+     * Parse a string containing a full LWM2M path containing rootpath (rt="oma.lwm2m").
+     * <p>
+     * E.g. : fullpath="/myrootpath/1/0 and rootpath="/myrootpat/" will return <code>new LwM2mPath(1,0)</code>
+     * 
+     * @param fullpath the path to parse.
+     * @param lwm2mRootpath the expected rootpath. <code>null</code> is considered as "/"
+     * @return A valid {@link LwM2mPath} or null it does not start by lwm2mRootPath
+     * 
+     * @exception NumberFormatException if path contains not Numeric value
+     * @exception LwM2mNodeException if path is invalid (e.g. too big number in path)
+     * @exception IllegalArgumentException if path length is invalid
+     */
+    public static LwM2mPath parse(String fullpath, String lwm2mRootpath)
+            throws NumberFormatException, LwM2mNodeException, IllegalArgumentException {
+        if (lwm2mRootpath == null) {
+            return new LwM2mPath(fullpath);
+        }
+
+        if (!fullpath.startsWith(lwm2mRootpath))
+            return null;
+        String path = fullpath.substring(lwm2mRootpath.length());
+
+        return new LwM2mPath(path);
+    }
 }

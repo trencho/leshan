@@ -15,6 +15,18 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.write;
 
+import static org.eclipse.leshan.core.ResponseCode.CONTENT;
+import static org.eclipse.leshan.integration.tests.util.TestUtil.assertContentFormat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.*;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.californium.core.coap.Response;
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
@@ -37,18 +49,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-
 @RunWith(Parameterized.class)
 public class WriteMultiValueTest {
     protected IntegrationTestHelper helper = new IntegrationTestHelper();
@@ -64,7 +64,7 @@ public class WriteMultiValueTest {
                                 { ContentFormat.SENML_CBOR } });
     }
 
-    private final ContentFormat contentFormat;
+    private ContentFormat contentFormat;
 
     public WriteMultiValueTest(ContentFormat contentFormat) {
         this.contentFormat = contentFormat;
@@ -210,4 +210,35 @@ public class WriteMultiValueTest {
         assertEquals(((ObjectLink) resource.getValue(2)).getObjectId(), 10244);
         assertEquals(((ObjectLink) resource.getValue(2)).getObjectInstanceId(), 3);
     }
+
+    @Test
+    public void can_write_object_resource_instance() throws InterruptedException {
+
+        Map<Integer, String> values = new HashMap<>();
+        values.put(10, "value10");
+        values.put(20, "value20");
+
+        // write multi instance
+        WriteResponse response = helper.server.send(helper.getCurrentRegistration(),
+                new WriteRequest(contentFormat, IntegrationTestHelper.TEST_OBJECT_ID, 0,
+                        IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID, values, Type.STRING));
+
+        // Verify Write result
+        assertEquals(ResponseCode.CHANGED, response.getCode());
+        assertNotNull(response.getCoapResponse());
+        assertThat(response.getCoapResponse(), is(instanceOf(Response.class)));
+
+        // read multi instance
+        ReadResponse readResponse = helper.server.send(helper.getCurrentRegistration(), new ReadRequest(contentFormat,
+                IntegrationTestHelper.TEST_OBJECT_ID, 0, IntegrationTestHelper.STRING_RESOURCE_INSTANCE_ID));
+
+        // verify result
+        assertEquals(CONTENT, readResponse.getCode());
+        assertContentFormat(contentFormat, readResponse);
+
+        LwM2mMultipleResource resourceInstance = (LwM2mMultipleResource) readResponse.getContent();
+        assertEquals("value10", resourceInstance.getInstance(10).getValue());
+        assertEquals("value20", resourceInstance.getInstance(20).getValue());
+    }
+
 }

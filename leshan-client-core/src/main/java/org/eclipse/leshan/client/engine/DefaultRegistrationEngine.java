@@ -15,9 +15,25 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.RegistrationUpdate;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
+import org.eclipse.leshan.client.bootstrap.InvalidStateException;
 import org.eclipse.leshan.client.observer.LwM2mClientObserver;
 import org.eclipse.leshan.client.request.LwM2mRequestSender;
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
@@ -27,6 +43,7 @@ import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.servers.ServerInfo;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
 import org.eclipse.leshan.client.util.LinkFormatHelper;
+import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.LwM2mId;
 import org.eclipse.leshan.core.ResponseCode;
@@ -44,20 +61,6 @@ import org.eclipse.leshan.core.response.UpdateResponse;
 import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Manage the registration life-cycle:
@@ -86,21 +89,22 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     // Time between bootstrap retry should incremental
     private final int retryWaitingTimeInMs;
     // Time between 2 update requests (used only if it is smaller than the lifetime)
-    private final Integer communicationPeriodInMs;
+    private Integer communicationPeriodInMs;
     // True if client should re-initiate a connection (DTLS) on registration update
-    private final boolean reconnectOnUpdate;
+    private boolean reconnectOnUpdate;
     // True if client should try to resume connection if possible.
-    private final boolean resumeOnConnect;
+    private boolean resumeOnConnect;
     // True if client use queueMode : for now this just add Q parameter on register request.
     private final boolean queueMode;
 
-    private enum Status {
+    private static enum Status {
         SUCCESS, FAILURE, TIMEOUT
     }
 
     // device state
     private final String endpoint;
     private final ContentFormat preferredContentFormat; // used for bootstrap
+    private final Set<ContentFormat> supportedContentFormats;
     private final Map<String, String> additionalAttributes;
     private final Map<String, String> bsAdditionalAttributes; // @since 1.1
     private final Map<Integer /* objectId */, LwM2mObjectEnabler> objectEnablers;
@@ -119,28 +123,17 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
     private Future<?> bootstrapFuture;
     private Future<?> registerFuture;
     private Future<?> updateFuture;
-    private final Object taskLock = new Object(); // a lock to avoid several task to be executed at the same time
+    private Object taskLock = new Object(); // a lock to avoid several task to be executed at the same time
     private final ScheduledExecutorService schedExecutor;
     private final boolean attachedExecutor;
 
-    public DefaultRegistrationEngine(String endpoint, LwM2mObjectTree objectTree, EndpointsManager endpointsManager,
-            LwM2mRequestSender requestSender, BootstrapHandler bootstrapState, LwM2mClientObserver observer,
-            Map<String, String> additionalAttributes, ScheduledExecutorService executor, long requestTimeoutInMs,
-            long deregistrationTimeoutInMs, int bootstrapSessionTimeoutInSec, int retryWaitingTimeInMs,
-            Integer communicationPeriodInMs, boolean reconnectOnUpdate, boolean resumeOnConnect) {
-        this(endpoint, objectTree, endpointsManager, requestSender, bootstrapState, observer, additionalAttributes,
-                null, executor, requestTimeoutInMs, deregistrationTimeoutInMs, bootstrapSessionTimeoutInSec,
-                retryWaitingTimeInMs, communicationPeriodInMs, reconnectOnUpdate, resumeOnConnect, false, null);
-    }
-
-    /** @since 1.1 */
     public DefaultRegistrationEngine(String endpoint, LwM2mObjectTree objectTree, EndpointsManager endpointsManager,
             LwM2mRequestSender requestSender, BootstrapHandler bootstrapState, LwM2mClientObserver observer,
             Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes,
             ScheduledExecutorService executor, long requestTimeoutInMs, long deregistrationTimeoutInMs,
             int bootstrapSessionTimeoutInSec, int retryWaitingTimeInMs, Integer communicationPeriodInMs,
             boolean reconnectOnUpdate, boolean resumeOnConnect, boolean useQueueMode,
-            ContentFormat preferredContentFormat) {
+            ContentFormat preferredContentFormat, Set<ContentFormat> supportedContentFormats) {
         this.endpoint = endpoint;
         this.objectEnablers = objectTree.getObjectEnablers();
         this.bootstrapHandler = bootstrapState;
@@ -160,6 +153,7 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
         this.resumeOnConnect = resumeOnConnect;
         this.queueMode = useQueueMode;
         this.preferredContentFormat = preferredContentFormat;
+        this.supportedContentFormats = supportedContentFormats;
 
         if (executor == null) {
             schedExecutor = createScheduledExecutor();
@@ -240,25 +234,33 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
                 } else if (response.isSuccess()) {
                     LOG.info("Bootstrap started");
                     // Wait until it is finished (or too late)
-                    boolean timeout = !bootstrapHandler.waitBoostrapFinished(bootstrapSessionTimeoutInSec);
-                    if (timeout) {
-                        LOG.info("Bootstrap sequence aborted: Timeout.");
+                    try {
+                        boolean timeout = !bootstrapHandler.waitBoostrapFinished(bootstrapSessionTimeoutInSec);
+                        if (timeout) {
+                            LOG.info("Bootstrap sequence aborted: Timeout.");
+                            if (observer != null) {
+                                observer.onBootstrapTimeout(bootstrapServer, request);
+                            }
+                            return null;
+                        } else {
+                            LOG.info("Bootstrap finished {}.", bootstrapServer.getUri());
+                            ServerInfo serverInfo = selectServer(
+                                    ServersInfoExtractor.getInfo(objectEnablers).deviceManagements);
+                            ServerIdentity dmServer = null;
+                            if (serverInfo != null) {
+                                dmServer = endpointsManager.createEndpoint(serverInfo);
+                            }
+                            if (observer != null) {
+                                observer.onBootstrapSuccess(bootstrapServer, request);
+                            }
+                            return dmServer;
+                        }
+                    } catch (InvalidStateException e) {
+                        LOG.info("Bootstrap finished with failure because of consistency check failure.", e);
                         if (observer != null) {
-                            observer.onBootstrapTimeout(bootstrapServer, request);
+                            observer.onBootstrapFailure(bootstrapServer, request, null, null, e);
                         }
                         return null;
-                    } else {
-                        LOG.info("Bootstrap finished {}.", bootstrapServer.getUri());
-                        ServerInfo serverInfo = selectServer(
-                                ServersInfoExtractor.getInfo(objectEnablers).deviceManagements);
-                        ServerIdentity dmServer = null;
-                        if (serverInfo != null) {
-                            dmServer = endpointsManager.createEndpoint(serverInfo);
-                        }
-                        if (observer != null) {
-                            observer.onBootstrapSuccess(bootstrapServer, request);
-                        }
-                        return dmServer;
                     }
                 } else {
                     LOG.info("Bootstrap failed: {} {}.", response.getCode(), response.getErrorMessage());
@@ -307,11 +309,14 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
         LOG.info("Trying to register to {} ...", server.getUri());
         RegisterRequest request = null;
         try {
+            Version lwM2mVersion = Version.lastSupported();
             EnumSet<BindingMode> supportedBindingMode = ServersInfoExtractor
                     .getDeviceSupportedBindingMode(objectEnablers.get(LwM2mId.DEVICE), 0);
-            request = new RegisterRequest(endpoint, dmInfo.lifetime, Version.lastSupported().toString(),
-                    supportedBindingMode, queueMode, null,
-                    LinkFormatHelper.getClientDescription(objectEnablers.values(), null), additionalAttributes);
+            Link[] links = LinkFormatHelper.getClientDescription(objectEnablers.values(), null,
+                    ContentFormat.getOptionalContentFormatForClient(supportedContentFormats, lwM2mVersion));
+
+            request = new RegisterRequest(endpoint, dmInfo.lifetime, lwM2mVersion.toString(), supportedBindingMode,
+                    queueMode, null, links, additionalAttributes);
             if (observer != null) {
                 observer.onRegistrationStarted(server, request);
             }
@@ -695,8 +700,8 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
 
     private class QueueUpdateTask implements Runnable {
 
-        private final RegistrationUpdate registrationUpdate;
-        private final ServerIdentity server;
+        private RegistrationUpdate registrationUpdate;
+        private ServerIdentity server;
 
         public QueueUpdateTask(ServerIdentity server, RegistrationUpdate registrationUpdate) {
             this.registrationUpdate = registrationUpdate;
@@ -762,6 +767,49 @@ public class DefaultRegistrationEngine implements RegistrationEngine {
                 }
             }
         }
+    }
+
+    @Override
+    public boolean triggerClientInitiatedBootstrap(final boolean deregister) {
+        synchronized (this) {
+            if (started) {
+
+                // check if we have a bootstrap server
+                ServerInfo bootstrapServerInfo = ServersInfoExtractor.getBootstrapServerInfo(objectEnablers);
+                if (bootstrapServerInfo == null) {
+                    return false;
+                }
+
+                // stop every
+                cancelUpdateTask(true);
+                cancelRegistrationTask();
+                // TODO we should manage the case where we stop in the middle of a bootstrap session ...
+                cancelBootstrapTask();
+
+                schedExecutor.submit(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        try {
+                            // deregister if needed
+                            if (deregister) {
+                                if (!registeredServers.isEmpty()) {
+                                    for (Entry<String, ServerIdentity> registeredServer : registeredServers
+                                            .entrySet()) {
+                                        deregister(registeredServer.getValue(), registeredServer.getKey());
+                                    }
+                                }
+                            }
+                        } catch (InterruptedException e) {
+                        }
+
+                        // schedule a new bootstrap.
+                        scheduleClientInitiatedBootstrap(NOW);
+                    }
+                });
+            }
+        }
+        return true;
     }
 
     private void logExceptionOnSendRequest(String message, Exception e) {

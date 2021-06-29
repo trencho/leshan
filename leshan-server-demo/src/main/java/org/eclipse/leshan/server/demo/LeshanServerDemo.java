@@ -44,6 +44,7 @@ import org.eclipse.leshan.server.demo.servlet.ClientServlet;
 import org.eclipse.leshan.server.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.demo.servlet.ObjectSpecServlet;
 import org.eclipse.leshan.server.demo.servlet.SecurityServlet;
+import org.eclipse.leshan.server.demo.servlet.ServerServlet;
 import org.eclipse.leshan.server.demo.utils.MagicLwM2mValueConverter;
 import org.eclipse.leshan.server.model.LwM2mModelProvider;
 import org.eclipse.leshan.server.model.VersionedModelProvider;
@@ -588,7 +589,7 @@ public class LeshanServerDemo {
         aHolder.setInitParameter("resourceBase",
                 LeshanServerDemo.class.getClassLoader().getResource("webapp2").toExternalForm());
         aHolder.setInitParameter("pathInfoOnly", "true");
-        root.addServlet(aHolder, "/v2/*");
+        root.addServlet(aHolder, "/*");
 
         // Configuration for old demo
         DefaultServlet bServlet = new DefaultServlet();
@@ -596,7 +597,7 @@ public class LeshanServerDemo {
         bHolder.setInitParameter("resourceBase",
                 LeshanServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
         bHolder.setInitParameter("pathInfoOnly", "true");
-        root.addServlet(bHolder, "/*");
+        root.addServlet(bHolder, "/old/*");
 
         server.setHandler(root);
         /* **************************************************************** */
@@ -606,11 +607,11 @@ public class LeshanServerDemo {
         ServletHolder eventServletHolder = new ServletHolder(eventServlet);
         root.addServlet(eventServletHolder, "/event/*"); // Temporary code to be able to serve both UI
         root.addServlet(eventServletHolder, "/api/event/*");
-        root.addServlet(eventServletHolder, "/v2/api/event/*"); // Temporary code to be able to serve both UI
+        root.addServlet(eventServletHolder, "/old/api/event/*"); // Temporary code to be able to serve both UI
 
         ServletHolder clientServletHolder = new ServletHolder(new ClientServlet(lwServer));
         root.addServlet(clientServletHolder, "/api/clients/*");
-        root.addServlet(clientServletHolder, "/v2/api/clients/*");// Temporary code to be able to serve both UI
+        root.addServlet(clientServletHolder, "/old/api/clients/*");// Temporary code to be able to serve both UI
 
         ServletHolder securityServletHolder;
         if (publicKey != null) {
@@ -619,12 +620,21 @@ public class LeshanServerDemo {
             securityServletHolder = new ServletHolder(new SecurityServlet(securityStore, serverCertificateChain[0]));
         }
         root.addServlet(securityServletHolder, "/api/security/*");
-        root.addServlet(securityServletHolder, "/v2/api/security/*");// Temporary code to be able to serve both UI
+        root.addServlet(securityServletHolder, "/old/api/security/*");// Temporary code to be able to serve both UI
+
+        ServletHolder serverServletHolder;
+        if (publicKey != null) {
+            serverServletHolder = new ServletHolder(new ServerServlet(lwServer, publicKey));
+        } else {
+            serverServletHolder = new ServletHolder(new ServerServlet(lwServer, serverCertificateChain[0]));
+        }
+        root.addServlet(serverServletHolder, "/api/server/*");
+        root.addServlet(serverServletHolder, "/old/api/server/*");// Temporary code to be able to serve both UI
 
         ServletHolder objectSpecServletHolder = new ServletHolder(
                 new ObjectSpecServlet(lwServer.getModelProvider(), lwServer.getRegistrationService()));
         root.addServlet(objectSpecServletHolder, "/api/objectspecs/*");
-        root.addServlet(objectSpecServletHolder, "/v2/api/objectspecs/*");// Temporary code to be able to serve both UI
+        root.addServlet(objectSpecServletHolder, "/old/api/objectspecs/*");// Temporary code to be able to serve both UI
 
         // Register a service to DNS-SD
         if (publishDNSSdServices) {

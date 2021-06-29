@@ -16,6 +16,13 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mObject;
@@ -37,12 +44,6 @@ import org.eclipse.leshan.senml.cbor.upokecenter.SenMLCborUpokecenterEncoderDeco
 import org.eclipse.leshan.senml.json.jackson.SenMLJsonJacksonEncoderDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A default {@link LwM2mNodeDecoder}.
@@ -244,4 +245,9 @@ public class DefaultLwM2mNodeDecoder implements LwM2mNodeDecoder {
     public boolean isSupported(ContentFormat format) {
         return nodeDecoders.get(format) != null;
     }
+
+    @Override
+    public Set<ContentFormat> getSupportedContentFormat() {
+        return nodeDecoders.keySet();
+    };
 }

@@ -15,6 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -22,9 +26,6 @@ import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ContentFormat;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A Decoder which should support several {@link ContentFormat} and is able to decode :
@@ -97,11 +98,11 @@ public interface LwM2mNodeDecoder {
 
     /**
      * Deserializes a binary content into a list of {@link LwM2mPath}.
-     *
+     * 
      * @param content the content to decode
      * @param format the format used to encode the content
      * @return a list of {@link LwM2mPath}
-     *
+     * 
      * @throws CodecException if content is malformed.
      */
     List<LwM2mPath> decodePaths(byte[] content, ContentFormat format) throws CodecException;
@@ -110,5 +111,10 @@ public interface LwM2mNodeDecoder {
      * return true is the given {@link ContentFormat} is supported
      */
     boolean isSupported(ContentFormat format);
+
+    /**
+     * @return {@link ContentFormat} supported by this decoder
+     */
+    Set<ContentFormat> getSupportedContentFormat();
 
 }

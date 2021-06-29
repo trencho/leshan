@@ -15,6 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
+import java.net.InetSocketAddress;
+import java.security.cert.Certificate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ScheduledExecutorService;
+
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -25,7 +33,9 @@ import org.eclipse.californium.elements.util.NamedThreadFactory;
 import org.eclipse.californium.scandium.config.DtlsConnectorConfig.Builder;
 import org.eclipse.leshan.client.LwM2mClient;
 import org.eclipse.leshan.client.RegistrationUpdateHandler;
+import org.eclipse.leshan.client.bootstrap.BootstrapConsistencyChecker;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
+import org.eclipse.leshan.client.bootstrap.DefaultBootstrapConsistencyChecker;
 import org.eclipse.leshan.client.californium.bootstrap.BootstrapResource;
 import org.eclipse.leshan.client.californium.object.ObjectResource;
 import org.eclipse.leshan.client.californium.request.CaliforniumLwM2mRequestSender;
@@ -59,12 +69,6 @@ import org.eclipse.leshan.core.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
-import java.security.cert.Certificate;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
-
 /**
  * A Lightweight M2M client based on Californium (CoAP implementation) and Scandium (DTLS implementation) which supports
  * only 1 LWM2M server.
@@ -78,7 +82,7 @@ public class LeshanClient implements LwM2mClient {
     private final CaliforniumLwM2mRequestSender requestSender;
     private final CaliforniumEndpointsManager endpointsManager;
 
-    private final LwM2mObjectTree objectTree;
+    private LwM2mObjectTree objectTree;
     private final BootstrapHandler bootstrapHandler;
     private final LwM2mRootEnabler rootEnabler;
     private final LwM2mNodeEncoder encoder;
@@ -102,15 +106,17 @@ public class LeshanClient implements LwM2mClient {
             Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes,
             LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder, ScheduledExecutorService sharedExecutor) {
         this(endpoint, localAddress, objectEnablers, coapConfig, dtlsConfigBuilder, null, endpointFactory,
-                engineFactory, additionalAttributes, bsAdditionalAttributes, encoder, decoder, sharedExecutor);
+                engineFactory, new DefaultBootstrapConsistencyChecker(), additionalAttributes, bsAdditionalAttributes,
+                encoder, decoder, sharedExecutor);
     }
 
     /** @since 2.0 */
     public LeshanClient(String endpoint, InetSocketAddress localAddress,
             List<? extends LwM2mObjectEnabler> objectEnablers, NetworkConfig coapConfig, Builder dtlsConfigBuilder,
             List<Certificate> trustStore, EndpointFactory endpointFactory, RegistrationEngineFactory engineFactory,
-            Map<String, String> additionalAttributes, Map<String, String> bsAdditionalAttributes,
-            LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder, ScheduledExecutorService sharedExecutor) {
+            BootstrapConsistencyChecker checker, Map<String, String> additionalAttributes,
+            Map<String, String> bsAdditionalAttributes, LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder,
+            ScheduledExecutorService sharedExecutor) {
 
         Validate.notNull(endpoint);
         Validate.notEmpty(objectEnablers);
@@ -121,12 +127,14 @@ public class LeshanClient implements LwM2mClient {
         this.decoder = decoder;
         this.encoder = encoder;
         observers = createClientObserverDispatcher();
-        bootstrapHandler = createBoostrapHandler(objectTree);
+        bootstrapHandler = createBoostrapHandler(objectTree, checker);
         endpointsManager = createEndpointsManager(localAddress, coapConfig, dtlsConfigBuilder, trustStore,
                 endpointFactory);
         requestSender = createRequestSender(endpointsManager, sharedExecutor, encoder, objectTree.getModel());
+
         engine = engineFactory.createRegistratioEngine(endpoint, objectTree, endpointsManager, requestSender,
-                bootstrapHandler, observers, additionalAttributes, bsAdditionalAttributes, sharedExecutor);
+                bootstrapHandler, observers, additionalAttributes, bsAdditionalAttributes,
+                getSupportedContentFormat(decoder, encoder), sharedExecutor);
 
         coapServer = createCoapServer(coapConfig, sharedExecutor);
         coapServer.add(createBootstrapResource(engine, endpointsManager, bootstrapHandler));
@@ -156,8 +164,8 @@ public class LeshanClient implements LwM2mClient {
         return observer;
     }
 
-    protected BootstrapHandler createBoostrapHandler(LwM2mObjectTree objectTree) {
-        return new BootstrapHandler(objectTree.getObjectEnablers());
+    protected BootstrapHandler createBoostrapHandler(LwM2mObjectTree objectTree, BootstrapConsistencyChecker checker) {
+        return new BootstrapHandler(objectTree.getObjectEnablers(), checker);
     }
 
     protected CoapServer createCoapServer(NetworkConfig coapConfig, ScheduledExecutorService sharedExecutor) {
@@ -245,6 +253,13 @@ public class LeshanClient implements LwM2mClient {
         return registrationUpdateHandler;
     }
 
+    protected Set<ContentFormat> getSupportedContentFormat(LwM2mNodeDecoder decoder, LwM2mNodeEncoder encoder) {
+        Set<ContentFormat> supportedContentFormat = new TreeSet<>();
+        supportedContentFormat.addAll(decoder.getSupportedContentFormat());
+        supportedContentFormat.addAll(encoder.getSupportedContentFormat());
+        return supportedContentFormat;
+    }
+
     @Override
     public void start() {
         LOG.info("Starting Leshan client ...");
@@ -291,6 +306,11 @@ public class LeshanClient implements LwM2mClient {
     @Override
     public void triggerRegistrationUpdate(ServerIdentity server) {
         engine.triggerRegistrationUpdate(server);
+    }
+
+    @Override
+    public boolean triggerClientInitiatedBootstrap(boolean deregister) {
+        return engine.triggerClientInitiatedBootstrap(deregister);
     }
 
     @Override

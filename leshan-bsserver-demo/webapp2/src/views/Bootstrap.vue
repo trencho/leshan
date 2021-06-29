@@ -1,68 +1,113 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="clientConfigs"
-    item-key="endpoint"
-    sort-by="endpoint"
-    class="elevation-0"
-    dense
-  >
-    <template v-slot:top>
-      <v-toolbar flat>
-        <v-toolbar-title>Clients Configuration</v-toolbar-title>
-        <v-divider class="mx-4" inset vertical></v-divider>
-        <v-spacer></v-spacer>
-        <!-- add clients configuration button-->
-        <v-btn dark class="mb-2" @click.stop="dialogOpened = true">
-          Add Clients Configuration
-          <v-icon right dark>
-            mdi-key-plus
-          </v-icon>
-        </v-btn>
+  <div>
+    <v-layout justify-center>
+      <v-alert
+        border="left"
+        outlined
+        type="info"
+        elevation="2"
+        icon="mdi-alert-decagram"
+        dismissible
+        prominent
+        class="ma-2"
+        v-model="shownews"
+      >
+        <p>
+          This is the new UI for Leshan Bootstrap Server Demo. If needed, you
+          can still use the old version which should be available
+          <a href="../old/"><strong>here</strong></a> but not for so long as it
+          <strong> will be removed very soon !</strong>
+        </p>
+      </v-alert>
+    </v-layout>
+    <v-data-table
+      :headers="headers"
+      :items="clientConfigs"
+      item-key="endpoint"
+      sort-by="endpoint"
+      class="elevation-0"
+      @click:row="openLink"
+      dense
+      :search="search"
+    >
+      <template v-slot:top>
+        <v-toolbar flat>
+          <v-toolbar-title v-if="$vuetify.breakpoint.smAndUp"
+            >Clients Configuration</v-toolbar-title
+          >
+          <v-divider
+            v-if="$vuetify.breakpoint.smAndUp"
+            class="mx-4"
+            inset
+            vertical
+          ></v-divider>
+          <v-text-field
+            v-model="search"
+            append-icon="mdi-magnify"
+            label="Search"
+            single-line
+            hide-details
+            class="pa-2"
+            clearable
+          ></v-text-field>
 
-        <!-- add client configuration dialog -->
-        <client-config-dialog
-          v-model="dialogOpened"
-          @add="addConfig($event)"
-          :initialValue="editedSecurityInfo"
-        />
-      </v-toolbar>
-    </template>
-    <!--custom display for "dm" column-->
-    <template v-slot:item.dm="{ item }">
-      <div v-for="server in item.dm" :key="server.shortid">
-        <p>
-          <strong>{{server.security.uri }}</strong><br />
-          security mode : {{server.security.securityMode}}<br />
-          <span v-if="server.security.certificateUsage">
-            certificate usage : {{server.security.certificateUsage}}<br />
-          </span>
-        </p>
-      </div>
-    </template>
-    <!--custom display for "bs" column-->
-    <template v-slot:item.bs="{ item }">
-        <div v-for="server in item.bs" :key="server.security.uri">
-        <p>
-          <strong>{{server.security.uri }}</strong><br />
-          security mode : {{server.security.securityMode}}<br />
-          <span v-if="server.security.certificateUsage">
-            certificate usage : {{server.security.certificateUsage}}<br />
-          </span>
-        </p>
+          <!-- add clients configuration button-->
+          <v-btn dark class="mb-2" @click.stop="dialogOpened = true">
+            {{
+              $vuetify.breakpoint.smAndDown ? "" : "Add Clients Configuration"
+            }}
+            <v-icon :right="!$vuetify.breakpoint.smAndDown" dark>
+              mdi-key-plus
+            </v-icon>
+          </v-btn>
+
+          <!-- add client configuration dialog -->
+          <client-config-dialog
+            v-model="dialogOpened"
+            @add="addConfig($event)"
+            :initialValue="editedSecurityInfo"
+          />
+        </v-toolbar>
+      </template>
+      <!--custom display for "dm" column-->
+      <template v-slot:item.dm="{ item }">
+        <div v-for="server in item.dm" :key="server.shortid">
+          <p>
+            <strong>{{ server.security.uri }}</strong
+            ><br />
+            security mode : {{ server.security.securityMode }}<br />
+            <span v-if="server.security.certificateUsage">
+              certificate usage : {{ server.security.certificateUsage }}<br />
+            </span>
+          </p>
         </div>
-    </template>
-    <!--custom display for "actions" column-->
-    <template v-slot:item.actions="{ item }">
-      <v-icon small @click="deleteConfig(item)">
-        mdi-delete
-      </v-icon>
-    </template>
-  </v-data-table>
+      </template>
+      <!--custom display for "bs" column-->
+      <template v-slot:item.bs="{ item }">
+        <div v-for="server in item.bs" :key="server.security.uri">
+          <p>
+            <strong>{{ server.security.uri }}</strong
+            ><br />
+            security mode : {{ server.security.securityMode }}<br />
+            <span v-if="server.security.certificateUsage">
+              certificate usage : {{ server.security.certificateUsage }}<br />
+            </span>
+          </p>
+        </div>
+      </template>
+      <!--custom display for "actions" column-->
+      <template v-slot:item.actions="{ item }">
+        <v-icon small @click.stop="deleteConfig(item)">
+          mdi-delete
+        </v-icon>
+      </template>
+    </v-data-table>
+  </div>
 </template>
 <script>
 import { configsFromRestToUI, configFromUIToRest } from "../js/bsconfigutil.js";
 import ClientConfigDialog from "../components/ClientConfigDialog.vue";
+import { preference } from "vue-preferences";
 
 export default {
   components: { ClientConfigDialog },
@@ -70,13 +115,26 @@ export default {
     dialogOpened: false,
     headers: [
       { text: "Endpoint", value: "endpoint", width: "20%" },
-      { text: "LWM2M Server", value: "dm", width: "40%" },
-      { text: "LWM2M Bootstrap Server", value: "bs", width: "40%" },
+      { text: "LWM2M Server", value: "dm", width: "40%", sortable: false },
+      {
+        text: "LWM2M Bootstrap Server",
+        value: "bs",
+        width: "40%",
+        sortable: false,
+      },
       { text: "Actions", value: "actions", sortable: false },
     ],
+    search: "",
     clientConfigs: [],
     editedSecurityInfo: {}, // initial value for Security Information dialog
   }),
+
+  computed: {
+    shownews: preference("shownews", {
+      defaultValue: true,
+      ttl: 60 * 60 * 24,
+    }),
+  },
 
   beforeMount() {
     this.axios
@@ -88,6 +146,9 @@ export default {
   },
 
   methods: {
+    openLink(bs) {
+      this.$router.push(`/bootstrap/${bs.endpoint}`);
+    },
     fromAscii(ascii) {
       var bytearray = [];
       for (var i in ascii) {
@@ -103,6 +164,7 @@ export default {
       return bytes;
     },
     formatData(c) {
+      console.log(c);
       let s = {};
       s.securityMode = c.mode.toUpperCase();
       s.uri = c.url;
@@ -114,7 +176,7 @@ export default {
         case "rpk":
           s.publicKeyOrId = this.fromHex(c.details.client_pub_key);
           s.secretKey = this.fromHex(c.details.client_pri_key);
-          s.serverPublicKey = this.fromHex(c.details.server_pri_key);
+          s.serverPublicKey = this.fromHex(c.details.server_pub_key);
           break;
         case "x509":
           s.publicKeyOrId = this.fromHex(c.details.client_certificate);

@@ -35,14 +35,14 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.leshan.core.LwM2m;
 import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.core.util.SecurityUtil;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfigurationStoreAdapter;
 import org.eclipse.leshan.server.bootstrap.demo.servlet.BootstrapServlet;
+import org.eclipse.leshan.server.bootstrap.demo.servlet.EventServlet;
 import org.eclipse.leshan.server.bootstrap.demo.servlet.ServerServlet;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.californium.bootstrap.LeshanBootstrapServer;
 import org.eclipse.leshan.server.californium.bootstrap.LeshanBootstrapServerBuilder;
+import org.eclipse.leshan.server.model.VersionedBootstrapModelProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -357,9 +357,9 @@ public class LeshanBootstrapServerDemo {
         // Prepare and start bootstrap server
         LeshanBootstrapServerBuilder builder = new LeshanBootstrapServerBuilder();
         JSONFileBootstrapStore bsStore = new JSONFileBootstrapStore(configFilename);
-        builder.setConfigStore(new BootstrapConfigurationStoreAdapter(bsStore));
+        builder.setConfigStore(bsStore);
         builder.setSecurityStore(new BootstrapConfigSecurityStore(bsStore));
-        builder.setModel(new StaticModel(models));
+        builder.setObjectModelProvider(new VersionedBootstrapModelProvider(models));
 
         // Create DTLS Config
         DtlsConnectorConfig.Builder dtlsConfig = new DtlsConnectorConfig.Builder();
@@ -453,7 +453,7 @@ public class LeshanBootstrapServerDemo {
         aHolder.setInitParameter("resourceBase",
                 LeshanBootstrapServerDemo.class.getClassLoader().getResource("webapp2").toExternalForm());
         aHolder.setInitParameter("pathInfoOnly", "true");
-        root.addServlet(aHolder, "/v2/*");
+        root.addServlet(aHolder, "/*");
 
         // Configuration for old demo
         DefaultServlet bServlet = new DefaultServlet();
@@ -461,12 +461,12 @@ public class LeshanBootstrapServerDemo {
         bHolder.setInitParameter("resourceBase",
                 LeshanBootstrapServerDemo.class.getClassLoader().getResource("webapp").toExternalForm());
         bHolder.setInitParameter("pathInfoOnly", "true");
-        root.addServlet(bHolder, "/*");
+        root.addServlet(bHolder, "/old/*");
         /* **************************************************************** */
 
         ServletHolder bsServletHolder = new ServletHolder(new BootstrapServlet(bsStore));
+        root.addServlet(bsServletHolder, "/old/api/bootstrap/*"); // Temporary code to be able to serve both UI
         root.addServlet(bsServletHolder, "/api/bootstrap/*");
-        root.addServlet(bsServletHolder, "/v2/api/bootstrap/*"); // Temporary code to be able to serve both UI
 
         ServletHolder serverServletHolder;
         if (publicKey != null) {
@@ -474,8 +474,14 @@ public class LeshanBootstrapServerDemo {
         } else {
             serverServletHolder = new ServletHolder(new ServerServlet(bsServer, serverCertificateChain[0]));
         }
+        root.addServlet(serverServletHolder, "/old/api/server/*"); // Temporary code to be able to serve both UI
         root.addServlet(serverServletHolder, "/api/server/*");
-        root.addServlet(serverServletHolder, "/v2/api/server/*"); // Temporary code to be able to serve both UI
+
+        EventServlet eventServlet = new EventServlet(bsServer);
+        ServletHolder eventServletHolder = new ServletHolder(eventServlet);
+        root.addServlet(eventServletHolder, "/old/event/*"); // Temporary code to be able to serve both UI
+        root.addServlet(eventServletHolder, "/api/event/*");
+        root.addServlet(eventServletHolder, "/old/api/event/*"); // Temporary code to be able to serve both UI
 
         server.setHandler(root);
         /* **************************************************************** */

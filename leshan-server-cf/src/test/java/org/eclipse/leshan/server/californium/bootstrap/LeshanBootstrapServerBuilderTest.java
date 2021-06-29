@@ -16,8 +16,8 @@
 package org.eclipse.leshan.server.californium.bootstrap;
 
 import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfiguration;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfigurationStore;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfigStore;
 import org.eclipse.leshan.server.bootstrap.BootstrapSession;
 import org.eclipse.leshan.server.security.BootstrapSecurityStore;
 import org.eclipse.leshan.server.security.SecurityInfo;
@@ -37,10 +37,10 @@ public class LeshanBootstrapServerBuilderTest {
     @Before
     public void start() {
         builder = new LeshanBootstrapServerBuilder();
-        builder.setConfigStore(new BootstrapConfigurationStore() {
+        builder.setConfigStore(new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfiguration get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
                 return null;
             }
         });
@@ -71,7 +71,6 @@ public class LeshanBootstrapServerBuilderTest {
 
         assertNotNull(server.getSecuredAddress());
         assertNotNull(server.getUnsecuredAddress());
-        assertNotNull(server.getBootstrapSecurityStore());
     }
 
     @Test

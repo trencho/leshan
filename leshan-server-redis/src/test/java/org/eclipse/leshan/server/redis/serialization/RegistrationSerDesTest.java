@@ -15,17 +15,18 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.redis.serialization;
 
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.server.registration.Registration;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.net.Inet4Address;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.server.registration.Registration;
+import org.junit.Test;
 
 public class RegistrationSerDesTest {
 
@@ -40,7 +41,36 @@ public class RegistrationSerDesTest {
         objs[1] = new Link("/0/2");
 
         Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
-                Identity.unsecure(Inet4Address.getLoopbackAddress(), 1)).objectLinks(objs);
+                Identity.unsecure(Inet4Address.getLoopbackAddress(), 1)).objectLinks(objs).rootPath("/")
+                        .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT);
+
+        builder.registrationDate(new Date(100L));
+        builder.lastUpdate(new Date(101L));
+        Registration r = builder.build();
+
+        byte[] ser = RegistrationSerDes.bSerialize(r);
+        Registration r2 = RegistrationSerDes.deserialize(ser);
+
+        assertEquals(r, r2);
+    }
+
+    @Test
+    public void ser_and_des_are_equals_with_app_data() throws Exception {
+        Link[] objs = new Link[2];
+        Map<String, Object> att = new HashMap<>();
+        att.put("ts", 12);
+        att.put("rt", "test");
+        att.put("hb", null);
+        objs[0] = new Link("/0/1024/2", att, Object.class);
+        objs[1] = new Link("/0/2");
+
+        Map<String, String> appData = new HashMap<>();
+        appData.put("string", "string test");
+        appData.put("null", null);
+
+        Registration.Builder builder = new Registration.Builder("registrationId", "endpoint",
+                Identity.unsecure(Inet4Address.getLoopbackAddress(), 1)).objectLinks(objs).rootPath("/")
+                        .supportedContentFormats(ContentFormat.TLV, ContentFormat.TEXT).applicationData(appData);
 
         builder.registrationDate(new Date(100L));
         builder.lastUpdate(new Date(101L));

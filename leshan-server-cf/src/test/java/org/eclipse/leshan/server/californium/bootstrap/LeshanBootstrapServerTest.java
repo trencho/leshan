@@ -15,24 +15,24 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
+import static org.junit.Assert.assertEquals;
+
+import java.net.InetSocketAddress;
+
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.response.BootstrapResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfiguration;
-import org.eclipse.leshan.server.bootstrap.BootstrapConfigurationStore;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfig;
+import org.eclipse.leshan.server.bootstrap.BootstrapConfigStore;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandler;
 import org.eclipse.leshan.server.bootstrap.BootstrapHandlerFactory;
 import org.eclipse.leshan.server.bootstrap.BootstrapSession;
+import org.eclipse.leshan.server.bootstrap.BootstrapSessionListener;
 import org.eclipse.leshan.server.bootstrap.BootstrapSessionManager;
 import org.eclipse.leshan.server.bootstrap.DefaultBootstrapHandler;
 import org.eclipse.leshan.server.bootstrap.LwM2mBootstrapRequestSender;
 import org.junit.Test;
-
-import java.net.InetSocketAddress;
-
-import static org.junit.Assert.assertEquals;
 
 public class LeshanBootstrapServerTest {
 
@@ -44,17 +44,19 @@ public class LeshanBootstrapServerTest {
         builder.setBootstrapHandlerFactory(new BootstrapHandlerFactory() {
 
             @Override
-            public BootstrapHandler create(BootstrapConfigurationStore store, LwM2mBootstrapRequestSender sender,
-                    BootstrapSessionManager sessionManager) {
-                bsHandler = new DefaultBootstrapHandler(store, sender, sessionManager);
+            public BootstrapHandler create(LwM2mBootstrapRequestSender sender, BootstrapSessionManager sessionManager,
+                    BootstrapSessionListener listener) {
+                bsHandler = new DefaultBootstrapHandler(sender, sessionManager, listener);
                 return bsHandler;
             }
         });
-        builder.setConfigStore(new BootstrapConfigurationStore() {
+        builder.setConfigStore(new BootstrapConfigStore() {
 
             @Override
-            public BootstrapConfiguration get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
-                return new BootstrapConfiguration(new BootstrapDeleteRequest());
+            public BootstrapConfig get(String endpoint, Identity deviceIdentity, BootstrapSession session) {
+                BootstrapConfig config = new BootstrapConfig();
+                config.toDelete.add("/");
+                return config;
             }
         });
         return builder.build();

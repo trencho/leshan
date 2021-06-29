@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020 Sierra Wireless and others.
+ * Copyright (c) 2021 Sierra Wireless and others.
  * 
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v2.0
@@ -13,22 +13,24 @@
  * Contributors:
  *     Sierra Wireless - initial API and implementation
  *******************************************************************************/
-package org.eclipse.leshan.server.bootstrap;
+package org.eclipse.leshan.client.bootstrap;
 
-import org.eclipse.leshan.core.request.Identity;
+import java.util.List;
+import java.util.Map;
+
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 
 /**
- * A store containing the bootstrap information to be sent to the devices.
+ * This class is responsible to check the consistency state of the client after at the end of a bootstrap session.
  */
-public interface BootstrapConfigurationStore {
+public interface BootstrapConsistencyChecker {
 
     /**
-     * Get the bootstrap configuration to apply to the device identified by the given parameters.
+     * check if current state of the client is consistent
      * 
-     * @param endpoint the endpoint of the device.
-     * @param deviceIdentity the {@link Identity} the device.
-     * @param session the current {@link BootstrapSession}.
-     * @return the {@link BootstrapConfig} to apply.
+     * @param objectEnablers all objects supported by the client.
+     * @return <code>null</code> if the current state is consistent or a list of issues
      */
-    BootstrapConfiguration get(String endpoint, Identity deviceIdentity, BootstrapSession session);
+    List<String> checkconfig(Map<Integer, LwM2mObjectEnabler> objectEnablers);
+
 }

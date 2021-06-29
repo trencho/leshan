@@ -15,14 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ContentFormat;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * A LWM2M Encoder which supports several {@link ContentFormat} and is able to encode :
@@ -73,11 +74,11 @@ public interface LwM2mNodeEncoder {
 
     /**
      * Serializes a list of {@link LwM2mPath} with the given content format.
-     *
+     * 
      * @param paths The list of {@link LwM2mPath} to encode
      * @param format the {@link ContentFormat} used to encode
      * @return the encoded path as byte array
-     *
+     * 
      * @throws CodecException if encoding failed.
      */
     byte[] encodePaths(List<LwM2mPath> paths, ContentFormat format) throws CodecException;
@@ -86,4 +87,9 @@ public interface LwM2mNodeEncoder {
      * return true is the given {@link ContentFormat} is supported
      */
     boolean isSupported(ContentFormat format);
+
+    /**
+     * @return {@link ContentFormat} supported by this Encoder
+     */
+    Set<ContentFormat> getSupportedContentFormat();
 }

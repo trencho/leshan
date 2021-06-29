@@ -15,16 +15,15 @@
  *******************************************************************************/
 package org.eclipse.leshan.core;
 
-import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.core.util.Validate;
-
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.eclipse.leshan.core.util.StringUtils;
+import org.eclipse.leshan.core.util.Validate;
 
 /**
  * A Link as defined in http://tools.ietf.org/html/rfc6690.
@@ -41,9 +40,7 @@ import java.util.Map.Entry;
 // https://github.com/google/coapblaster/blob/master/src/main/java/com/google/iot/coap/LinkFormat.java
 // https://github.com/eclipse/californium/blob/2.0.x/californium-core/src/main/java/org/eclipse/californium/core/coap/LinkFormat.java
 // https://github.com/ARMmbed/java-coap/blob/master/coap-core/src/main/java/com/mbed/coap/linkformat/LinkFormat.java
-public class Link implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class Link {
 
     private final String url;
 
@@ -251,8 +248,11 @@ public class Link implements Serializable {
         } else if (!attributes.equals(other.attributes))
             return false;
         if (url == null) {
-            return other.url == null;
-        } else return url.equals(other.url);
+            if (other.url != null)
+                return false;
+        } else if (!url.equals(other.url))
+            return false;
+        return true;
     }
 
     /**

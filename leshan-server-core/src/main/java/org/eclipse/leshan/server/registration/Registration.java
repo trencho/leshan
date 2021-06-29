@@ -16,16 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import org.eclipse.leshan.core.Link;
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.attributes.Attribute;
-import org.eclipse.leshan.core.model.ObjectModel;
-import org.eclipse.leshan.core.request.BindingMode;
-import org.eclipse.leshan.core.request.Identity;
-import org.eclipse.leshan.core.util.StringUtils;
-import org.eclipse.leshan.core.util.Validate;
-
-import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -34,17 +24,31 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.eclipse.leshan.core.Link;
+import org.eclipse.leshan.core.LwM2m.Version;
+import org.eclipse.leshan.core.attributes.Attribute;
+import org.eclipse.leshan.core.model.ObjectModel;
+import org.eclipse.leshan.core.node.LwM2mPath;
+import org.eclipse.leshan.core.request.BindingMode;
+import org.eclipse.leshan.core.request.ContentFormat;
+import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.util.StringUtils;
+import org.eclipse.leshan.core.util.Validate;
+import org.eclipse.leshan.server.security.Authorizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An immutable structure which represent a LW-M2M client registration on the server
  */
-public class Registration implements Serializable {
+public class Registration {
 
-    private static final long serialVersionUID = 1L;
+    private static final Logger LOG = LoggerFactory.getLogger(Registration.class);
 
     private static final long DEFAULT_LIFETIME_IN_SEC = 86400L;
 
@@ -56,76 +60,66 @@ public class Registration implements Serializable {
 
     private final String smsNumber;
 
-    private final String lwM2mVersion;
+    private final Version lwM2mVersion;
 
     private final EnumSet<BindingMode> bindingMode;
 
     private final Boolean queueMode; // since LWM2M 1.1
 
-    /**
-     * The LWM2M Client's unique end point name.
-     */
+    // The LWM2M Client's unique end point name.
     private final String endpoint;
 
     private final String id;
 
     private final Link[] objectLinks;
 
-    // Lazy Loaded map of supported object (object id => version)
-    // built from objectLinks
-    private final AtomicReference<Map<Integer, String>> supportedObjects;
-
     private final Map<String, String> additionalRegistrationAttributes;
 
-    /** The location where LWM2M objects are hosted on the device */
+    // The location where LWM2M objects are hosted on the device
     private final String rootPath;
+
+    // All ContentFormat supported by the client
+    private final Set<ContentFormat> supportedContentFormats;
+
+    // All supported object (object id => version)
+    private final Map<Integer, String> supportedObjects;
+
+    // All available instances
+    private final Set<LwM2mPath> availableInstances;
 
     private final Date lastUpdate;
 
-    protected Registration(String id, String endpoint, Identity identity, String lwM2mVersion, Long lifetimeInSec,
-            String smsNumber, EnumSet<BindingMode> bindingMode, Boolean queueMode, Link[] objectLinks,
-            Date registrationDate, Date lastUpdate, Map<String, String> additionalRegistrationAttributes,
-            Map<Integer, String> supportedObjects) {
+    private final Map<String, String> applicationData;
 
-        Validate.notNull(id);
-        Validate.notEmpty(endpoint);
-        Validate.notNull(identity);
+    protected Registration(Builder builder) {
 
-        this.id = id;
-        this.identity = identity;
-        this.endpoint = endpoint;
-        this.smsNumber = smsNumber;
+        Validate.notNull(builder.registrationId);
+        Validate.notEmpty(builder.endpoint);
+        Validate.notNull(builder.identity);
 
-        this.objectLinks = objectLinks;
-        // Parse object link to extract root path.
-        String rootPath = "/";
-        if (objectLinks != null) {
-            for (Link link : objectLinks) {
-                if (link != null && "oma.lwm2m".equals(Link.unquote(link.getAttributes().get("rt")))) {
-                    rootPath = link.getUrl();
-                    break;
-                }
-            }
-        }
-        if (!rootPath.endsWith("/"))
-            rootPath = rootPath + "/";
-        this.rootPath = rootPath;
-        this.supportedObjects = new AtomicReference<Map<Integer, String>>(supportedObjects);
-        this.lifeTimeInSec = lifetimeInSec == null ? DEFAULT_LIFETIME_IN_SEC : lifetimeInSec;
-        this.lwM2mVersion = lwM2mVersion == null ? Version.getDefault().toString() : lwM2mVersion;
-        this.bindingMode = bindingMode == null ? EnumSet.of(BindingMode.U) : bindingMode;
-        this.queueMode = queueMode == null && Version.get(this.lwM2mVersion).newerThan(Version.V1_0) ? Boolean.FALSE
-                : queueMode;
-        this.registrationDate = registrationDate == null ? new Date() : registrationDate;
-        this.lastUpdate = lastUpdate == null ? new Date() : lastUpdate;
-        if (additionalRegistrationAttributes == null || additionalRegistrationAttributes.isEmpty()) {
-            this.additionalRegistrationAttributes = Collections.emptyMap();
-        } else {
-            // We create a new HashMap to have a real immutable map and to avoid "unmodifiableMap" encapsulation.
-            this.additionalRegistrationAttributes = Collections
-                    .unmodifiableMap(new HashMap<>(additionalRegistrationAttributes));
-        }
+        // mandatory params
+        id = builder.registrationId;
+        identity = builder.identity;
+        endpoint = builder.endpoint;
 
+        // object links related params
+        objectLinks = builder.objectLinks;
+        rootPath = builder.rootPath;
+        supportedContentFormats = builder.supportedContentFormats;
+        supportedObjects = builder.supportedObjects;
+        availableInstances = builder.availableInstances;
+
+        // other params
+        lifeTimeInSec = builder.lifeTimeInSec;
+        lwM2mVersion = builder.lwM2mVersion;
+        bindingMode = builder.bindingMode;
+        queueMode = builder.queueMode;
+        registrationDate = builder.registrationDate;
+        lastUpdate = builder.lastUpdate;
+        smsNumber = builder.smsNumber;
+        additionalRegistrationAttributes = builder.additionalRegistrationAttributes;
+
+        applicationData = builder.applicationData;
     }
 
     public String getId() {
@@ -235,7 +229,7 @@ public class Registration implements Serializable {
         return smsNumber;
     }
 
-    public String getLwM2mVersion() {
+    public Version getLwM2mVersion() {
         return lwM2mVersion;
     }
 
@@ -252,6 +246,20 @@ public class Registration implements Serializable {
      */
     public String getRootPath() {
         return rootPath;
+    }
+
+    /**
+     * @return all {@link ContentFormat} supported by the client.
+     */
+    public Set<ContentFormat> getSupportedContentFormats() {
+        return supportedContentFormats;
+    }
+
+    /**
+     * @return all available object instance by the client
+     */
+    public Set<LwM2mPath> getAvailableInstances() {
+        return availableInstances;
     }
 
     /**
@@ -306,7 +314,7 @@ public class Registration implements Serializable {
     }
 
     public boolean usesQueueMode() {
-        if (Version.get(lwM2mVersion).olderThan(Version.V1_1))
+        if (lwM2mVersion.olderThan(Version.V1_1))
             return bindingMode.contains(BindingMode.Q);
         else
             return queueMode;
@@ -325,92 +333,139 @@ public class Registration implements Serializable {
      * @return a map from {@code objectId} {@literal =>} {@code supportedVersion} for each supported objects. supported.
      */
     public Map<Integer, String> getSupportedObject() {
-        Map<Integer, String> objects = supportedObjects.get();
-        if (objects != null)
-            return objects;
+        return supportedObjects;
+    }
 
-        supportedObjects.compareAndSet(null, Collections.unmodifiableMap(getSupportedObject(rootPath, objectLinks)));
-        return supportedObjects.get();
+    /**
+     * @return Some application data which could have been added at Registration by the {@link Authorizer}
+     */
+    public Map<String, String> getApplicationData() {
+        return applicationData;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "Registration [registrationDate=%s, identity=%s, lifeTimeInSec=%s, smsNumber=%s, lwM2mVersion=%s, bindingMode=%s, endpoint=%s, registrationId=%s, objectLinks=%s, lastUpdate=%s]",
-                registrationDate, identity, lifeTimeInSec, smsNumber, lwM2mVersion, bindingMode, endpoint, id,
-                Arrays.toString(objectLinks), lastUpdate);
+                "Registration [registrationDate=%s, identity=%s, lifeTimeInSec=%s, smsNumber=%s, lwM2mVersion=%s, bindingMode=%s, queueMode=%s, endpoint=%s, id=%s, objectLinks=%s, additionalRegistrationAttributes=%s, rootPath=%s, supportedContentFormats=%s, supportedObjects=%s, availableInstances=%s, lastUpdate=%s, applicationData=%s]",
+                registrationDate, identity, lifeTimeInSec, smsNumber, lwM2mVersion, bindingMode, queueMode, endpoint,
+                id, Arrays.toString(objectLinks), additionalRegistrationAttributes, rootPath, supportedContentFormats,
+                supportedObjects, availableInstances, lastUpdate, applicationData);
     }
 
-    /**
-     * Computes a hash code for this client.
-     * 
-     * @return the hash code based on the <em>endpoint</em> property
-     */
     @Override
     public int hashCode() {
-        return getEndpoint().hashCode();
+        final int prime = 31;
+        int result = 1;
+        result = prime * result
+                + ((additionalRegistrationAttributes == null) ? 0 : additionalRegistrationAttributes.hashCode());
+        result = prime * result + ((applicationData == null) ? 0 : applicationData.hashCode());
+        result = prime * result + ((availableInstances == null) ? 0 : availableInstances.hashCode());
+        result = prime * result + ((bindingMode == null) ? 0 : bindingMode.hashCode());
+        result = prime * result + ((endpoint == null) ? 0 : endpoint.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        result = prime * result + ((identity == null) ? 0 : identity.hashCode());
+        result = prime * result + ((lastUpdate == null) ? 0 : lastUpdate.hashCode());
+        result = prime * result + (int) (lifeTimeInSec ^ (lifeTimeInSec >>> 32));
+        result = prime * result + ((lwM2mVersion == null) ? 0 : lwM2mVersion.hashCode());
+        result = prime * result + Arrays.hashCode(objectLinks);
+        result = prime * result + ((queueMode == null) ? 0 : queueMode.hashCode());
+        result = prime * result + ((registrationDate == null) ? 0 : registrationDate.hashCode());
+        result = prime * result + ((rootPath == null) ? 0 : rootPath.hashCode());
+        result = prime * result + ((smsNumber == null) ? 0 : smsNumber.hashCode());
+        result = prime * result + ((supportedContentFormats == null) ? 0 : supportedContentFormats.hashCode());
+        result = prime * result + ((supportedObjects == null) ? 0 : supportedObjects.hashCode());
+        return result;
     }
 
-    /**
-     * Compares this Client to another object.
-     * 
-     * @return <code>true</code> if the other object is a Client instance and its <em>endpoint</em> property has the
-     *         same value as this Client
-     */
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof Registration) {
-            Registration other = (Registration) obj;
-            return this.getEndpoint().equals(other.getEndpoint());
-        } else {
+        if (this == obj)
+            return true;
+        if (obj == null)
             return false;
-        }
-    }
-
-    /**
-     * Build a Map {@code objectId} {@literal =>} {@code supportedVersion} from root path and registration object links.
-     * 
-     * @param rootPath the rootpath of LWM2M tree.
-     * @param objectLinks the registraiton object links payload.
-     * @return a Map {@code objectId} {@literal =>} {@code supportedVersion}.
-     */
-    public static Map<Integer, String> getSupportedObject(String rootPath, Link[] objectLinks) {
-        Map<Integer, String> objects = new HashMap<>();
-        for (Link link : objectLinks) {
-            if (link != null) {
-                Pattern p = Pattern.compile("^\\Q" + rootPath + "\\E(\\d+)(?:/\\d+)*$");
-                Matcher m = p.matcher(link.getUrl());
-                if (m.matches()) {
-                    try {
-                        // extract object id and version
-                        int objectId = Integer.parseInt(m.group(1));
-                        String version = link.getAttributes().get(Attribute.OBJECT_VERSION);
-                        // un-quote version (see https://github.com/eclipse/leshan/issues/732)
-                        version = Link.unquote(version);
-                        String currentVersion = objects.get(objectId);
-
-                        // store it in map
-                        if (currentVersion == null) {
-                            // we never find version for this object add it
-                            if (version != null) {
-                                objects.put(objectId, version);
-                            } else {
-                                objects.put(objectId, ObjectModel.DEFAULT_VERSION);
-                            }
-                        } else {
-                            // if version is already set, we override it only if new version is not DEFAULT_VERSION
-                            if (version != null && !version.equals(ObjectModel.DEFAULT_VERSION)) {
-                                objects.put(objectId, version);
-                            }
-                        }
-                    } catch (NumberFormatException e) {
-                        // This should not happened except maybe if the number in url is too long...
-                        // In this case we just ignore it because this is not an object id.
-                    }
-                }
-            }
-        }
-        return objects;
+        if (getClass() != obj.getClass())
+            return false;
+        Registration other = (Registration) obj;
+        if (additionalRegistrationAttributes == null) {
+            if (other.additionalRegistrationAttributes != null)
+                return false;
+        } else if (!additionalRegistrationAttributes.equals(other.additionalRegistrationAttributes))
+            return false;
+        if (applicationData == null) {
+            if (other.applicationData != null)
+                return false;
+        } else if (!applicationData.equals(other.applicationData))
+            return false;
+        if (availableInstances == null) {
+            if (other.availableInstances != null)
+                return false;
+        } else if (!availableInstances.equals(other.availableInstances))
+            return false;
+        if (bindingMode == null) {
+            if (other.bindingMode != null)
+                return false;
+        } else if (!bindingMode.equals(other.bindingMode))
+            return false;
+        if (endpoint == null) {
+            if (other.endpoint != null)
+                return false;
+        } else if (!endpoint.equals(other.endpoint))
+            return false;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (identity == null) {
+            if (other.identity != null)
+                return false;
+        } else if (!identity.equals(other.identity))
+            return false;
+        if (lastUpdate == null) {
+            if (other.lastUpdate != null)
+                return false;
+        } else if (!lastUpdate.equals(other.lastUpdate))
+            return false;
+        if (lifeTimeInSec != other.lifeTimeInSec)
+            return false;
+        if (lwM2mVersion == null) {
+            if (other.lwM2mVersion != null)
+                return false;
+        } else if (!lwM2mVersion.equals(other.lwM2mVersion))
+            return false;
+        if (!Arrays.equals(objectLinks, other.objectLinks))
+            return false;
+        if (queueMode == null) {
+            if (other.queueMode != null)
+                return false;
+        } else if (!queueMode.equals(other.queueMode))
+            return false;
+        if (registrationDate == null) {
+            if (other.registrationDate != null)
+                return false;
+        } else if (!registrationDate.equals(other.registrationDate))
+            return false;
+        if (rootPath == null) {
+            if (other.rootPath != null)
+                return false;
+        } else if (!rootPath.equals(other.rootPath))
+            return false;
+        if (smsNumber == null) {
+            if (other.smsNumber != null)
+                return false;
+        } else if (!smsNumber.equals(other.smsNumber))
+            return false;
+        if (supportedContentFormats == null) {
+            if (other.supportedContentFormats != null)
+                return false;
+        } else if (!supportedContentFormats.equals(other.supportedContentFormats))
+            return false;
+        if (supportedObjects == null) {
+            if (other.supportedObjects != null)
+                return false;
+        } else if (!supportedObjects.equals(other.supportedObjects))
+            return false;
+        return true;
     }
 
     public static class Builder {
@@ -424,10 +479,44 @@ public class Registration implements Serializable {
         private String smsNumber;
         private EnumSet<BindingMode> bindingMode;
         private Boolean queueMode;
-        private String lwM2mVersion;
+        private Version lwM2mVersion = Version.getDefault();
         private Link[] objectLinks;
+        private String rootPath;
+        private Set<ContentFormat> supportedContentFormats;
         private Map<Integer, String> supportedObjects;
+        private Set<LwM2mPath> availableInstances;
         private Map<String, String> additionalRegistrationAttributes;
+        private Map<String, String> applicationData;
+
+        // builder setting
+        private boolean extractData; // if true extract data from objectLinks
+
+        public Builder(Registration registration) {
+
+            // mandatory params
+            registrationId = registration.id;
+            identity = registration.identity;
+            endpoint = registration.endpoint;
+
+            // object links related params
+            objectLinks = registration.objectLinks;
+            rootPath = registration.rootPath;
+            supportedContentFormats = registration.supportedContentFormats;
+            supportedObjects = registration.supportedObjects;
+            availableInstances = registration.availableInstances;
+
+            // other params
+            lifeTimeInSec = registration.lifeTimeInSec;
+            lwM2mVersion = registration.lwM2mVersion;
+            bindingMode = registration.bindingMode;
+            queueMode = registration.queueMode;
+            registrationDate = registration.registrationDate;
+            lastUpdate = registration.lastUpdate;
+            smsNumber = registration.smsNumber;
+            additionalRegistrationAttributes = registration.additionalRegistrationAttributes;
+
+            applicationData = registration.applicationData;
+        }
 
         public Builder(String registrationId, String endpoint, Identity identity) {
 
@@ -437,6 +526,11 @@ public class Registration implements Serializable {
             this.registrationId = registrationId;
             this.endpoint = endpoint;
             this.identity = identity;
+        }
+
+        public Builder extractDataFromObjectLink(boolean extract) {
+            this.extractData = extract;
+            return this;
         }
 
         public Builder registrationDate(Date registrationDate) {
@@ -469,7 +563,7 @@ public class Registration implements Serializable {
             return this;
         }
 
-        public Builder lwM2mVersion(String lwM2mVersion) {
+        public Builder lwM2mVersion(Version lwM2mVersion) {
             this.lwM2mVersion = lwM2mVersion;
             return this;
         }
@@ -479,8 +573,31 @@ public class Registration implements Serializable {
             return this;
         }
 
+        public Builder rootPath(String rootPath) {
+            this.rootPath = rootPath;
+            return this;
+        }
+
+        public Builder supportedContentFormats(Set<ContentFormat> supportedContentFormats) {
+            this.supportedContentFormats = supportedContentFormats;
+            return this;
+        }
+
+        public Builder supportedContentFormats(ContentFormat... supportedContentFormats) {
+            this.supportedContentFormats = new HashSet<>();
+            for (ContentFormat contentFormat : supportedContentFormats) {
+                this.supportedContentFormats.add(contentFormat);
+            }
+            return this;
+        }
+
         public Builder supportedObjects(Map<Integer, String> supportedObjects) {
-            this.supportedObjects = Collections.unmodifiableMap(supportedObjects);
+            this.supportedObjects = supportedObjects;
+            return this;
+        }
+
+        public Builder availableInstances(Set<LwM2mPath> availableInstances) {
+            this.availableInstances = availableInstances;
             return this;
         }
 
@@ -489,12 +606,170 @@ public class Registration implements Serializable {
             return this;
         }
 
-        public Registration build() {
-            return new Registration(Builder.this.registrationId, Builder.this.endpoint, Builder.this.identity,
-                    Builder.this.lwM2mVersion, Builder.this.lifeTimeInSec, Builder.this.smsNumber, this.bindingMode,
-                    this.queueMode, this.objectLinks, this.registrationDate, this.lastUpdate,
-                    this.additionalRegistrationAttributes, this.supportedObjects);
+        public Builder applicationData(Map<String, String> applicationData) {
+            this.applicationData = applicationData;
+            return this;
         }
 
+        private void extractDataFromObjectLinks() {
+            if (objectLinks != null) {
+                // Define default RootPath;
+                rootPath = "/";
+
+                // Parse object link to extract root path
+                for (Link link : objectLinks) {
+                    if (link != null && "oma.lwm2m".equals(Link.unquote(link.getAttributes().get("rt")))) {
+                        rootPath = link.getUrl();
+                        if (!rootPath.endsWith("/")) {
+                            rootPath = rootPath + "/";
+                        }
+                        break;
+                    }
+                }
+
+                // Extract data from link object
+                supportedObjects = new HashMap<>();
+                availableInstances = new HashSet<>();
+                for (Link link : objectLinks) {
+                    if (link != null) {
+                        // search supported Content format in root link
+                        if (rootPath.equals(link.getUrl())) {
+                            String ctValue = link.getAttributes().get("ct");
+                            if (ctValue != null) {
+                                supportedContentFormats = extractContentFormat(ctValue);
+                            }
+                        } else {
+                            LwM2mPath path = LwM2mPath.parse(link.getUrl(), rootPath);
+                            if (path != null) {
+                                // add supported objects
+                                if (path.isObject()) {
+                                    addSupportedObject(link, path);
+                                } else if (path.isObjectInstance()) {
+                                    addSupportedObject(link, path);
+                                    availableInstances.add(path);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private Set<ContentFormat> extractContentFormat(String ctValue) {
+            Set<ContentFormat> supportedContentFormats = new HashSet<>();
+
+            // add content format from ct attributes
+            if (!ctValue.startsWith("\"")) {
+                try {
+                    supportedContentFormats.add(ContentFormat.fromCode(ctValue));
+                } catch (NumberFormatException e) {
+                    LOG.warn(
+                            "Invalid supported Content format for ct attributes for registration {} of client {} :  [{}] is not an Integer",
+                            registrationId, endpoint, ctValue);
+                }
+            } else {
+                if (!ctValue.endsWith("\"")) {
+                    LOG.warn("Invalid ct value [{}] attributes for registration {} of client {} : end quote is missing",
+                            ctValue, registrationId, endpoint);
+                } else {
+                    String[] formats = Link.unquote(ctValue).split(" ");
+                    for (String codeAsString : formats) {
+                        try {
+                            ContentFormat contentformat = ContentFormat.fromCode(codeAsString);
+                            if (supportedContentFormats.contains(contentformat)) {
+                                LOG.warn(
+                                        "Duplicate Content format [{}] in ct={} attributes for registration {} of client {} ",
+                                        codeAsString, ctValue, registrationId, endpoint);
+                            }
+                            supportedContentFormats.add(contentformat);
+                        } catch (NumberFormatException e) {
+                            LOG.warn(
+                                    "Invalid supported Content format in ct={} attributes for registration {} of client {}: [{}] is not an Integer",
+                                    ctValue, registrationId, endpoint, codeAsString);
+                        }
+                    }
+                }
+            }
+
+            // add mandatory content format
+            for (ContentFormat format : ContentFormat.knownContentFormat) {
+                if (format.isMandatoryForClient(lwM2mVersion)) {
+                    supportedContentFormats.add(format);
+                }
+            }
+            return supportedContentFormats;
+        }
+
+        private void addSupportedObject(Link link, LwM2mPath path) {
+            // extract object id and version
+            int objectId = path.getObjectId();
+            String version = link.getAttributes().get(Attribute.OBJECT_VERSION);
+            // un-quote version (see https://github.com/eclipse/leshan/issues/732)
+            version = Link.unquote(version);
+            String currentVersion = supportedObjects.get(objectId);
+
+            // store it in map
+            if (currentVersion == null) {
+                // we never find version for this object add it
+                if (version != null) {
+                    supportedObjects.put(objectId, version);
+                } else {
+                    supportedObjects.put(objectId, ObjectModel.DEFAULT_VERSION);
+                }
+            } else {
+                // if version is already set, we override it only if new version is not DEFAULT_VERSION
+                if (version != null && !version.equals(ObjectModel.DEFAULT_VERSION)) {
+                    supportedObjects.put(objectId, version);
+                }
+            }
+        }
+
+        public Registration build() {
+            // Define Default value
+            rootPath = rootPath == null ? "/" : rootPath;
+            lifeTimeInSec = lifeTimeInSec == null ? DEFAULT_LIFETIME_IN_SEC : lifeTimeInSec;
+            lwM2mVersion = lwM2mVersion == null ? Version.getDefault() : lwM2mVersion;
+            bindingMode = bindingMode == null ? EnumSet.of(BindingMode.U) : bindingMode;
+            queueMode = queueMode == null && lwM2mVersion.newerThan(Version.V1_0) ? Boolean.FALSE : queueMode;
+            registrationDate = registrationDate == null ? new Date() : registrationDate;
+            lastUpdate = lastUpdate == null ? new Date() : lastUpdate;
+
+            // Extract data from object links if wanted
+            if (extractData) {
+                extractDataFromObjectLinks();
+            }
+
+            // Make collection immutable
+            // We create a new Collection and make it "unmodifiable".
+            if (supportedContentFormats == null || supportedContentFormats.isEmpty()) {
+                supportedContentFormats = Collections.emptySet();
+            } else {
+                supportedContentFormats = Collections.unmodifiableSet(new HashSet<>(supportedContentFormats));
+            }
+            if (supportedObjects == null || supportedObjects.isEmpty()) {
+                supportedObjects = Collections.emptyMap();
+            } else {
+                supportedObjects = Collections.unmodifiableMap(new HashMap<>(supportedObjects));
+            }
+            if (availableInstances == null || availableInstances.isEmpty()) {
+                availableInstances = Collections.emptySet();
+            } else {
+                availableInstances = Collections.unmodifiableSet(new TreeSet<>(availableInstances));
+            }
+            if (additionalRegistrationAttributes == null || additionalRegistrationAttributes.isEmpty()) {
+                additionalRegistrationAttributes = Collections.emptyMap();
+            } else {
+                additionalRegistrationAttributes = Collections
+                        .unmodifiableMap(new HashMap<>(additionalRegistrationAttributes));
+            }
+            if (applicationData == null || applicationData.isEmpty()) {
+                applicationData = Collections.emptyMap();
+            } else {
+                applicationData = Collections.unmodifiableMap(new HashMap<>(applicationData));
+            }
+
+            // Create Registration
+            return new Registration(this);
+        }
     }
 }

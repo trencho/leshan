@@ -118,5 +118,4 @@ public class ReadMultiValueTest {
         LwM2mObjectInstance instance = (LwM2mObjectInstance) response.getContent();
         assertEquals(0, instance.getId());
     }
-
 }

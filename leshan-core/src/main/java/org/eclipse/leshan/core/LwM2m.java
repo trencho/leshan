@@ -21,6 +21,7 @@ public interface LwM2m {
      * Version of LWM2M specification.
      */
     public class Version implements Comparable<Version> {
+
         public static Version V1_0 = new Version("1.0", true);
         public static Version V1_1 = new Version("1.1", true);
         private static Version[] supportedVersions = new Version[] { V1_0, V1_1 };

@@ -15,9 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
+import java.util.List;
+
+import org.eclipse.leshan.core.model.LwM2mModel;
+import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.Identity;
+import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.util.RandomStringUtils;
 import org.eclipse.leshan.core.util.Validate;
 
@@ -34,6 +39,10 @@ public class DefaultBootstrapSession implements BootstrapSession {
     private final long creationTime;
     private final BootstrapRequest request;
 
+    private volatile LwM2mModel model;
+    private volatile List<BootstrapDownlinkRequest<? extends LwM2mResponse>> requests;
+    private volatile List<LwM2mResponse> responses;
+    private volatile boolean moreTasks = false;
     private volatile boolean cancelled = false;
 
     /**
@@ -130,6 +139,39 @@ public class DefaultBootstrapSession implements BootstrapSession {
     @Override
     public BootstrapRequest getBootstrapRequest() {
         return request;
+    }
+
+    public List<BootstrapDownlinkRequest<? extends LwM2mResponse>> getRequests() {
+        return requests;
+    }
+
+    public void setRequests(List<BootstrapDownlinkRequest<? extends LwM2mResponse>> requests) {
+        this.requests = requests;
+    }
+
+    public List<LwM2mResponse> getResponses() {
+        return responses;
+    }
+
+    public void setResponses(List<LwM2mResponse> responses) {
+        this.responses = responses;
+    }
+
+    @Override
+    public LwM2mModel getModel() {
+        return model;
+    }
+
+    public void setModel(LwM2mModel model) {
+        this.model = model;
+    }
+
+    public void setMoreTasks(boolean moreTasks) {
+        this.moreTasks = moreTasks;
+    }
+
+    public boolean hasMoreTasks() {
+        return moreTasks;
     }
 
     @Override

@@ -17,7 +17,6 @@ package org.eclipse.leshan.server.bootstrap;
 
 import org.eclipse.leshan.core.ResponseCode;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
-import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
@@ -51,9 +50,10 @@ public class BootstrapHandlerTest {
     @Test
     public void error_if_not_authorized() {
         // prepare bootstrapHandler with a session manager which does not authorized any session
-        BootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(false);
-        BootstrapHandler bsHandler = new DefaultBootstrapHandler((BootstrapConfigurationStore) null, null,
-                bsSessionManager);
+        BootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(false,
+                new InMemoryBootstrapConfigStore());
+        BootstrapHandler bsHandler = new DefaultBootstrapHandler(new MockRequestSender(Mode.ALWAYS_SUCCESS),
+                bsSessionManager, new BootstrapSessionDispatcher());
 
         // Try to bootstrap
         BootstrapResponse response = bsHandler
@@ -69,11 +69,13 @@ public class BootstrapHandlerTest {
         // prepare a bootstrap handler with a session manager which authorize all session
         // and a sender which "obtains" always successful response.
         // and a config store with and an empty config for the expected endpoint
-        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true);
         LwM2mBootstrapRequestSender requestSender = new MockRequestSender(Mode.ALWAYS_SUCCESS);
-        EditableBootstrapConfigurationStore bsStore = new InMemoryBootstrapConfigurationStore();
-        bsStore.add("endpoint", new BootstrapConfiguration());
-        BootstrapHandler bsHandler = new DefaultBootstrapHandler(bsStore, requestSender, bsSessionManager);
+        EditableBootstrapConfigStore bsStore = new InMemoryBootstrapConfigStore();
+        bsStore.add("endpoint", new BootstrapConfig());
+        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true, bsStore);
+
+        BootstrapHandler bsHandler = new DefaultBootstrapHandler(requestSender, bsSessionManager,
+                new BootstrapSessionDispatcher());
 
         // Try to bootstrap
         SendableResponse<BootstrapResponse> sendableResponse = bsHandler
@@ -90,11 +92,12 @@ public class BootstrapHandlerTest {
         // prepare a bootstrap handler with a session manager which authorize all session
         // and a sender which always failed to send request.
         // and a config store with and an empty config for the expected endpoint
-        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true);
         LwM2mBootstrapRequestSender requestSender = new MockRequestSender(Mode.ALWAYS_FAILURE);
-        EditableBootstrapConfigurationStore bsStore = new InMemoryBootstrapConfigurationStore();
-        bsStore.add("endpoint", new BootstrapConfiguration());
-        BootstrapHandler bsHandler = new DefaultBootstrapHandler(bsStore, requestSender, bsSessionManager);
+        EditableBootstrapConfigStore bsStore = new InMemoryBootstrapConfigStore();
+        bsStore.add("endpoint", new BootstrapConfig());
+        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true, bsStore);
+        BootstrapHandler bsHandler = new DefaultBootstrapHandler(requestSender, bsSessionManager,
+                new BootstrapSessionDispatcher());
 
         // Try to bootstrap
         SendableResponse<BootstrapResponse> sendableResponse = bsHandler
@@ -113,12 +116,12 @@ public class BootstrapHandlerTest {
         // prepare a bootstrap handler with a session manager which authorize all session
         // and a sender which never get response.
         // and a config store with and an empty config for the expected endpoint
-        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true);
         MockRequestSender requestSender = new MockRequestSender(Mode.NO_RESPONSE);
-        EditableBootstrapConfigurationStore bsStore = new InMemoryBootstrapConfigurationStore();
-        bsStore.add("endpoint", new BootstrapConfiguration());
-        BootstrapHandler bsHandler = new DefaultBootstrapHandler(bsStore, requestSender, bsSessionManager,
-                DefaultBootstrapHandler.DEFAULT_TIMEOUT);
+        EditableBootstrapConfigStore bsStore = new InMemoryBootstrapConfigStore();
+        bsStore.add("endpoint", new BootstrapConfig());
+        MockBootstrapSessionManager bsSessionManager = new MockBootstrapSessionManager(true, bsStore);
+        BootstrapHandler bsHandler = new DefaultBootstrapHandler(requestSender, bsSessionManager,
+                new BootstrapSessionDispatcher(), DefaultBootstrapHandler.DEFAULT_TIMEOUT);
 
         // First bootstrap : which will not end (because of sender)
         SendableResponse<BootstrapResponse> first_response = bsHandler
@@ -214,7 +217,7 @@ public class BootstrapHandlerTest {
         }
     }
 
-    private static class MockBootstrapSessionManager implements BootstrapSessionManager {
+    private static class MockBootstrapSessionManager extends DefaultBootstrapSessionManager {
 
         private final boolean authorized;
         private BootstrapSession lastSession;
@@ -222,7 +225,8 @@ public class BootstrapHandlerTest {
         private final List<BootstrapSession> endedSession = new ArrayList<BootstrapSession>();
         private final Map<BootstrapSession, BootstrapFailureCause> failureCauses = new HashMap<>();
 
-        public MockBootstrapSessionManager(boolean authorized) {
+        public MockBootstrapSessionManager(boolean authorized, BootstrapConfigStore store) {
+            super(null, store);
             this.authorized = authorized;
         }
 
@@ -250,34 +254,15 @@ public class BootstrapHandlerTest {
 
         @Override
         public void end(BootstrapSession bsSession) {
+            super.end(bsSession);
             endedSession.add(bsSession);
         }
 
         @Override
         public void failed(BootstrapSession bsSession, BootstrapFailureCause cause) {
+            super.end(bsSession);
             lastFailureCause = cause;
             failureCauses.put(bsSession, cause);
-        }
-
-        @Override
-        public void onResponseSuccess(BootstrapSession bsSession,
-                BootstrapDownlinkRequest<? extends LwM2mResponse> request) {
-
-        }
-
-        @Override
-        public BootstrapPolicy onResponseError(BootstrapSession bsSession,
-                BootstrapDownlinkRequest<? extends LwM2mResponse> request, LwM2mResponse response) {
-            if (request instanceof BootstrapFinishRequest) {
-                return BootstrapPolicy.STOP;
-            }
-            return BootstrapPolicy.CONTINUE;
-        }
-
-        @Override
-        public BootstrapPolicy onRequestFailure(BootstrapSession bsSession,
-                BootstrapDownlinkRequest<? extends LwM2mResponse> request, Throwable cause) {
-            return BootstrapPolicy.STOP;
         }
 
         public void reset() {
