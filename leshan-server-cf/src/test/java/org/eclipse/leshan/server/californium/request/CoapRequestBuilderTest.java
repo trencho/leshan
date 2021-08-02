@@ -26,8 +26,8 @@ import org.eclipse.leshan.core.model.ObjectLoader;
 import org.eclipse.leshan.core.model.StaticModel;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
-import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
-import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mEncoder;
+import org.eclipse.leshan.core.node.codec.LwM2mEncoder;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.CreateRequest;
 import org.eclipse.leshan.core.request.DeleteRequest;
@@ -62,12 +62,12 @@ import static org.junit.Assert.assertNotNull;
 public class CoapRequestBuilderTest {
 
     private static LwM2mModel model;
-    private static LwM2mNodeEncoder encoder;
+    private static LwM2mEncoder encoder;
 
     @BeforeClass
     public static void loadModel() {
         model = new StaticModel(ObjectLoader.loadDefault());
-        encoder = new DefaultLwM2mNodeEncoder();
+        encoder = new DefaultLwM2mEncoder();
     }
 
     private Registration newRegistration() throws UnknownHostException {

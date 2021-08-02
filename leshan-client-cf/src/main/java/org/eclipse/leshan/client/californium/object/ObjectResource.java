@@ -40,10 +40,11 @@ import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.node.LwM2mResource;
 import org.eclipse.leshan.core.node.codec.CodecException;
-import org.eclipse.leshan.core.node.codec.LwM2mNodeDecoder;
-import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.node.codec.LwM2mDecoder;
+import org.eclipse.leshan.core.node.codec.LwM2mEncoder;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
+import org.eclipse.leshan.core.request.BootstrapReadRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.CreateRequest;
@@ -58,6 +59,7 @@ import org.eclipse.leshan.core.request.WriteRequest;
 import org.eclipse.leshan.core.request.WriteRequest.Mode;
 import org.eclipse.leshan.core.response.BootstrapDeleteResponse;
 import org.eclipse.leshan.core.response.BootstrapDiscoverResponse;
+import org.eclipse.leshan.core.response.BootstrapReadResponse;
 import org.eclipse.leshan.core.response.BootstrapWriteResponse;
 import org.eclipse.leshan.core.response.CreateResponse;
 import org.eclipse.leshan.core.response.DeleteResponse;
@@ -78,11 +80,11 @@ import static org.eclipse.leshan.core.californium.ResponseCodeUtil.toCoapRespons
 public class ObjectResource extends LwM2mClientCoapResource implements ObjectListener {
 
     protected final LwM2mObjectEnabler nodeEnabler;
-    protected final LwM2mNodeEncoder encoder;
-    protected final LwM2mNodeDecoder decoder;
+    protected final LwM2mEncoder encoder;
+    protected final LwM2mDecoder decoder;
 
     public ObjectResource(LwM2mObjectEnabler nodeEnabler, RegistrationEngine registrationEngine,
-            CaliforniumEndpointsManager endpointsManager, LwM2mNodeEncoder encoder, LwM2mNodeDecoder decoder) {
+            CaliforniumEndpointsManager endpointsManager, LwM2mEncoder encoder, LwM2mDecoder decoder) {
         super(Integer.toString(nodeEnabler.getId()), registrationEngine, endpointsManager);
         this.nodeEnabler = nodeEnabler;
         this.nodeEnabler.addListener(this);
@@ -152,21 +154,41 @@ public class ObjectResource extends LwM2mClientCoapResource implements ObjectLis
                     return;
                 }
             }
-            // Manage Read Request
+
             else {
-                ReadRequest readRequest = new ReadRequest(requestedContentFormat, URI, coapRequest);
-                ReadResponse response = nodeEnabler.read(identity, readRequest);
-                if (response.getCode() == org.eclipse.leshan.core.ResponseCode.CONTENT) {
-                    LwM2mPath path = new LwM2mPath(URI);
-                    LwM2mNode content = response.getContent();
-                    LwM2mModel model = new StaticModel(nodeEnabler.getObjectModel());
-                    ContentFormat format = getContentFormat(readRequest, requestedContentFormat);
-                    exchange.respond(ResponseCode.CONTENT, encoder.encode(content, format, path, model),
-                            format.getCode());
-                    return;
+                if (identity.isLwm2mBootstrapServer()) {
+                    // Manage Bootstrap Read Request
+                    BootstrapReadRequest readRequest = new BootstrapReadRequest(requestedContentFormat, URI,
+                            coapRequest);
+                    BootstrapReadResponse response = nodeEnabler.read(identity, readRequest);
+                    if (response.getCode() == org.eclipse.leshan.core.ResponseCode.CONTENT) {
+                        LwM2mPath path = new LwM2mPath(URI);
+                        LwM2mNode content = response.getContent();
+                        LwM2mModel model = new StaticModel(nodeEnabler.getObjectModel());
+                        ContentFormat format = getContentFormat(readRequest, requestedContentFormat);
+                        exchange.respond(ResponseCode.CONTENT, encoder.encode(content, format, path, model),
+                                format.getCode());
+                        return;
+                    } else {
+                        exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+                        return;
+                    }
                 } else {
-                    exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
-                    return;
+                    // Manage Read Request
+                    ReadRequest readRequest = new ReadRequest(requestedContentFormat, URI, coapRequest);
+                    ReadResponse response = nodeEnabler.read(identity, readRequest);
+                    if (response.getCode() == org.eclipse.leshan.core.ResponseCode.CONTENT) {
+                        LwM2mPath path = new LwM2mPath(URI);
+                        LwM2mNode content = response.getContent();
+                        LwM2mModel model = new StaticModel(nodeEnabler.getObjectModel());
+                        ContentFormat format = getContentFormat(readRequest, requestedContentFormat);
+                        exchange.respond(ResponseCode.CONTENT, encoder.encode(content, format, path, model),
+                                format.getCode());
+                        return;
+                    } else {
+                        exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+                        return;
+                    }
                 }
             }
         }
@@ -267,15 +289,20 @@ public class ObjectResource extends LwM2mClientCoapResource implements ObjectLis
 
         // Manage Execute Request
         if (path.isResource()) {
-            byte[] payload = exchange.getRequestPayload();
-            ExecuteResponse response = nodeEnabler.execute(identity,
-                    new ExecuteRequest(URI, payload != null ? new String(payload) : null, coapRequest));
-            if (response.getCode().isError()) {
-                exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
-            } else {
-                exchange.respond(toCoapResponseCode(response.getCode()));
+            // execute request has no content format at all or a TEXT concent format for parameters.
+            if (!exchange.getRequestOptions().hasContentFormat()
+                    || ContentFormat.fromCode(exchange.getRequestOptions().getContentFormat()) == ContentFormat.TEXT) {
+                byte[] payload = exchange.getRequestPayload();
+
+                ExecuteResponse response = nodeEnabler.execute(identity,
+                        new ExecuteRequest(URI, payload != null ? new String(payload) : null, coapRequest));
+                if (response.getCode().isError()) {
+                    exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+                } else {
+                    exchange.respond(toCoapResponseCode(response.getCode()));
+                }
+                return;
             }
-            return;
         }
 
         // handle content format for Write (Update) and Create request
@@ -291,6 +318,22 @@ public class ObjectResource extends LwM2mClientCoapResource implements ObjectLis
         }
         LwM2mModel model = new StaticModel(nodeEnabler.getObjectModel());
 
+        // manage partial update of multi-instance resource
+        if (path.isResource()) {
+            try {
+                LwM2mNode lwM2mNode = decoder.decode(exchange.getRequestPayload(), contentFormat, path, model);
+                WriteResponse response = nodeEnabler.write(identity,
+                        new WriteRequest(Mode.UPDATE, contentFormat, URI, lwM2mNode, coapRequest));
+                if (response.getCode().isError()) {
+                    exchange.respond(toCoapResponseCode(response.getCode()), response.getErrorMessage());
+                } else {
+                    exchange.respond(toCoapResponseCode(response.getCode()));
+                }
+            } catch (CodecException e) {
+                handleInvalidRequest(exchange.advanced(), "Unable to decode payload on WRITE", e);
+            }
+            return;
+        }
         // Manage Update Instance
         if (path.isObjectInstance()) {
             try {

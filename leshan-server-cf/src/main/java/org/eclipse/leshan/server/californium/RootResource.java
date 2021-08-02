@@ -15,10 +15,9 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium;
 
+
 import org.eclipse.californium.core.CoapResource;
-import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.coap.CoAP.ResponseCode;
-import org.eclipse.californium.core.network.Endpoint;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 
 import java.util.List;
@@ -28,21 +27,13 @@ import java.util.List;
  */
 public class RootResource extends CoapResource {
 
-    private CoapServer coapServer;
-
-    public RootResource(CoapServer coapServer) {
+    public RootResource() {
         super("");
         setVisible(false);
-        this.coapServer = coapServer;
     }
 
     @Override
     public void handleGET(CoapExchange exchange) {
         exchange.respond(ResponseCode.NOT_FOUND);
-    }
-
-    @Override
-    public List<Endpoint> getEndpoints() {
-        return coapServer.getEndpoints();
     }
 }

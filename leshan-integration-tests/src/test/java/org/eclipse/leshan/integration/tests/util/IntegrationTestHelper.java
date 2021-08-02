@@ -35,8 +35,8 @@ import org.eclipse.leshan.core.model.ResourceModel;
 import org.eclipse.leshan.core.model.ResourceModel.Operations;
 import org.eclipse.leshan.core.model.ResourceModel.Type;
 import org.eclipse.leshan.core.model.StaticModel;
-import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
-import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeEncoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mEncoder;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.request.UplinkRequest;
 import org.eclipse.leshan.core.response.ExecuteResponse;
@@ -88,6 +88,7 @@ public class IntegrationTestHelper {
     public static final int STRING_MANDATORY_RESOURCE_ID = 9;
     public static final int STRING_RESOURCE_INSTANCE_ID = 65010;
     public static final int UNSIGNED_INTEGER_RESOURCE_ID = 11;
+    public static final int OPAQUE_MULTI_INSTANCE_RESOURCE_ID = 12;
 
     public static final String MULTI_INSTANCE = "multiinstance";
 
@@ -132,9 +133,13 @@ public class IntegrationTestHelper {
         ResourceModel unsignedintegerfield = new ResourceModel(UNSIGNED_INTEGER_RESOURCE_ID, "unsigned", Operations.RW,
                 false, false, Type.UNSIGNED_INTEGER, null, null, null);
 
+        ResourceModel opaqueMultiField = new ResourceModel(OPAQUE_MULTI_INSTANCE_RESOURCE_ID, "opaque_multi",
+                Operations.RW, true, false, Type.OPAQUE, null, null, null);
+
         objectModels.add(new ObjectModel(TEST_OBJECT_ID, "testobject", null, ObjectModel.DEFAULT_VERSION, true, false,
                 stringfield, booleanfield, integerfield, floatfield, timefield, opaquefield, objlnkfield,
-                objlnkSinglefield, integermandatoryfield, stringmandatoryfield, multiInstance, unsignedintegerfield));
+                objlnkSinglefield, integermandatoryfield, stringmandatoryfield, multiInstance, unsignedintegerfield,
+                opaqueMultiField));
 
         return objectModels;
     }
@@ -194,8 +199,8 @@ public class IntegrationTestHelper {
 
         // Build Client
         LeshanClientBuilder builder = new LeshanClientBuilder(currentEndpointIdentifier.get());
-        builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
-        builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
+        builder.setDecoder(new DefaultLwM2mDecoder(true));
+        builder.setEncoder(new DefaultLwM2mEncoder(true));
         builder.setAdditionalAttributes(additionalAttributes);
         builder.setObjects(objects);
         client = builder.build();
@@ -210,8 +215,8 @@ public class IntegrationTestHelper {
 
     protected LeshanServerBuilder createServerBuilder() {
         LeshanServerBuilder builder = new LeshanServerBuilder();
-        builder.setDecoder(new DefaultLwM2mNodeDecoder(true));
-        builder.setEncoder(new DefaultLwM2mNodeEncoder(true));
+        builder.setDecoder(new DefaultLwM2mDecoder(true));
+        builder.setEncoder(new DefaultLwM2mEncoder(true));
         builder.setObjectModelProvider(new VersionedModelProvider(createObjectModels()));
         builder.setLocalAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
         builder.setLocalSecureAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));

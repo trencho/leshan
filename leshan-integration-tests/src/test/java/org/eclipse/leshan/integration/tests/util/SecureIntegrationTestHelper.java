@@ -266,7 +266,7 @@ public class SecureIntegrationTestHelper extends IntegrationTestHelper {
                 if (pskStore != null) {
                     PskPublicInformation identity = pskStore.getIdentity(null, null);
                     SecretKey key = pskStore
-                            .requestPskSecretResult(ConnectionId.EMPTY, null, identity, null, null, null).getSecret();
+                            .requestPskSecretResult(ConnectionId.EMPTY, null, identity, null, null, null, false).getSecret();
                     singlePSKStore = new SinglePSKStore(identity, key);
                     dtlsConfigBuilder.setAdvancedPskStore(singlePSKStore);
                 }

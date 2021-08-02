@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * a {@link LwM2mPath} decoder.
  * 
- * @see DefaultLwM2mNodeDecoder
+ * @see DefaultLwM2mDecoder
  */
 public interface PathDecoder {
 

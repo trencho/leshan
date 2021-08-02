@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * A {@link NodeEncoder} which can also encode time-stamped values.
  * 
- * @see DefaultLwM2mNodeEncoder
+ * @see DefaultLwM2mEncoder
  */
 public interface TimestampedNodeEncoder extends NodeEncoder {
 

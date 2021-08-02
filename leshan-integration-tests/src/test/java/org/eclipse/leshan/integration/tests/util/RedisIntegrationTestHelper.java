@@ -16,6 +16,10 @@
 package org.eclipse.leshan.integration.tests.util;
 
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.model.StaticModelProvider;
 import org.eclipse.leshan.server.redis.RedisRegistrationStore;
@@ -33,7 +37,7 @@ public class RedisIntegrationTestHelper extends IntegrationTestHelper {
         LeshanServerBuilder builder = new LeshanServerBuilder();
         StaticModelProvider modelProvider = new StaticModelProvider(createObjectModels());
         builder.setObjectModelProvider(modelProvider);
-        DefaultLwM2mNodeDecoder decoder = new DefaultLwM2mNodeDecoder();
+        DefaultLwM2mDecoder decoder = new DefaultLwM2mDecoder();
         builder.setDecoder(decoder);
         builder.setLocalAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));
         builder.setLocalSecureAddress(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0));

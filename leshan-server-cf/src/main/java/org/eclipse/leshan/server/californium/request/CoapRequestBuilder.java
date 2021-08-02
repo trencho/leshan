@@ -27,10 +27,11 @@ import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mObject;
 import org.eclipse.leshan.core.node.LwM2mObjectInstance;
 import org.eclipse.leshan.core.node.LwM2mPath;
-import org.eclipse.leshan.core.node.codec.LwM2mNodeEncoder;
+import org.eclipse.leshan.core.node.codec.LwM2mEncoder;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
+import org.eclipse.leshan.core.request.BootstrapReadRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.request.CancelObservationRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
@@ -68,12 +69,12 @@ public class CoapRequestBuilder implements DownlinkRequestVisitor {
     private final boolean allowConnectionInitiation;
 
     private final LwM2mModel model;
-    private final LwM2mNodeEncoder encoder;
+    private final LwM2mEncoder encoder;
 
     private LowerLayerConfig lowerLayerConfig;
 
     public CoapRequestBuilder(Identity destination, String rootPath, String registrationId, String endpoint,
-            LwM2mModel model, LwM2mNodeEncoder encoder, boolean allowConnectionInitiation,
+            LwM2mModel model, LwM2mEncoder encoder, boolean allowConnectionInitiation,
             LowerLayerConfig lowerLayerConfig) {
         this.destination = destination;
         this.rootPath = rootPath;
@@ -207,6 +208,15 @@ public class CoapRequestBuilder implements DownlinkRequestVisitor {
         ContentFormat format = request.getContentFormat();
         coapRequest.getOptions().setContentFormat(format.getCode());
         coapRequest.setPayload(encoder.encode(request.getNode(), format, request.getPath(), model));
+        setTarget(coapRequest, request.getPath());
+        applyLowerLayerConfig(coapRequest);
+    }
+
+    @Override
+    public void visit(BootstrapReadRequest request) {
+        coapRequest = Request.newGet();
+        if (request.getContentFormat() != null)
+            coapRequest.getOptions().setAccept(request.getContentFormat().getCode());
         setTarget(coapRequest, request.getPath());
         applyLowerLayerConfig(coapRequest);
     }

@@ -53,7 +53,7 @@ public class LwM2mPskStore implements AdvancedPskStore {
 
     @Override
     public PskSecretResult requestPskSecretResult(ConnectionId cid, ServerNames serverName,
-            PskPublicInformation identity, String hmacAlgorithm, SecretKey otherSecret, byte[] seed) {
+            PskPublicInformation identity, String hmacAlgorithm, SecretKey otherSecret, byte[] seed, boolean useExtendedMasterSecret) {
         if (securityStore == null)
             return null;
 
@@ -67,7 +67,7 @@ public class LwM2mPskStore implements AdvancedPskStore {
     }
 
     @Override
-    public void setResultHandler(org.eclipse.californium.scandium.dtls.PskSecretResultHandler resultHandler) {
+    public void setResultHandler(org.eclipse.californium.scandium.dtls.HandshakeResultHandler resultHandler) {
         // we don't use async mode.
     }
 

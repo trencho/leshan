@@ -1,10 +1,10 @@
 /*******************************************************************************
  * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
+ * are made available under the terms of the Eclipse Public License v2.0
  * and Eclipse Distribution License v1.0 which accompany this distribution.
  * 
  * The Eclipse Public License is available at
- *    http://www.eclipse.org/legal/epl-v10.html
+ *    http://www.eclipse.org/legal/epl-v20.html
  * and the Eclipse Distribution License is available at
  *    http://www.eclipse.org/org/documents/edl-v10.html.
  * 
@@ -27,7 +27,7 @@ import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.ObjectLink;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.node.codec.CodecException;
-import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
+import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
 import org.eclipse.leshan.core.node.codec.MultiNodeDecoder;
 import org.eclipse.leshan.core.node.codec.TimestampedNodeDecoder;
 import org.eclipse.leshan.core.util.Hex;
@@ -125,7 +125,7 @@ public class LwM2mNodeSenMLDecoder implements TimestampedNodeDecoder, MultiNodeD
                         nodes.put(path, null);
                     } else {
                         LwM2mNode node = parseRecords(recordsByPath.get(path), path, model,
-                                DefaultLwM2mNodeDecoder.nodeClassFromPath(path));
+                                DefaultLwM2mDecoder.nodeClassFromPath(path));
                         nodes.put(path, node);
                     }
                 }
@@ -137,7 +137,7 @@ public class LwM2mNodeSenMLDecoder implements TimestampedNodeDecoder, MultiNodeD
                     LwM2mResolvedSenMLRecord resolvedRecord = resolver.resolve(record);
                     LwM2mPath path = resolvedRecord.getPath();
                     LwM2mNode node = parseRecords(Arrays.asList(resolvedRecord), path, model,
-                            DefaultLwM2mNodeDecoder.nodeClassFromPath(path));
+                            DefaultLwM2mDecoder.nodeClassFromPath(path));
                     nodes.put(path, node);
                 }
             }
