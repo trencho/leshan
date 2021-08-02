@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -33,6 +29,10 @@ import org.eclipse.leshan.server.security.SecurityChecker;
 import org.eclipse.leshan.server.security.SecurityInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Default implementation of a {@link BootstrapSessionManager}.

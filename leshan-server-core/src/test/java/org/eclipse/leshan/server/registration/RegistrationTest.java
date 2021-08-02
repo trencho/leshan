@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import static org.junit.Assert.*;
-
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Set;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -29,6 +22,15 @@ import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.server.registration.Registration.Builder;
 import org.junit.Test;
+
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class RegistrationTest {
 

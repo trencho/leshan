@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node;
 
+import org.eclipse.leshan.core.model.ResourceModel.Type;
+
 import java.util.Collection;
 import java.util.Iterator;
-
-import org.eclipse.leshan.core.model.ResourceModel.Type;
 
 /**
  * Utility class about {@link LwM2mNode} and {@link LwM2mPath}.

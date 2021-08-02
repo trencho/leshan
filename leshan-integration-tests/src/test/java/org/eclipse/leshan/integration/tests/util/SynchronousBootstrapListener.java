@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.util;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
-
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
 import org.eclipse.leshan.core.request.Identity;
@@ -26,6 +22,10 @@ import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.server.bootstrap.BootstrapFailureCause;
 import org.eclipse.leshan.server.bootstrap.BootstrapSession;
 import org.eclipse.leshan.server.bootstrap.BootstrapSessionListener;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class SynchronousBootstrapListener implements BootstrapSessionListener {
 

@@ -142,10 +142,10 @@ public class LeshanServer {
      *        Register operation.
      */
     public LeshanServer(CoapEndpoint unsecuredEndpoint, CoapEndpoint securedEndpoint,
-            CaliforniumRegistrationStore registrationStore, SecurityStore securityStore, Authorizer authorizer,
-            LwM2mModelProvider modelProvider, LwM2mEncoder encoder, LwM2mDecoder decoder,
-            NetworkConfig coapConfig, boolean noQueueMode, ClientAwakeTimeProvider awakeTimeProvider,
-            RegistrationIdProvider registrationIdProvider) {
+                        CaliforniumRegistrationStore registrationStore, SecurityStore securityStore, Authorizer authorizer,
+                        LwM2mModelProvider modelProvider, LwM2mEncoder encoder, LwM2mDecoder decoder,
+                        NetworkConfig coapConfig, boolean noQueueMode, ClientAwakeTimeProvider awakeTimeProvider,
+                        RegistrationIdProvider registrationIdProvider) {
         this(unsecuredEndpoint, securedEndpoint, registrationStore, securityStore, authorizer, modelProvider, encoder,
                 decoder, coapConfig, noQueueMode, awakeTimeProvider, registrationIdProvider, false);
     }

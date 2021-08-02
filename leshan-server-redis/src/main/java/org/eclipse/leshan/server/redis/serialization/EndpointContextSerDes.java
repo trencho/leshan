@@ -20,26 +20,6 @@ import com.eclipsesource.json.JsonObject;
 import com.eclipsesource.json.JsonObject.Member;
 import com.eclipsesource.json.JsonValue;
 import org.eclipse.californium.elements.AddressEndpointContext;
-import org.eclipse.californium.elements.EndpointContext;
-import org.eclipse.californium.elements.MapBasedEndpointContext;
-import org.eclipse.californium.elements.auth.PreSharedKeyIdentity;
-import org.eclipse.californium.elements.auth.RawPublicKeyIdentity;
-import org.eclipse.californium.elements.auth.X509CertPath;
-import org.eclipse.leshan.core.util.Hex;
-
-import javax.security.auth.x500.X500Principal;
-import java.net.InetSocketAddress;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.Principal;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Map;
-
-import javax.security.auth.x500.X500Principal;
-
-import org.eclipse.californium.elements.AddressEndpointContext;
 import org.eclipse.californium.elements.DtlsEndpointContext;
 import org.eclipse.californium.elements.EndpointContext;
 import org.eclipse.californium.elements.MapBasedEndpointContext;
@@ -54,10 +34,15 @@ import org.eclipse.californium.scandium.dtls.ConnectionId;
 import org.eclipse.californium.scandium.dtls.SessionId;
 import org.eclipse.leshan.core.util.Hex;
 
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
-import com.eclipsesource.json.JsonObject.Member;
-import com.eclipsesource.json.JsonValue;
+import javax.security.auth.x500.X500Principal;
+import java.net.InetSocketAddress;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.Principal;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Map;
 
 /**
  * Functions for serializing and deserializing a Californium {@link EndpointContext} in JSON.

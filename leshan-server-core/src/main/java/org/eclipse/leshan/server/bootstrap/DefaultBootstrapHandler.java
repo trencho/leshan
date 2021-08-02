@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.*;
-
-import java.util.concurrent.ConcurrentHashMap;
-
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapFinishRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -32,6 +28,15 @@ import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.server.bootstrap.BootstrapSessionManager.BootstrapPolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ConcurrentHashMap;
+
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.CANCELLED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.FINISH_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.INTERNAL_SERVER_ERROR;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.NO_BOOTSTRAP_CONFIG;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.REQUEST_FAILED;
+import static org.eclipse.leshan.server.bootstrap.BootstrapFailureCause.UNAUTHORIZED;
 
 /**
  * A default implementation for {@link BootstrapHandler}.

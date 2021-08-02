@@ -16,11 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.bootstrap;
 
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.client.util.LinkFormatHelper;
@@ -33,6 +28,11 @@ import org.eclipse.leshan.core.response.BootstrapDeleteResponse;
 import org.eclipse.leshan.core.response.BootstrapDiscoverResponse;
 import org.eclipse.leshan.core.response.BootstrapFinishResponse;
 import org.eclipse.leshan.core.response.SendableResponse;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Handle bootstrap session state.

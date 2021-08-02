@@ -16,12 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import java.net.InetSocketAddress;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.core.network.config.NetworkConfig.Keys;
@@ -63,7 +57,6 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 
 /**
  * Class helping you to build and configure a Californium based Leshan Bootstrap Lightweight M2M server.

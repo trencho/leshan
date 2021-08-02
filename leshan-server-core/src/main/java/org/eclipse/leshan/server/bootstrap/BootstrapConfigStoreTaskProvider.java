@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.node.LwM2mPath;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
@@ -26,6 +22,10 @@ import org.eclipse.leshan.core.response.BootstrapDiscoverResponse;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * An implementation of {@link BootstrapTaskProvider} which use a {@link BootstrapConfigStore} to know which requests to

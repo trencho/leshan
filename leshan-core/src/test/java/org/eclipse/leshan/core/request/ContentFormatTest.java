@@ -15,15 +15,22 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
-import static org.eclipse.leshan.core.request.ContentFormat.*;
-import static org.junit.Assert.assertEquals;
+import org.eclipse.leshan.core.LwM2m.Version;
+import org.eclipse.leshan.core.node.codec.CodecException;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.leshan.core.LwM2m.Version;
-import org.eclipse.leshan.core.node.codec.CodecException;
-import org.junit.Test;
+import static org.eclipse.leshan.core.request.ContentFormat.CBOR;
+import static org.eclipse.leshan.core.request.ContentFormat.JSON;
+import static org.eclipse.leshan.core.request.ContentFormat.LINK;
+import static org.eclipse.leshan.core.request.ContentFormat.OPAQUE;
+import static org.eclipse.leshan.core.request.ContentFormat.SENML_CBOR;
+import static org.eclipse.leshan.core.request.ContentFormat.SENML_JSON;
+import static org.eclipse.leshan.core.request.ContentFormat.TEXT;
+import static org.eclipse.leshan.core.request.ContentFormat.TLV;
+import static org.junit.Assert.assertEquals;
 
 public class ContentFormatTest {
 

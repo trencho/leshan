@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.bootstrap;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 import org.eclipse.leshan.client.servers.ServersInfoExtractor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A default implementation of {@link BootstrapConsistencyChecker}

@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.integration.tests.util;
 
-import org.eclipse.leshan.core.node.codec.DefaultLwM2mNodeDecoder;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-
 import org.eclipse.leshan.core.node.codec.DefaultLwM2mDecoder;
 import org.eclipse.leshan.server.californium.LeshanServerBuilder;
 import org.eclipse.leshan.server.model.StaticModelProvider;

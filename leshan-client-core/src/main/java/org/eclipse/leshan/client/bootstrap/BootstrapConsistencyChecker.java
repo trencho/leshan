@@ -15,10 +15,10 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.bootstrap;
 
+import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
+
 import java.util.List;
 import java.util.Map;
-
-import org.eclipse.leshan.client.resource.LwM2mObjectEnabler;
 
 /**
  * This class is responsible to check the consistency state of the client after at the end of a bootstrap session.

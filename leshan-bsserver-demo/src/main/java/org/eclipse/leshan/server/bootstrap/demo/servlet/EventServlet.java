@@ -15,14 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap.demo.servlet;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.eclipse.jetty.servlets.EventSource;
 import org.eclipse.jetty.servlets.EventSourceServlet;
 import org.eclipse.leshan.core.request.BootstrapDeleteRequest;
@@ -40,8 +34,12 @@ import org.eclipse.leshan.server.californium.bootstrap.LeshanBootstrapServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EventServlet extends EventSourceServlet {
     private static final long serialVersionUID = 1L;

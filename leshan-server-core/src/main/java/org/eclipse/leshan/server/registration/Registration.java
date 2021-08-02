@@ -16,19 +16,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.eclipse.leshan.core.Link;
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.attributes.Attribute;
@@ -42,6 +29,19 @@ import org.eclipse.leshan.core.util.Validate;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * An immutable structure which represent a LW-M2M client registration on the server

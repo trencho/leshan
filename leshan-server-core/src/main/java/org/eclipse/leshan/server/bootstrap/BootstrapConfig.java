@@ -15,13 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.core.CertificateUsage;
 import org.eclipse.leshan.core.MatchingType;
 import org.eclipse.leshan.core.SecurityMode;
@@ -29,6 +22,13 @@ import org.eclipse.leshan.core.request.BindingMode;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
 import org.eclipse.leshan.core.request.ContentFormat;
 import org.eclipse.leshan.core.util.datatype.ULong;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A client configuration to apply to a device during a bootstrap session.

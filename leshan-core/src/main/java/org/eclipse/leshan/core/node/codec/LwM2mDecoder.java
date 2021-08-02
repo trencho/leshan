@@ -15,10 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.node.codec;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.node.LwM2mNode;
 import org.eclipse.leshan.core.node.LwM2mPath;
@@ -26,6 +22,10 @@ import org.eclipse.leshan.core.node.LwM2mResourceInstance;
 import org.eclipse.leshan.core.node.LwM2mSingleResource;
 import org.eclipse.leshan.core.node.TimestampedLwM2mNode;
 import org.eclipse.leshan.core.request.ContentFormat;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Decoder which should support several {@link ContentFormat} and is able to decode :

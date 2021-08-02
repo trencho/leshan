@@ -17,8 +17,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.registration;
 
-import java.util.Date;
-
 import org.eclipse.leshan.core.LwM2m.Version;
 import org.eclipse.leshan.core.request.DeregisterRequest;
 import org.eclipse.leshan.core.request.Identity;
@@ -31,6 +29,8 @@ import org.eclipse.leshan.core.response.UpdateResponse;
 import org.eclipse.leshan.server.security.Authorizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * Handle the client registration logic. Check if the client is allowed to register, with the wanted security scheme.

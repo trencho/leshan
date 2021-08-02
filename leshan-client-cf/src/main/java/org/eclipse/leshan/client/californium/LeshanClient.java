@@ -15,14 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.californium;
 
-import java.net.InetSocketAddress;
-import java.security.cert.Certificate;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -68,6 +60,14 @@ import org.eclipse.leshan.core.response.SendResponse;
 import org.eclipse.leshan.core.util.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
+import java.security.cert.Certificate;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * A Lightweight M2M client based on Californium (CoAP implementation) and Scandium (DTLS implementation) which supports

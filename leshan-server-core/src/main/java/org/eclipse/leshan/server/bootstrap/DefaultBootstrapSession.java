@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.List;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapRequest;
@@ -25,6 +23,8 @@ import org.eclipse.leshan.core.request.Identity;
 import org.eclipse.leshan.core.response.LwM2mResponse;
 import org.eclipse.leshan.core.util.RandomStringUtils;
 import org.eclipse.leshan.core.util.Validate;
+
+import java.util.List;
 
 /**
  * A default implementation for {@link BootstrapSession}

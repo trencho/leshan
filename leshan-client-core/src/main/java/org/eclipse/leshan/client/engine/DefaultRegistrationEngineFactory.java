@@ -15,16 +15,16 @@
  *******************************************************************************/
 package org.eclipse.leshan.client.engine;
 
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-
 import org.eclipse.leshan.client.EndpointsManager;
 import org.eclipse.leshan.client.bootstrap.BootstrapHandler;
 import org.eclipse.leshan.client.observer.LwM2mClientObserver;
 import org.eclipse.leshan.client.request.LwM2mRequestSender;
 import org.eclipse.leshan.client.resource.LwM2mObjectTree;
 import org.eclipse.leshan.core.request.ContentFormat;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
 
 /**
  * A default implementation of {@link RegistrationEngineFactory}.

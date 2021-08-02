@@ -15,8 +15,6 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.californium.bootstrap;
 
-import java.net.InetSocketAddress;
-
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.CoapServer;
 import org.eclipse.californium.core.network.CoapEndpoint;
@@ -38,6 +36,8 @@ import org.eclipse.leshan.server.bootstrap.LwM2mBootstrapRequestSender;
 import org.eclipse.leshan.server.californium.RootResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.net.InetSocketAddress;
 
 /**
  * A Lightweight M2M server, serving bootstrap information on /bs.
@@ -69,8 +69,8 @@ public class LeshanBootstrapServer {
      * @param decoder decoder used to decode response payload.
      */
     public LeshanBootstrapServer(CoapEndpoint unsecuredEndpoint, CoapEndpoint securedEndpoint,
-            BootstrapSessionManager bsSessionManager, BootstrapHandlerFactory bsHandlerFactory,
-            NetworkConfig coapConfig, LwM2mEncoder encoder, LwM2mDecoder decoder) {
+                                 BootstrapSessionManager bsSessionManager, BootstrapHandlerFactory bsHandlerFactory,
+                                 NetworkConfig coapConfig, LwM2mEncoder encoder, LwM2mDecoder decoder) {
 
         Validate.notNull(bsSessionManager, "session manager must not be null");
         Validate.notNull(bsHandlerFactory, "BootstrapHandler factory must not be null");

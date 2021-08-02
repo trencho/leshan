@@ -15,14 +15,14 @@
  *******************************************************************************/
 package org.eclipse.leshan.server.bootstrap;
 
-import java.util.List;
-import java.util.Map;
-
 import org.eclipse.leshan.core.model.LwM2mModel;
 import org.eclipse.leshan.core.request.BootstrapDiscoverRequest;
 import org.eclipse.leshan.core.request.BootstrapDownlinkRequest;
 import org.eclipse.leshan.core.request.BootstrapWriteRequest;
 import org.eclipse.leshan.core.response.LwM2mResponse;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * A class responsible to return tasks to do during a {@link BootstrapSession}

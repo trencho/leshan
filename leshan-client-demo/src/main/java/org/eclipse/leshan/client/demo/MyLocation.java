@@ -4,42 +4,43 @@ import org.eclipse.leshan.client.resource.BaseInstanceEnabler;
 import org.eclipse.leshan.client.servers.ServerIdentity;
 import org.eclipse.leshan.core.model.ObjectModel;
 import org.eclipse.leshan.core.response.ReadResponse;
-import org.eclipse.leshan.core.util.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.Random;
 
 public class MyLocation extends BaseInstanceEnabler {
 
     private static final Logger LOG = LoggerFactory.getLogger(MyLocation.class);
 
     private static final List<Integer> supportedResources = Arrays.asList(0, 1, 5);
+    private static final Random RANDOM = new Random();
 
     private float latitude;
     private float longitude;
+    private float scaleFactor;
+    private Date timestamp;
 
     public MyLocation() {
-        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(new NamedThreadFactory("Location"));
-        scheduler.scheduleAtFixedRate(new Runnable() {
+        this(null, null, 1.0f);
+    }
 
-            @Override
-            public void run() {
-                try {
-                    readLocation();
-                } catch (Exception e) {
-                    System.out.println("Error reading sensor");
-                    e.printStackTrace();
-                }
-            }
-        }, 0, 1, TimeUnit.HOURS);
+    public MyLocation(Float latitude, Float longitude, float scaleFactor) {
+        if (latitude != null) {
+            this.latitude = latitude + 90f;
+        } else {
+            this.latitude = RANDOM.nextInt(180);
+        }
+        if (longitude != null) {
+            this.longitude = longitude + 180f;
+        } else {
+            this.longitude = RANDOM.nextInt(360);
+        }
+        this.scaleFactor = scaleFactor;
+        timestamp = new Date();
     }
 
     @Override
@@ -57,36 +58,49 @@ public class MyLocation extends BaseInstanceEnabler {
         }
     }
 
-    private void readLocation() throws Exception {
-        Runtime rt = Runtime.getRuntime();
-        Process p = rt.exec("python3 /home/pi/Desktop/TempHumSensor/AdafruitDHT.py 11 4");
-        BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        String line;
-        if ((line = bri.readLine()) != null) {
-            if (!(line.contains("Failed") || line.contains("Try again"))) {
-                String[] data = line.split(" ");
-                latitude = (float) Double.parseDouble(data[0]);
-                longitude = (float) Double.parseDouble(data[1]);
-            } else {
-                System.out.println("Error reading sensor value");
-            }
+    public void moveLocation(String nextMove) {
+        switch (nextMove.charAt(0)) {
+            case 'w':
+                moveLatitude(1.0f);
+                LOG.info("Move to North {}/{}", getLatitude(), getLongitude());
+                break;
+            case 'a':
+                moveLongitude(-1.0f);
+                LOG.info("Move to East {}/{}", getLatitude(), getLongitude());
+                break;
+            case 's':
+                moveLatitude(-1.0f);
+                LOG.info("Move to South {}/{}", getLatitude(), getLongitude());
+                break;
+            case 'd':
+                moveLongitude(1.0f);
+                LOG.info("Move to West {}/{}", getLatitude(), getLongitude());
+                break;
         }
-        bri.close();
-        p.waitFor();
+    }
 
-        fireResourcesChange(0, 1, 5);
+    private void moveLatitude(float delta) {
+        latitude = latitude + delta * scaleFactor;
+        timestamp = new Date();
+        fireResourcesChange(0, 5);
+    }
+
+    private void moveLongitude(float delta) {
+        longitude = longitude + delta * scaleFactor;
+        timestamp = new Date();
+        fireResourcesChange(1, 5);
     }
 
     public float getLatitude() {
-        return latitude;
+        return latitude - 90.0f;
     }
 
     public float getLongitude() {
-        return longitude;
+        return longitude - 180.f;
     }
 
     public Date getTimestamp() {
-        return new Date();
+        return timestamp;
     }
 
     @Override

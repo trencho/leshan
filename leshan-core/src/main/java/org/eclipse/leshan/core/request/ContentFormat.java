@@ -15,6 +15,8 @@
  *******************************************************************************/
 package org.eclipse.leshan.core.request;
 
+import org.eclipse.leshan.core.LwM2m.Version;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,8 +24,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import org.eclipse.leshan.core.LwM2m.Version;
 
 /**
  * Data format defined by the LWM2M specification
